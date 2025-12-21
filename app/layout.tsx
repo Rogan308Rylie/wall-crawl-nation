@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,10 +26,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    >
+      <nav style={{ padding: "16px", borderBottom: "1px solid white" }}>
+        <strong>Wall Crawl Nation</strong>
+        <Link href="/" style={{ marginLeft: "20px" }}>
+          Home
+        </Link>
+        <Link href="/shop" style={{ marginLeft: "12px" }}>
+          Shop
+        </Link>          
+        <Link href="/cart" style={{ marginLeft: "12px" }}>
+          Cart
+        </Link>
+      </nav>
+
+      <main style={{ padding: "24px" }}>
         {children}
-      </body>
+      </main>
+    </body>
+
     </html>
   );
 }
