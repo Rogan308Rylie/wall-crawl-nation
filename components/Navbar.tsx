@@ -30,12 +30,15 @@ export default function Navbar() {
           Shop
         </Link>
 
-        <Link
-          href="/cart"
-          className={pathname === "/cart" ? "underline font-semibold" : "hover:underline"}
-        >
-          Cart ({cartCount})
+        <Link href="/cart" className={`relative ${ pathname === "/cart" ? "font-semibold underline" : "hover:underline"}`}>
+            Cart
+            {cartCount > 0 && (
+            <span className="absolute -top-2 -right-4 bg-white text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                {cartCount}
+            </span>
+            )}
         </Link>
+
       </div>
     </nav>
   );

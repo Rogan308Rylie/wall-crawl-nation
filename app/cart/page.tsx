@@ -21,7 +21,7 @@ export default function CartPage() {
 
       <div className="space-y-4">
         {cart.map((item) => (
-          <div key={item.id} className="flex justify-between items-center border border-white p-4 rounded">
+          <div key={item.id} className="flex justify-between items-center border border-white p-5 rounded-lg bg-black/40">
             <div>
                 <h3 className="font-semibold">{item.title}</h3>
 
@@ -47,7 +47,7 @@ export default function CartPage() {
         ))}
       </div>
 
-      <div className="mt-6 text-right text-xl font-bold">
+      <div className="mt-8 text-right text-2xl font-extrabold">
         Total: ₹{totalAmount}
       </div>
 
