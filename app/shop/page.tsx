@@ -10,10 +10,12 @@ export default function ShopPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {posters.map((poster) => (
           <PosterCard
-            key={poster.id}
-            title={poster.title}
-            price={poster.price}
-          />
+          key={poster.id}
+          id={poster.id}
+          title={poster.title}
+          price={poster.price}
+        />
+
         ))}
       </div>
     </div>
