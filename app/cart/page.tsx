@@ -1,10 +1,21 @@
 "use client";
 
 import { useCart } from "../../context/CartContext";
+import { useEffect, useState } from "react";
+
 
 export default function CartPage() {
   const { cart, increaseQuantity, decreaseQuantity } = useCart();
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  if(!mounted) {
+    return null;
+  }
 
   if (cart.length === 0) {
     return (

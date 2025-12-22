@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type CartItem = {
   id: number;
@@ -20,7 +20,17 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("wall-crawl-cart");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
+    useEffect(() => {
+    localStorage.setItem("wall-crawl-cart", JSON.stringify(cart));
+  }, [cart]);
 
   function addToCart(item: Omit<CartItem, "quantity">) {
     setCart((prev) => {
