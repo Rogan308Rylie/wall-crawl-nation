@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import { CartProvider } from "../context/CartContext";
 
 
 const geistSans = Geist({
@@ -28,10 +29,12 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
       <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <Navbar />
-      <main className="p-6">
-        {children}
-      </main>
+      <CartProvider>
+        <Navbar />
+        <main className="p-6">
+          {children}
+        </main>
+      </CartProvider>
     </body>
 
     </html>
