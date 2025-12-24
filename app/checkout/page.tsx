@@ -8,14 +8,27 @@ export default function CheckoutPage() {
 
   const [mounted, setMounted] = useState(false);
   
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
   
+  const [address, setAddress] = useState({
+  fullName: "",
+  phone: "",
+  gender: "",
+  email: "",
+  hostelNumber: "",
+  roomNumber: "",
+  block: "",
+  additionalNotes: "",
+});
+
+    
+    useEffect(() => {
+      setMounted(true);
+    }, []);
+  
+    if (!mounted) {
+      return null;
+    }
+
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -31,24 +44,115 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-semibold mb-4">Delivery Details</h2>
 
           <form className="space-y-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="w-full p-3 border border-white bg-transparent rounded"
-            />
+  {/* Name */}
+  <input
+    type="text"
+    placeholder="Full Name"
+    required
+    value={address.fullName}
+    onChange={(e) =>
+      setAddress({ ...address, fullName: e.target.value })
+    }
+    className="w-full p-3 border border-white bg-transparent rounded"
+  />
 
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              className="w-full p-3 border border-white bg-transparent rounded"
-            />
+  {/* Phone */}
+  <input
+    type="tel"
+    placeholder="Contact Number"
+    required
+    value={address.phone}
+    onChange={(e) =>
+      setAddress({ ...address, phone: e.target.value })
+    }
+    className="w-full p-3 border border-white bg-transparent rounded"
+  />
 
-            <textarea
-              placeholder="Complete Address"
-              rows={4}
-              className="w-full p-3 border border-white bg-transparent rounded"
-            />
-          </form>
+  {/* Gender */}
+  <select
+    required
+    value={address.gender}
+    onChange={(e) =>
+      setAddress({ ...address, gender: e.target.value })
+    }
+    className={`w-full p-3 border border-white bg-black rounded ${ address.gender === "" ? "text-gray-400" : "text-white"}`}>
+        
+    <option value="" disabled className="text-gray-400">
+      Select Gender
+    </option>
+    <option value="female" className="bg-black text-white">
+      Female
+    </option>
+    <option value="male" className="bg-black text-white">
+      Male
+    </option>
+    <option value="other" className="bg-black text-white">
+      Other
+    </option>
+  </select>
+
+  {/* Email */}
+  <input
+    type="email"
+    placeholder="Email Address"
+    required
+    value={address.email}
+    onChange={(e) =>
+      setAddress({ ...address, email: e.target.value })
+    }
+    className="w-full p-3 border border-white bg-transparent rounded"
+  />
+
+  {/* Hostel Number */}
+  <input
+    type="text"
+    placeholder="Hostel Number"
+    required
+    value={address.hostelNumber}
+    onChange={(e) =>
+      setAddress({ ...address, hostelNumber: e.target.value })
+    }
+    className="w-full p-3 border border-white bg-transparent rounded"
+  />
+
+  {/* Room + Block */}
+  <div className="flex gap-4">
+    <input
+      type="text"
+      placeholder="Room Number"
+      required
+      value={address.roomNumber}
+      onChange={(e) =>
+        setAddress({ ...address, roomNumber: e.target.value })
+      }
+      className="w-full p-3 border border-white bg-transparent rounded"
+    />
+
+    <input
+      type="text"
+      placeholder="Block"
+      required
+      value={address.block}
+      onChange={(e) =>
+        setAddress({ ...address, block: e.target.value })
+      }
+      className="w-full p-3 border border-white bg-transparent rounded"
+    />
+  </div>
+
+  {/* Notes */}
+  <textarea
+    placeholder="Additional Notes (optional)"
+    value={address.additionalNotes}
+    onChange={(e) =>
+      setAddress({ ...address, additionalNotes: e.target.value })
+    }
+    rows={3}
+    className="w-full p-3 border border-white bg-transparent rounded"
+  />
+</form>
+
+
         </div>
 
         {/* Order Summary */}
