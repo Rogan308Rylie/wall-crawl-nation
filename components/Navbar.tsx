@@ -66,7 +66,7 @@ export default function Navbar() {
   )}
 
   {!loading && user && (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition">
   {user.photoURL ? (
     <img
       src={user.photoURL}
@@ -83,14 +83,8 @@ export default function Navbar() {
   <span className="text-sm opacity-80 max-w-[140px] truncate">
     {user.displayName || user.email}
   </span>
-
-  <button
-    onClick={logout}
-    className="border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition"
-  >
-    Logout
-  </button>
 </div>
+
 
 
   )}
