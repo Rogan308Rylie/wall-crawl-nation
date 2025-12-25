@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function SignupPage() {
-  const { signup, loginWithGoogle } = useAuth();
+export default function LoginPage() {
+  const { login, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -13,64 +13,52 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSignup(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
     try {
       setLoading(true);
-      await signup(email, password);
+      await login(email, password);
       router.push("/");
     } catch (err: any) {
-      setError(err.message || "Failed to create account.");
+      setError("Invalid email or password.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleGoogleSignup() {
-  try {
-    setLoading(true);
-    await loginWithGoogle();
-    router.push("/");
-  } catch (err: any) {
-    setError(err.message || "Google sign-in failed.");
-  } finally {
-    setLoading(false);
+  async function handleGoogleLogin() {
+    try {
+      setLoading(true);
+      await loginWithGoogle();
+      router.push("/");
+    } catch (err: any) {
+      setError("Google sign-in failed.");
+    } finally {
+      setLoading(false);
+    }
   }
-}
-
 
   return (
     <div className="max-w-md mx-auto mt-20 border border-white rounded-lg p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">
-        Create Account
+        Welcome Back
       </h1>
 
       <button
-        onClick={handleGoogleSignup}
+        onClick={handleGoogleLogin}
         disabled={loading}
-        className="w-full mb-4 py-3 border border-white rounded flex items-center justify-center gap-3 hover:bg-white hover:text-black transition disabled:opacity-50"
-        >
-        <span className="font-semibold">Continue with Google</span>
+        className="w-full mb-4 py-3 border border-white rounded hover:bg-white hover:text-black transition disabled:opacity-50"
+      >
+        Continue with Google
       </button>
 
-<div className="text-center text-sm opacity-70 mb-4">
-  or continue with email
-</div>
+      <div className="text-center text-sm opacity-70 mb-4">
+        or continue with email
+      </div>
 
-
-      <form onSubmit={handleSignup} className="space-y-4">
+      <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"
           placeholder="Email"
@@ -98,7 +86,7 @@ export default function SignupPage() {
           disabled={loading}
           className="w-full py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition disabled:opacity-50"
         >
-          {loading ? "Creating account..." : "Sign Up"}
+          {loading ? "Signing in..." : "Login"}
         </button>
       </form>
     </div>
