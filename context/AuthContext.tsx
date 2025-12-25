@@ -18,17 +18,18 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-
+import { updateProfile } from "firebase/auth";
 import app from "@/lib/firebase";
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 };
+
 
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -48,9 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, [auth]);
 
-  async function signup(email: string, password: string) {
-    await createUserWithEmailAndPassword(auth, email, password);
-  }
+  async function signup(email: string, password: string, name: string) {
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  await updateProfile(result.user, {
+    displayName: name,
+  });
+}
+
 
   async function login(email: string, password: string) {
     await signInWithEmailAndPassword(auth, email, password);

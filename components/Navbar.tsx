@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+
 
 export default function Navbar() {
     const pathname = usePathname();
     const { cart } = useCart();
+    const { user, logout, loading } = useAuth();
     const[mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -45,6 +48,37 @@ export default function Navbar() {
 
         </Link>
 
+        {!loading && !user && (
+    <>
+      <Link
+        href="/login"
+        className="hover:underline"
+      >
+        Login
+      </Link>
+      <Link
+        href="/signup"
+        className="border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition"
+      >
+        Sign Up
+      </Link>
+    </>
+  )}
+
+  {!loading && user && (
+    <div className="flex items-center gap-4">
+      <span className="text-sm opacity-80">
+        {user.displayName || user.email}
+      </span>
+      <button
+        onClick={logout}
+        className="border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition"
+      >
+        Logout
+      </button>
+    </div>
+
+  )}
       </div>
     </nav>
   );

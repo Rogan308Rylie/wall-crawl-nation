@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function SignupPage() {
   const { signup, loginWithGoogle } = useAuth();
   const router = useRouter();
-
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ export default function SignupPage() {
 
     try {
       setLoading(true);
-      await signup(email, password);
+      await signup(email, password, name);
       router.push("/");
     } catch (err: any) {
       setError(err.message || "Failed to create account.");
@@ -71,6 +71,16 @@ export default function SignupPage() {
 
 
       <form onSubmit={handleSignup} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Full Name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full p-3 border border-white bg-transparent rounded"
+        />  
+
+
         <input
           type="email"
           placeholder="Email"
