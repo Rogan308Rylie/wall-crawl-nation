@@ -4,7 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import { CartProvider } from "../context/CartContext";
-
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,15 +27,18 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
   return (
     <html lang="en">
       <body
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-    >
-      <CartProvider>
-        <Navbar />
-        <main className="p-6">
-          {children}
-        </main>
-      </CartProvider>
-    </body>
+  className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+>
+  <AuthProvider>
+    <CartProvider>
+      <Navbar />
+      <main className="p-6">
+        {children}
+      </main>
+    </CartProvider>
+  </AuthProvider>
+</body>
+
 
     </html>
   );
