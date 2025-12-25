@@ -1,25 +1,19 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  User,
-} from "firebase/auth";
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
+import { createContext, useContext, useEffect, useState, } from "react";
+
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User,} from "firebase/auth";
+
+import { GoogleAuthProvider, signInWithPopup,} from "firebase/auth";
+
 import { updateProfile } from "firebase/auth";
+
 import app from "@/lib/firebase";
+
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+
+import { db } from "@/lib/firebase";
+
 
 type AuthContextType = {
   user: User | null;
@@ -49,21 +43,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, [auth]);
 
-  async function signup(email: string, password: string, name: string) {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(result.user, {
-    displayName: name,
-  });
+  async function saveUserProfile(user: any) {
+  const userRef = doc(db, "users", user.uid);
+
+  await setDoc(
+    userRef,
+    {
+      uid: user.uid,
+      name: user.displayName || "",
+      email: user.email || "",
+      photoURL: user.photoURL || "",
+      provider: user.providerData[0]?.providerId || "password",
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
 }
 
+  async function signup(email: string, password: string, name: string) {
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  await updateProfile(result.user, { displayName: name,});
+  await saveUserProfile({ ...result.user, displayName: name });
+}
 
   async function login(email: string, password: string) {
+    const result = await signInWithEmailAndPassword(auth, email, password);
     await signInWithEmailAndPassword(auth, email, password);
+    await saveUserProfile(result.user);
   }
 
   async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(auth, provider);
   await signInWithPopup(auth, provider);
+  await saveUserProfile(result.user);
 }
 
   async function logout() {

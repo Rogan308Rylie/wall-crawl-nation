@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export default function SignupPage() {
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup, loginWithGoogle, user } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,13 +43,21 @@ export default function SignupPage() {
   try {
     setLoading(true);
     await loginWithGoogle();
-    router.push("/");
   } catch (err: any) {
-    setError(err.message || "Google sign-in failed.");
-  } finally {
+  if (err.code !== "auth/popup-closed-by-user") {
+    setError("Google sign-in failed.");
+  }
+}
+ finally {
     setLoading(false);
   }
 }
+
+useEffect(() => {
+  if (user) {
+    router.push("/");
+  }
+}, [user, router]);
 
 
   return (
