@@ -2,23 +2,39 @@
 
 import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
+import { DeliveryAddress, Order } from "@/types/order";
+
+type AddressFormState = {
+  fullName: string;
+  phone: string;
+  email: string;
+  hostelNumber: string;
+  roomNumber: string;
+  block: string;
+  gender: "" | "male" | "female" | "other";
+  additionalNotes: string;
+};
+
+
 
 export default function CheckoutPage() {
-  const { cart } = useCart();
+  const { cart, clearCart } = useCart();
 
   const [mounted, setMounted] = useState(false);
   
   
-  const [address, setAddress] = useState({
+  const [address, setAddress] = useState<AddressFormState>({
   fullName: "",
   phone: "",
-  gender: "",
   email: "",
   hostelNumber: "",
   roomNumber: "",
   block: "",
+  gender: "",        // ✅ truly empty initially
   additionalNotes: "",
 });
+
+
 
     
     useEffect(() => {
@@ -33,6 +49,45 @@ export default function CheckoutPage() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  function placeOrder() {
+    if (cart.length === 0) {
+      alert("Your cart is empty. Please add items before checking out.");
+      return;
+    }
+  
+    if (
+    !address.fullName ||
+    !address.phone ||
+    !address.email ||
+    !address.hostelNumber ||
+    !address.roomNumber ||
+    !address.block ||
+    !address.gender
+  ) {
+    alert("Please fill in all required delivery details.");
+    return;
+  }
+
+  const deliveryAddress: DeliveryAddress = {
+    ...address,
+    gender: address.gender as "male" | "female" | "other",
+  };
+
+  const order: Order = {
+    orderId: crypto.randomUUID(),
+    items: cart,
+    totalAmount,
+    deliveryAddress,
+    status: "pending",
+    createdAt: Date.now(),
+  };
+
+  console.log("ORDER PLACED:", order);
+  alert("Order placed successfully! 🎉");
+  clearCart();
+  }
+
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -73,7 +128,7 @@ export default function CheckoutPage() {
     required
     value={address.gender}
     onChange={(e) =>
-      setAddress({ ...address, gender: e.target.value })
+      setAddress({ ...address, gender: e.target.value as AddressFormState["gender"] })
     }
     className={`w-full p-3 border border-white bg-black rounded ${ address.gender === "" ? "text-gray-400" : "text-white"}`}>
         
@@ -105,18 +160,21 @@ export default function CheckoutPage() {
 
   {/* Hostel Number */}
   <input
-    type="text"
-    placeholder="Hostel Number"
-    required
-    value={address.hostelNumber}
-    onChange={(e) =>
-      setAddress({ ...address, hostelNumber: e.target.value })
-    }
-    className="w-full p-3 border border-white bg-transparent rounded"
-  />
+  type="text"
+  placeholder="Hostel Number"
+  required
+  inputMode="numeric"
+  pattern="[0-9]*"
+  value={address.hostelNumber}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setAddress({ ...address, hostelNumber: value });
+  }}
+  className="w-full p-3 border border-white bg-transparent rounded"
+/>
+
 
   {/* Room + Block */}
-  <div className="flex gap-4">
     <input
       type="text"
       placeholder="Room Number"
@@ -129,16 +187,20 @@ export default function CheckoutPage() {
     />
 
     <input
-      type="text"
-      placeholder="Block"
-      required
-      value={address.block}
-      onChange={(e) =>
-        setAddress({ ...address, block: e.target.value })
-      }
-      className="w-full p-3 border border-white bg-transparent rounded"
-    />
-  </div>
+  type="text"
+  placeholder="Block"
+  required
+  maxLength={1}
+  value={address.block}
+  onChange={(e) => {
+    const value = e.target.value
+      .replace(/[^a-zA-Z]/g, "")
+      .toUpperCase();
+    setAddress({ ...address, block: value });
+  }}
+  className="w-full p-3 border border-white bg-transparent rounded"
+/>
+
 
   {/* Notes */}
   <textarea
@@ -150,7 +212,7 @@ export default function CheckoutPage() {
     rows={3}
     className="w-full p-3 border border-white bg-transparent rounded"
   />
-</form>
+          </form>
 
 
         </div>
@@ -176,10 +238,11 @@ export default function CheckoutPage() {
 
             <button
               type="button"
+              onClick={placeOrder}
               className="w-full mt-4 py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition"
             >
-              Place Order
-            </button>
+            Place Order
+           </button>
           </div>
         </div>
       </div>
