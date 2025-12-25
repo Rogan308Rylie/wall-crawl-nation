@@ -66,17 +66,32 @@ export default function Navbar() {
   )}
 
   {!loading && user && (
-    <div className="flex items-center gap-4">
-      <span className="text-sm opacity-80">
-        {user.displayName || user.email}
-      </span>
-      <button
-        onClick={logout}
-        className="border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition"
-      >
-        Logout
-      </button>
+    <div className="flex items-center gap-3">
+  {user.photoURL ? (
+    <img
+      src={user.photoURL}
+      alt={user.displayName || "User"}
+      className="w-8 h-8 rounded-full object-cover border border-white"
+      referrerPolicy="no-referrer"
+    />
+  ) : (
+    <div className="w-8 h-8 rounded-full border border-white flex items-center justify-center text-xs font-semibold">
+      {(user.displayName || user.email || "U")[0].toUpperCase()}
     </div>
+  )}
+
+  <span className="text-sm opacity-80 max-w-[140px] truncate">
+    {user.displayName || user.email}
+  </span>
+
+  <button
+    onClick={logout}
+    className="border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition"
+  >
+    Logout
+  </button>
+</div>
+
 
   )}
       </div>
