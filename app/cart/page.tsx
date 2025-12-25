@@ -2,12 +2,16 @@
 
 import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 
 export default function CartPage() {
   const { cart, increaseQuantity, decreaseQuantity } = useCart();
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
 
   useEffect(() => {
     setMounted(true);
@@ -61,6 +65,16 @@ export default function CartPage() {
       <div className="mt-8 text-right text-2xl font-extrabold">
         Total: ₹{totalAmount}
       </div>
+
+      {cart.length > 0 && (
+     <button
+       onClick={() => router.push("/checkout")}
+       className="w-full mt-6 py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition"
+     >
+       Proceed to Checkout
+     </button>
+)}
+
 
     </div>
   );
