@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [auth]);
 
   async function saveUserProfile(user: any) {
+    if (!user) return;
   const userRef = doc(db, "users", user.uid);
 
   await setDoc(
@@ -68,14 +69,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function login(email: string, password: string) {
     const result = await signInWithEmailAndPassword(auth, email, password);
-    await signInWithEmailAndPassword(auth, email, password);
     await saveUserProfile(result.user);
   }
 
   async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
-  await signInWithPopup(auth, provider);
   await saveUserProfile(result.user);
 }
 
