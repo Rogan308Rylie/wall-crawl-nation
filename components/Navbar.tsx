@@ -12,11 +12,25 @@ export default function Navbar() {
     const { cart } = useCart();
     const { user, logout, loading } = useAuth();
     const[mounted, setMounted] = useState(false);
-
+    
     useEffect(() => {
         setMounted(true);
     }, []);
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+
+    // Logout shortcut for devs: Ctrl + Shift + L
+    useEffect(() => {
+  function handleKey(e: KeyboardEvent) {
+    if (e.ctrlKey && e.shiftKey && e.key === "L") {
+      logout();
+      console.log("Logged out (dev shortcut)");
+    }
+  }
+
+  window.addEventListener("keydown", handleKey);
+  return () => window.removeEventListener("keydown", handleKey);
+}, [logout]);
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-white">

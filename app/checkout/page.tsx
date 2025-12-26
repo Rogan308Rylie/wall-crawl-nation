@@ -3,6 +3,11 @@
 import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
 import { DeliveryAddress, Order } from "@/types/order";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
 
 type AddressFormState = {
   fullName: string;
@@ -19,11 +24,12 @@ type AddressFormState = {
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
-
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [placing, setPlacing] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  
-  const [address, setAddress] = useState<AddressFormState>({
+const initialAddressState: AddressFormState = {
   fullName: "",
   phone: "",
   email: "",
@@ -32,16 +38,24 @@ export default function CheckoutPage() {
   block: "",
   gender: "",        // ✅ truly empty initially
   additionalNotes: "",
-});
+};
 
+  const [address, setAddress] = useState<AddressFormState>(initialAddressState);
 
 
     
     useEffect(() => {
       setMounted(true);
     }, []);
+
+    useEffect(() => {
+  if (!loading && !user) {
+    router.replace("/login");
+  }
+}, [user, loading, router]);
+
   
-    if (!mounted) {
+    if (!mounted || loading || !user) {
       return null;
     }
 
@@ -50,43 +64,57 @@ export default function CheckoutPage() {
     0
   );
 
-  function placeOrder() {
-    if (cart.length === 0) {
-      alert("Your cart is empty. Please add items before checking out.");
-      return;
-    }
-  
-    if (
-    !address.fullName ||
-    !address.phone ||
-    !address.email ||
-    !address.hostelNumber ||
-    !address.roomNumber ||
-    !address.block ||
-    !address.gender
-  ) {
-    alert("Please fill in all required delivery details.");
+  async function placeOrder() {
+  if (!user) return;
+
+  if (cart.length === 0) {
+    alert("Your cart is empty.");
     return;
   }
 
-  const deliveryAddress: DeliveryAddress = {
-    ...address,
-    gender: address.gender as "male" | "female" | "other",
-  };
+  // basic validation (UI already does required, but backend must double-check)
+  if (
+    !address.fullName ||
+    !address.phone ||
+    !address.gender ||
+    !address.email ||
+    !address.hostelNumber ||
+    !address.roomNumber ||
+    !address.block
+  ) {
+    alert("Please fill all required delivery details.");
+    return;
+  }
 
-  const order: Order = {
-    orderId: crypto.randomUUID(),
+  const orderId = crypto.randomUUID();
+
+  const order = {
+    orderId,
+    userId: user.uid,
     items: cart,
     totalAmount,
-    deliveryAddress,
+    deliveryAddress: address,
     status: "pending",
-    createdAt: Date.now(),
+    paymentStatus: "unpaid",
+    createdAt: serverTimestamp(),
   };
+  setPlacing(true);
+  try {
+    await setDoc(doc(db, "orders", orderId), order);
 
-  console.log("ORDER PLACED:", order);
-  alert("Order placed successfully! 🎉");
-  clearCart();
+    clearCart();
+    setAddress(initialAddressState);
+    alert("Order placed successfully!");
+    router.push("/");
+  } catch (error) {
+    console.error("Order failed:", error);
+    alert("Failed to place order. Please try again.");
   }
+  finally {
+    setPlacing(false);
+  }
+}
+
 
 
   return (
@@ -173,7 +201,8 @@ export default function CheckoutPage() {
   className="w-full p-3 border border-white bg-transparent rounded"
 />
 
-
+<div className="flex gap-4">
+  
   {/* Room + Block */}
     <input
       type="text"
@@ -200,6 +229,8 @@ export default function CheckoutPage() {
   }}
   className="w-full p-3 border border-white bg-transparent rounded"
 />
+
+</div>
 
 
   {/* Notes */}
@@ -239,9 +270,10 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={placeOrder}
-              className="w-full mt-4 py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition"
+              disabled={placing}
+              className={`w-full mt-4 py-3 bg-white text-black font-semibold rounded transition ${ placing ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
             >
-            Place Order
+            {placing ? "Placing Order..." : "Place Order"}
            </button>
           </div>
         </div>
