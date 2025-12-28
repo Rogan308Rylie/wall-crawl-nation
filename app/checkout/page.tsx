@@ -63,8 +63,26 @@ const initialAddressState: AddressFormState = {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+  
+  async function createRazorpayOrder(amount: number, orderId: string) {
+  const res = await fetch("/api/razorpay/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, orderId }),
+  });
 
-  async function placeOrder() {
+  if (!res.ok) {
+    throw new Error("Failed to create Razorpay order");
+  }
+
+  return res.json();
+}
+
+console.log("NEW RAZORPAY PLACE ORDER CALLED");
+
+throw new Error("SHOULD CRASH IF NEW CODE IS RUNNING");
+
+async function placeOrder() {
   if (!user) return;
 
   if (cart.length === 0) {
@@ -72,7 +90,6 @@ const initialAddressState: AddressFormState = {
     return;
   }
 
-  // basic validation (UI already does required, but backend must double-check)
   if (
     !address.fullName ||
     !address.phone ||
@@ -86,34 +103,61 @@ const initialAddressState: AddressFormState = {
     return;
   }
 
+  setPlacing(true);
+
   const orderId = crypto.randomUUID();
 
-  const order = {
-    orderId,
-    userId: user.uid,
-    items: cart,
-    totalAmount,
-    deliveryAddress: address,
-    status: "pending",
-    paymentStatus: "unpaid",
-    createdAt: serverTimestamp(),
-  };
-  setPlacing(true);
   try {
-    await setDoc(doc(db, "orders", orderId), order);
+    // 1️⃣ Create internal order (UNPAID)
+    await setDoc(doc(db, "orders", orderId), {
+      orderId,
+      userId: user.uid,
+      items: cart,
+      totalAmount,
+      deliveryAddress: address,
+      status: "pending",
+      paymentStatus: "created",
+      createdAt: serverTimestamp(),
+    });
 
-    clearCart();
-    setAddress(initialAddressState);
-    alert("Order placed successfully!");
-    router.push("/");
-  } catch (error) {
-    console.error("Order failed:", error);
-    alert("Failed to place order. Please try again.");
-  }
-  finally {
+    // 2️⃣ Create Razorpay order (SERVER)
+    const razorpayOrder = await createRazorpayOrder(
+      totalAmount,
+      orderId
+    );
+
+    // 3️⃣ Open Razorpay Checkout (CLIENT)
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // we'll add this next
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      name: "Wall Crawl Nation",
+      description: "Order Payment",
+      order_id: razorpayOrder.razorpayOrderId,
+      handler: function (response: any) {
+        // ❗ DO NOTHING YET
+        // Verification comes in next step
+        console.log("Payment response:", response);
+      },
+      prefill: {
+        name: address.fullName,
+        email: address.email,
+        contact: address.phone,
+      },
+      theme: { color: "#ffffff" },
+    };
+
+    // @ts-ignore
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    console.error(err);
+    alert("Payment initialization failed");
+  } finally {
     setPlacing(false);
   }
 }
+
 
 
 

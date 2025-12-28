@@ -36,6 +36,8 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
         {children}
       </main>
     </CartProvider>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" async/>
+
   </AuthProvider>
 </body>
 
