@@ -80,8 +80,6 @@ const initialAddressState: AddressFormState = {
 
 console.log("NEW RAZORPAY PLACE ORDER CALLED");
 
-throw new Error("SHOULD CRASH IF NEW CODE IS RUNNING");
-
 async function placeOrder() {
   if (!user) return;
 
