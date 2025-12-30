@@ -132,11 +132,32 @@ async function placeOrder() {
       name: "Wall Crawl Nation",
       description: "Order Payment",
       order_id: razorpayOrder.razorpayOrderId,
-      handler: function (response: any) {
-        // ❗ DO NOTHING YET
-        // Verification comes in next step
-        console.log("Payment response:", response);
-      },
+      handler: async function (response: any) {
+  try {
+    const verifyRes = await fetch("/api/razorpay/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        orderId, // same internal orderId
+      }),
+    });
+
+    if (!verifyRes.ok) {
+      throw new Error("Payment verification failed");
+    }
+
+    // ✅ VERIFIED — now we finalize UX
+    clearCart();
+    router.push("/thank-you");
+  } catch (err) {
+    console.error(err);
+    alert("Payment verification failed. Please contact support.");
+  }
+},
+
       prefill: {
         name: address.fullName,
         email: address.email,
@@ -155,9 +176,6 @@ async function placeOrder() {
     setPlacing(false);
   }
 }
-
-
-
 
   return (
     <div className="max-w-4xl mx-auto">
