@@ -1,10 +1,9 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import crypto from "crypto";
-import { adminDb } from "@/lib/firebaseAdmin";
+import * as crypto from "crypto";
 import admin from "firebase-admin";
-
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +13,7 @@ export async function POST(req: Request) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      orderId, // your internal orderId
+      orderId,
     } = body;
 
     if (
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔐 Create expected signature
+    // 🔐 STEP 1: Verify Razorpay signature
     const signBody = `${razorpay_order_id}|${razorpay_payment_id}`;
 
     const expectedSignature = crypto
@@ -38,28 +37,34 @@ export async function POST(req: Request) {
       .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
+      console.error("❌ Signature mismatch");
       return NextResponse.json(
         { error: "Invalid payment signature" },
         { status: 400 }
       );
     }
 
-    // ✅ Signature valid → mark order PAID
-    await adminDb.collection("orders").doc(orderId).update({
-  paymentStatus: "paid",
-  status: "confirmed",
-  razorpay: {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-  },
-  paidAt: admin.firestore.FieldValue.serverTimestamp(),
-});
+    console.log("✅ Razorpay signature verified");
 
+    // 📝 STEP 2: Update order using Admin SDK (bypasses rules)
+    console.log("📝 Updating order via Admin SDK:", orderId);
+
+    await adminDb.collection("orders").doc(orderId).update({
+      paymentStatus: "paid",
+      status: "confirmed",
+      razorpay: {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      },
+      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log("✅ Order marked paid in Firestore");
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Payment verification failed:", error);
+    console.error("❌ Verify-payment failed:", error);
     return NextResponse.json(
       { error: "Payment verification failed" },
       { status: 500 }
