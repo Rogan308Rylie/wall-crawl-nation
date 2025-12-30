@@ -2,8 +2,9 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebaseAdmin";
+import admin from "firebase-admin";
+
 
 export async function POST(req: Request) {
   try {
@@ -44,18 +45,17 @@ export async function POST(req: Request) {
     }
 
     // ✅ Signature valid → mark order PAID
-    const orderRef = doc(db, "orders", orderId);
+    await adminDb.collection("orders").doc(orderId).update({
+  paymentStatus: "paid",
+  status: "confirmed",
+  razorpay: {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  },
+  paidAt: admin.firestore.FieldValue.serverTimestamp(),
+});
 
-    await updateDoc(orderRef, {
-      paymentStatus: "paid",
-      status: "confirmed",
-      razorpay: {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-      },
-      paidAt: serverTimestamp(),
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
