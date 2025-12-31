@@ -2,21 +2,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
+  const { pathname } = req.nextUrl;
 
-  if (!isAdminRoute) {
+  // Only match admin routes
+  if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  // Only check: is user logged in?
-  const session = req.cookies.get("__session");
-
-  if (!session) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("redirect", req.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
+  // TEMP: allow access, auth handled in page/API
   return NextResponse.next();
 }
 

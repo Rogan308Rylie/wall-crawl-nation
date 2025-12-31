@@ -63,20 +63,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signup(email: string, password: string, name: string) {
   const result = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(result.user, { displayName: name,});
+
+  await updateProfile(result.user, { displayName: name });
   await saveUserProfile({ ...result.user, displayName: name });
+
+  // 🔐 CREATE SESSION COOKIE
+  const idToken = await result.user.getIdToken();
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
 }
 
+
   async function login(email: string, password: string) {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    await saveUserProfile(result.user);
-  }
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  await saveUserProfile(result.user);
+
+  // 🔐 CREATE SESSION COOKIE
+  const idToken = await result.user.getIdToken();
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+}
+
 
   async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
   await saveUserProfile(result.user);
+
+  // 🔐 CREATE SESSION COOKIE
+  const idToken = await result.user.getIdToken();
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
 }
+
 
   async function logout() {
     await signOut(auth);
