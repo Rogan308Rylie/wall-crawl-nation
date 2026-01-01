@@ -1,31 +1,19 @@
 import { NextResponse } from "next/server";
-import admin from "@/lib/firebaseAdmin";
+import { cookies } from "next/headers";
+import { getAdminAuth } from "@/lib/firebaseAdmin";
 
-export async function POST(req: Request) {
-  const { idToken } = await req.json();
+export async function GET() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("__session")?.value;
 
-  if (!idToken) {
-    return NextResponse.json(
-      { error: "Missing ID token" },
-      { status: 400 }
-    );
+  if (!session) {
+    return NextResponse.json({ user: null });
   }
 
-  const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-
-  const sessionCookie = await admin
-    .auth()
-    .createSessionCookie(idToken, { expiresIn });
-
-  const response = NextResponse.json({ success: true });
-
-  response.cookies.set("__session", sessionCookie, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: expiresIn / 1000,
-  });
-
-  return response;
+  try {
+    const decoded = await getAdminAuth().verifySessionCookie(session, true);
+    return NextResponse.json({ user: decoded });
+  } catch {
+    return NextResponse.json({ user: null });
+  }
 }

@@ -1,45 +1,25 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin";
-import { isAdmin } from "@/lib/isAdmin";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 
-export async function GET(req: Request) {
-  const allowed = await isAdmin(req);
-  if (!allowed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET() {
+  try {
+    const adminDb = await getAdminDb();
+    const snapshot = await adminDb
+      .collection("orders")
+      .orderBy("createdAt", "desc")
+      .get();
 
-  const snapshot = await adminDb
-    .collection("orders")
-    .orderBy("paidAt", "desc")
-    .get();
+    const orders = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-  const orders = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-
-  return NextResponse.json(orders);
-}
-
-export async function PATCH(req: Request) {
-  const allowed = await isAdmin(req);
-  if (!allowed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { orderId, status } = await req.json();
-
-  if (!orderId || !status) {
+    return NextResponse.json(orders);
+  } catch (error) {
+    console.error("Failed to fetch admin orders:", error);
     return NextResponse.json(
-      { error: "Missing orderId or status" },
-      { status: 400 }
+      { error: "Failed to fetch orders" },
+      { status: 500 }
     );
   }
-
-  await adminDb.collection("orders").doc(orderId).update({
-    status,
-    updatedAt: new Date(),
-  });
-
-  return NextResponse.json({ success: true });
 }

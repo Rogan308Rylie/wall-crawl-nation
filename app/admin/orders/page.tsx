@@ -1,45 +1,71 @@
-// app/admin/orders/page.tsx
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
 
 type Order = {
+  id: string;
   orderId: string;
   totalAmount: number;
+  paymentStatus: string;
   status: string;
+  items: {
+    title: string;
+    quantity: number;
+    price: number;
+  }[];
 };
 
-export default async function AdminOrdersPage() {
-  const headersList = headers();
-  const host = (await headersList).get("host");
+export default function AdminOrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!host) redirect("/");
+  useEffect(() => {
+    async function loadOrders() {
+      const res = await fetch("/api/admin/orders", {
+        cache: "no-store",
+      });
 
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-  const baseUrl = `${protocol}://${host}`;
+      const data = await res.json();
 
-  const res = await fetch(`${baseUrl}/api/admin/orders`, {
-    cache: "no-store",
-  });
+      // ✅ YOUR API RETURNS AN ARRAY DIRECTLY
+      setOrders(data);
+      setLoading(false);
+    }
 
-  if (!res.ok) redirect("/");
+    loadOrders();
+  }, []);
 
-  const orders: Order[] = await res.json();
+  if (loading) return <p>Loading orders…</p>;
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Admin Orders</h1>
+    <div>
+      <h1>Orders</h1>
 
       {orders.length === 0 && <p>No orders found.</p>}
 
-      <ul>
-        {orders.map((order) => (
-          <li key={order.orderId} style={{ marginBottom: "1rem" }}>
-            <strong>Order ID:</strong> {order.orderId} <br />
-            <strong>Amount:</strong> ₹{order.totalAmount} <br />
-            <strong>Status:</strong> {order.status}
-          </li>
-        ))}
-      </ul>
+      {orders.map((order) => (
+        <div
+          key={order.id}
+          style={{
+            border: "1px solid #444",
+            padding: "12px",
+            marginBottom: "12px",
+          }}
+        >
+          <p><strong>Order ID:</strong> {order.orderId}</p>
+          <p><strong>Status:</strong> {order.status}</p>
+          <p><strong>Payment:</strong> {order.paymentStatus}</p>
+          <p><strong>Total:</strong> ₹{order.totalAmount}</p>
+
+          <ul>
+            {order.items.map((item, i) => (
+              <li key={i}>
+                {item.title} × {item.quantity} (₹{item.price})
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }

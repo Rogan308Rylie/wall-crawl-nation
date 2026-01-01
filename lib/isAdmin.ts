@@ -1,20 +1,15 @@
-import { adminAuth, adminDb } from "./firebaseAdmin";
+// lib/isAdmin.ts
+import { getAdminAuth, getAdminDb } from "./firebaseAdmin";
 
-export async function isAdmin(req: Request): Promise<boolean> {
-  try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) return false;
+export async function isAdminFromRequest(req: Request) {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) return false;
 
-    const token = authHeader.split("Bearer ")[1];
+  const token = authHeader.split("Bearer ")[1];
 
-    const decoded = await adminAuth.verifyIdToken(token);
-    const uid = decoded.uid;
+  const decoded = await getAdminAuth().verifyIdToken(token);
+  const uid = decoded.uid;
 
-    const userSnap = await adminDb.collection("users").doc(uid).get();
-
-    return userSnap.exists && userSnap.data()?.role === "admin";
-  } catch (err) {
-    console.error("isAdmin check failed:", err);
-    return false;
-  }
+  const snap = await getAdminDb().collection("users").doc(uid).get();
+  return snap.exists && snap.data()?.role === "admin";
 }
