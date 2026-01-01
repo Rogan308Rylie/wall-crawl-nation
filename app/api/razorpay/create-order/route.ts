@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       amount: amount * 100,
       currency: "INR",
       receipt: orderId,
+      notes : { orderId: orderId },
     });
 
     return NextResponse.json({
