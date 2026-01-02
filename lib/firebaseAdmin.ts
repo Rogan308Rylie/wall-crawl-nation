@@ -1,31 +1,15 @@
-// lib/firebaseAdmin.ts
-import admin from "firebase-admin";
+import { getApps, initializeApp, cert } from "firebase-admin/app";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
 
-let app: admin.app.App | null = null;
-
-export function getAdminApp() {
-  if (!app) {
-    const base64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-    if (!base64) {
-      throw new Error("Missing FIREBASE_SERVICE_ACCOUNT_BASE64");
-    }
-
-    const serviceAccount = JSON.parse(
-      Buffer.from(base64, "base64").toString("utf8")
-    );
-
-    app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-  }
-
-  return app;
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+  });
 }
 
-export function getAdminDb() {
-  return getAdminApp().firestore();
-}
-
-export function getAdminAuth() {
-  return getAdminApp().auth();
-}
+// ✅ Export Firestore INSTANCE (not a function)
+export const adminDb: Firestore = getFirestore();

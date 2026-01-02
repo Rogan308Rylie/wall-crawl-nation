@@ -1,83 +1,69 @@
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import admin from "firebase-admin";
-import { getAdminDb } from "@/lib/firebaseAdmin";
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export async function POST(req: Request) {
   try {
-    // 1️⃣ Read raw body (Razorpay requires raw payload for signature)
-    const rawBody = await req.text();
+    const bodyText = await req.text();
     const signature = req.headers.get("x-razorpay-signature");
 
     if (!signature) {
-      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+      return NextResponse.json({ received: true });
     }
 
-    // 2️⃣ Verify webhook signature
+    // 1️⃣ Verify webhook signature
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
-      .update(rawBody)
+      .update(bodyText)
       .digest("hex");
 
     if (expectedSignature !== signature) {
-      console.error("❌ Webhook signature mismatch");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+      return NextResponse.json({ received: true });
     }
 
-    // 3️⃣ Parse payload AFTER verification
-    const payload = JSON.parse(rawBody);
+    const payload = JSON.parse(bodyText);
 
-    // We only care about successful payments
-    if (payload.event !== "payment.captured") {
-      return NextResponse.json({ ok: true });
+    // 2️⃣ Extract payment info safely
+    const paymentEntity = payload?.payload?.payment?.entity;
+    const razorpayOrderId = paymentEntity?.order_id;
+    const razorpayPaymentId = paymentEntity?.id;
+
+    if (!razorpayOrderId || !razorpayPaymentId) {
+      return NextResponse.json({ received: true });
     }
 
-    const payment = payload.payload.payment.entity;
-    const orderId = payment.notes?.orderId;
+    // 3️⃣ Find order by razorpayOrderId
+    const snapshot = await adminDb
+      .collection("orders")
+      .where("razorpayOrderId", "==", razorpayOrderId)
+      .limit(1)
+      .get();
 
-    if (!orderId) {
-      console.warn("⚠️ orderId missing in webhook notes");
-      return NextResponse.json({ ok: true });
+    if (snapshot.empty) {
+      // Order not found — ACK webhook anyway
+      return NextResponse.json({ received: true });
     }
 
-    const razorpay_payment_id = payment.id;
-    const razorpay_order_id = payment.order_id;
+    const orderRef = snapshot.docs[0].ref;
+    const orderData = snapshot.docs[0].data();
 
-    // 4️⃣ Idempotency guard
-    const orderRef = getAdminDb().collection("orders").doc(orderId);
-    const orderSnap = await orderRef.get();
-
-    if (!orderSnap.exists) {
-      return NextResponse.json({ ok: true });
+    // 4️⃣ IDEMPOTENCY CHECK
+    if (orderData.status === "paid") {
+      return NextResponse.json({ received: true });
     }
 
-    const order = orderSnap.data();
-
-    // 🚫 If already paid, ignore replay
-    if (order?.paymentStatus === "paid") {
-      console.log("⚠️ Webhook replay ignored:", orderId);
-      return NextResponse.json({ ok: true });
-    }
-
-    // 5️⃣ Update order ONCE
+    // 5️⃣ Mark order as PAID (webhook confirmation)
     await orderRef.update({
-      paymentStatus: "paid",
-      status: "confirmed",
-      paidAt: admin.firestore.FieldValue.serverTimestamp(),
-      razorpay: {
-        razorpay_payment_id,
-        razorpay_order_id,
-      },
+      status: "paid",
+      razorpayPaymentId,
+      paidAt: new Date(),
     });
 
-    console.log("✅ Webhook processed:", orderId);
-
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error("❌ Webhook error:", error);
-    // Razorpay expects 200 even on internal errors (to avoid retries storm)
-    return NextResponse.json({ ok: true });
+    // 6️⃣ Always ACK webhook
+    return NextResponse.json({ received: true });
+  } catch (err) {
+    console.error("razorpay webhook error:", err);
+    // Never fail a webhook — Razorpay retries aggressively
+    return NextResponse.json({ received: true });
   }
 }

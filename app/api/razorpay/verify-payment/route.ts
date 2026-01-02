@@ -1,9 +1,6 @@
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
-import * as crypto from "crypto";
-import admin from "firebase-admin";
-import { getAdminDb } from "@/lib/firebaseAdmin";
+import crypto from "crypto";
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export async function POST(req: Request) {
   try {
@@ -13,9 +10,10 @@ export async function POST(req: Request) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      orderId,
+      orderId, // 🔑 internal Firestore orderId
     } = body;
 
+    // 1️⃣ Basic validation
     if (
       !razorpay_order_id ||
       !razorpay_payment_id ||
@@ -23,71 +21,60 @@ export async function POST(req: Request) {
       !orderId
     ) {
       return NextResponse.json(
-        { error: "Missing payment details" },
+        { success: false, error: "Missing payment details" },
         { status: 400 }
       );
     }
 
-    // 🔐 STEP 1: Verify Razorpay signature
-    const signBody = `${razorpay_order_id}|${razorpay_payment_id}`;
-
-    const expectedSignature = crypto
+    // 2️⃣ Verify Razorpay signature
+    const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-      .update(signBody)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
-      console.error("❌ Signature mismatch");
+    if (generatedSignature !== razorpay_signature) {
       return NextResponse.json(
-        { error: "Invalid payment signature" },
+        { success: false, error: "Invalid signature" },
         { status: 400 }
       );
     }
 
-    console.log("✅ Razorpay signature verified");
-
-    // 📝 STEP 2: Update order using Admin SDK (bypasses rules)
-    // 🔒 STEP 2.5: Fetch order & prevent double verification
-    const orderRef = getAdminDb().collection("orders").doc(orderId);
+    // 3️⃣ Fetch Firestore order by INTERNAL orderId
+    const orderRef = adminDb.collection("orders").doc(orderId);
     const orderSnap = await orderRef.get();
 
     if (!orderSnap.exists) {
       return NextResponse.json(
-        { error: "Order not found" },
+        { success: false, error: "Order not found" },
         { status: 404 }
       );
     }
 
-    const order = orderSnap.data();
+    const orderData = orderSnap.data();
 
-    // 🚫 HARD LOCK: block re-processing
-    if (order?.status !== "created") {
-      return NextResponse.json(
-        { error: "Order already processed" },
-        { status: 409 }
-      );
+    // 4️⃣ IDEMPOTENCY CHECK
+    if (orderData?.status === "paid") {
+      return NextResponse.json({
+        success: true,
+        alreadyPaid: true,
+      });
     }
 
-    console.log("📝 Updating order via Admin SDK:", orderId);
-
+    // 5️⃣ Mark order as PAID (first writer wins)
     await orderRef.update({
-      paymentStatus: "paid",
-      status: "confirmed",
-      razorpay: {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-      },
-      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+      status: "paid",
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+      paidAt: new Date(),
     });
 
-    console.log("✅ Order marked paid in Firestore");
-
+    // 6️⃣ Always return success to frontend
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("❌ Verify-payment failed:", error);
+  } catch (err) {
+    console.error("verify-payment error:", err);
     return NextResponse.json(
-      { error: "Payment verification failed" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

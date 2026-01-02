@@ -116,8 +116,7 @@ async function placeOrder() {
       items: cart,
       totalAmount,
       deliveryAddress: address,
-      status: "pending",
-      paymentStatus: "created",
+      status: "created",
       createdAt: serverTimestamp(),
     });
 
@@ -135,26 +134,30 @@ async function placeOrder() {
       name: "Wall Crawl Nation",
       description: "Order Payment",
       order_id: razorpayOrder.razorpayOrderId,
+
       handler: async function (rzpResponse: any) {
   try {
     const verifyRes = await fetch("/api/razorpay/verify-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...rzpResponse,
-        orderId,
-      }),
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...rzpResponse,
+    orderId,
+  }),
+});
 
-    if (!verifyRes.ok) {
-      throw new Error("Payment verification failed");
-    }
+const data = await verifyRes.json();
 
-    // ✅ CLEAR CART
-    clearCart();
+if (!verifyRes.ok || !data.success) {
+  throw new Error("Payment verification failed");
+}
 
-    // ✅ REDIRECT
-    router.push("/thank-you");
+// ✅ CLEAR CART
+clearCart();
+
+// ✅ REDIRECT
+router.replace("/thank-you");
+
   } catch (err) {
     console.error(err);
     alert("Payment succeeded but verification failed");
