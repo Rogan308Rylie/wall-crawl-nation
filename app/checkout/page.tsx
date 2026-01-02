@@ -64,19 +64,22 @@ const initialAddressState: AddressFormState = {
     0
   );
   
-  async function createRazorpayOrder(amount: number, orderId: string) {
-  const res = await fetch("/api/razorpay/create-order", {
+async function createRazorpayOrder(amount: number, orderId: string) {
+  const response = await fetch("/api/razorpay/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount, orderId }),
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to create Razorpay order");
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err || "Failed to create Razorpay order");
   }
 
-  return res.json();
+  return response.json();
 }
+
+
 
 console.log("NEW RAZORPAY PLACE ORDER CALLED");
 
@@ -132,16 +135,14 @@ async function placeOrder() {
       name: "Wall Crawl Nation",
       description: "Order Payment",
       order_id: razorpayOrder.razorpayOrderId,
-      handler: async function (response: any) {
+      handler: async function (rzpResponse: any) {
   try {
     const verifyRes = await fetch("/api/razorpay/verify-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_signature: response.razorpay_signature,
-        orderId, // same internal orderId
+        ...rzpResponse,
+        orderId,
       }),
     });
 
@@ -149,12 +150,14 @@ async function placeOrder() {
       throw new Error("Payment verification failed");
     }
 
-    // ✅ VERIFIED — now we finalize UX
+    // ✅ CLEAR CART
     clearCart();
+
+    // ✅ REDIRECT
     router.push("/thank-you");
   } catch (err) {
     console.error(err);
-    alert("Payment verification failed. Please contact support.");
+    alert("Payment succeeded but verification failed");
   }
 },
 
