@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
 
 export default function LoginPage() {
   const { login, loginWithGoogle, user } = useAuth();
@@ -35,17 +34,18 @@ export default function LoginPage() {
       await loginWithGoogle();
     } catch (err: any) {
       if (err.code !== "auth/popup-closed-by-user") {
-      setError("Google sign-in failed.");
-    }  } finally {
+        setError("Google sign-in failed.");
+      }
+    } finally {
       setLoading(false);
     }
   }
 
-    useEffect(() => {
-        if (user) {
-            router.push("/");
-        }
-    }, [user, router]);
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
     
   return (
     <div className="max-w-md mx-auto mt-20 border border-white rounded-lg p-6">

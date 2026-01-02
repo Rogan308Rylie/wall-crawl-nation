@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
 
 export default function SignupPage() {
   const { signup, loginWithGoogle, user } = useAuth();
@@ -40,24 +39,23 @@ export default function SignupPage() {
   }
 
   async function handleGoogleSignup() {
-  try {
-    setLoading(true);
-    await loginWithGoogle();
-  } catch (err: any) {
-  if (err.code !== "auth/popup-closed-by-user") {
-    setError("Google sign-in failed.");
+    try {
+      setLoading(true);
+      await loginWithGoogle();
+    } catch (err: any) {
+      if (err.code !== "auth/popup-closed-by-user") {
+        setError("Google sign-in failed.");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
-}
- finally {
-    setLoading(false);
-  }
-}
 
-useEffect(() => {
-  if (user) {
-    router.push("/");
-  }
-}, [user, router]);
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
 
   return (

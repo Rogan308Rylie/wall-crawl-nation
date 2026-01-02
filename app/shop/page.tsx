@@ -1,5 +1,5 @@
-import PosterCard from "../../components/PosterCard";
-import { posters } from "../../data/posters";
+import PosterCard from "@/components/PosterCard";
+import { posters } from "@/data/posters";
 
 
 export default function ShopPage() {

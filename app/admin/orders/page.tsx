@@ -1,22 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Order } from "@/types/order";
 
-type Order = {
-  id: string;
-  orderId: string;
-  totalAmount: number;
-  paymentStatus: string;
-  status: string;
-  items: {
-    title: string;
-    quantity: number;
-    price: number;
-  }[];
+type AdminOrder = Order & {
+  id: string; // Document ID from Firestore
 };
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,8 +19,8 @@ export default function AdminOrdersPage() {
 
       const data = await res.json();
 
-      // ✅ YOUR API RETURNS AN ARRAY DIRECTLY
-      setOrders(data);
+      // ✅ API RETURNS { orders: [...] }
+      setOrders(data.orders || []);
       setLoading(false);
     }
 
@@ -54,7 +46,6 @@ export default function AdminOrdersPage() {
         >
           <p><strong>Order ID:</strong> {order.orderId}</p>
           <p><strong>Status:</strong> {order.status}</p>
-          <p><strong>Payment:</strong> {order.paymentStatus}</p>
           <p><strong>Total:</strong> ₹{order.totalAmount}</p>
 
           <ul>

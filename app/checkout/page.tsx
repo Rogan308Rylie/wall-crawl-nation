@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "../../context/CartContext";
+import { useCart } from "@/context/CartContext";
 import { useEffect, useState } from "react";
 import { DeliveryAddress, Order } from "@/types/order";
 import { useAuth } from "@/context/AuthContext";
@@ -81,7 +81,6 @@ async function createRazorpayOrder(amount: number, orderId: string) {
 
 
 
-console.log("NEW RAZORPAY PLACE ORDER CALLED");
 
 async function placeOrder() {
   if (!user) return;
@@ -116,7 +115,7 @@ async function placeOrder() {
       items: cart,
       totalAmount,
       deliveryAddress: address,
-      status: "created",
+      status: "pending",
       createdAt: serverTimestamp(),
     });
 
@@ -128,7 +127,7 @@ async function placeOrder() {
 
     // 3️⃣ Open Razorpay Checkout (CLIENT)
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // we'll add this next
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
       name: "Wall Crawl Nation",

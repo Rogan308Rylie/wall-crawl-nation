@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       amount: amount * 100,
       currency: "INR",
       receipt: orderId,
-      notes : { orderId: orderId },
+      notes: { orderId: orderId },
     });
 
     return NextResponse.json({
@@ -41,5 +41,3 @@ export async function POST(req: Request) {
   }
 }
 
-console.log("KEY ID:", !!process.env.RAZORPAY_KEY_ID);
-console.log("KEY SECRET:", !!process.env.RAZORPAY_KEY_SECRET);

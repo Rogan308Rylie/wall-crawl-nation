@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCart } from "../context/CartContext";
+import { useCart } from "@/context/CartContext";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -11,7 +11,7 @@ export default function Navbar() {
     const pathname = usePathname();
     const { cart } = useCart();
     const { user, logout, loading } = useAuth();
-    const[mounted, setMounted] = useState(false);
+    const [mounted, setMounted] = useState(false);
     
     useEffect(() => {
         setMounted(true);

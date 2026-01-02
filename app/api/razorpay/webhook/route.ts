@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { adminDb } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 
 export async function POST(req: Request) {
   try {
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
     await orderRef.update({
       status: "paid",
       razorpayPaymentId,
-      paidAt: new Date(),
+      paidAt: FieldValue.serverTimestamp(),
     });
 
     // 6️⃣ Always ACK webhook

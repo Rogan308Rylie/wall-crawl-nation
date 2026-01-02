@@ -1,17 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, } from "react";
-
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User,} from "firebase/auth";
-
-import { GoogleAuthProvider, signInWithPopup,} from "firebase/auth";
-
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  getAuth,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
+} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { updateProfile } from "firebase/auth";
-
 import app from "@/lib/firebase";
-
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-
 import { db } from "@/lib/firebase";
 
 
@@ -108,6 +109,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function logout() {
     await signOut(auth);
+    
+    // Clear session cookie
+    await fetch("/api/auth/session", {
+      method: "DELETE",
+    });
   }
 
   return (
