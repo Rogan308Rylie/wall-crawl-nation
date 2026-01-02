@@ -12,10 +12,15 @@ if (!getApps().length) {
   });
 }
 
-// ✅ Firestore instance
+// Firestore instance
 export const adminDb: Firestore = getFirestore();
 
-// ✅ Admin Auth accessor (EXPECTED BY auth/session route)
+// Admin DB accessor (for consistency with getAdminAuth)
+export function getAdminDb() {
+  return adminDb;
+}
+
+// Admin Auth accessor
 export function getAdminAuth() {
   return getAuth();
 }

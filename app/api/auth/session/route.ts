@@ -17,3 +17,9 @@ export async function GET() {
     return NextResponse.json({ user: null });
   }
 }
+
+export async function DELETE() {
+  const cookieStore = await cookies();
+  cookieStore.delete("__session");
+  return NextResponse.json({ success: true });
+}
