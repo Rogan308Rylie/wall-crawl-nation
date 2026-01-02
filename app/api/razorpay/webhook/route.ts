@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { adminDb } from "@/lib/firebaseAdmin";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 
 export async function POST(req: Request) {
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // 3️⃣ Find order by razorpayOrderId
-    const snapshot = await adminDb
+    const snapshot = await getAdminDb()
       .collection("orders")
       .where("razorpayOrderId", "==", razorpayOrderId)
       .limit(1)
