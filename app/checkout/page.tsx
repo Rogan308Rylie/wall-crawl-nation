@@ -141,22 +141,23 @@ async function placeOrder() {
         razorpay_order_id: response.razorpay_order_id,
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
-        orderId, // same internal orderId
+        orderId,
       }),
     });
 
     if (!verifyRes.ok) {
-      throw new Error("Payment verification failed");
+      throw new Error("Verification failed");
     }
 
-    // ✅ VERIFIED — now we finalize UX
+    // ✅ ONLY after server confirms
     clearCart();
-    router.push("/thank-you");
+    router.replace("/thank-you");
   } catch (err) {
     console.error(err);
-    alert("Payment verification failed. Please contact support.");
+    alert("Payment succeeded but verification failed. Please contact support.");
   }
 },
+
 
       prefill: {
         name: address.fullName,

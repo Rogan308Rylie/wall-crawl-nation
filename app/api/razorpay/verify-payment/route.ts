@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import * as crypto from "crypto";
+import crypto from "crypto";
 import admin from "firebase-admin";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔐 STEP 1: Verify Razorpay signature
+    // 🔐 Verify Razorpay signature
     const signBody = `${razorpay_order_id}|${razorpay_payment_id}`;
 
     const expectedSignature = crypto
@@ -37,39 +37,31 @@ export async function POST(req: Request) {
       .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      console.error("❌ Signature mismatch");
       return NextResponse.json(
-        { error: "Invalid payment signature" },
+        { error: "Invalid signature" },
         { status: 400 }
       );
     }
 
-    console.log("✅ Razorpay signature verified");
-
-    // 📝 STEP 2: Update order using Admin SDK (bypasses rules)
-    // 🔒 STEP 2.5: Fetch order & prevent double verification
+    // 🛑 Idempotency guard
     const orderRef = getAdminDb().collection("orders").doc(orderId);
-    const orderSnap = await orderRef.get();
+    const snap = await orderRef.get();
 
-    if (!orderSnap.exists) {
+    if (!snap.exists) {
       return NextResponse.json(
         { error: "Order not found" },
         { status: 404 }
       );
     }
 
-    const order = orderSnap.data();
+    const order = snap.data();
 
-    // 🚫 HARD LOCK: block re-processing
-    if (order?.status !== "created") {
-      return NextResponse.json(
-        { error: "Order already processed" },
-        { status: 409 }
-      );
+    if (order?.paymentStatus === "paid") {
+      // already processed → return OK
+      return NextResponse.json({ success: true });
     }
 
-    console.log("📝 Updating order via Admin SDK:", orderId);
-
+    // ✅ Mark order paid
     await orderRef.update({
       paymentStatus: "paid",
       status: "confirmed",
@@ -81,13 +73,11 @@ export async function POST(req: Request) {
       paidAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    console.log("✅ Order marked paid in Firestore");
-
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("❌ Verify-payment failed:", error);
+  } catch (err) {
+    console.error("VERIFY PAYMENT ERROR:", err);
     return NextResponse.json(
-      { error: "Payment verification failed" },
+      { error: "Verification failed" },
       { status: 500 }
     );
   }
