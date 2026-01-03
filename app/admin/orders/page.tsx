@@ -64,6 +64,54 @@ export default function AdminOrdersPage() {
               </li>
             ))}
           </ul>
+
+          <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+  {order.status === "confirmed" && (
+    <button
+      onClick={() => console.log("PACK", order.id)}
+      style={{
+        padding: "6px 10px",
+        background: "#111",
+        color: "#fff",
+        border: "1px solid #444",
+        cursor: "pointer",
+      }}
+    >
+      Mark as Packed
+    </button>
+  )}
+
+  {order.status === "packed" && (
+    <button
+      onClick={() => console.log("SHIP", order.id)}
+      style={{
+        padding: "6px 10px",
+        background: "#111",
+        color: "#fff",
+        border: "1px solid #444",
+        cursor: "pointer",
+      }}
+    >
+      Mark as Shipped
+    </button>
+  )}
+
+  {order.status === "shipped" && (
+    <button
+      onClick={() => console.log("DELIVER", order.id)}
+      style={{
+        padding: "6px 10px",
+        background: "#111",
+        color: "#fff",
+        border: "1px solid #444",
+        cursor: "pointer",
+      }}
+    >
+      Mark as Delivered
+    </button>
+  )}
+</div>
+
         </div>
       ))}
     </div>
