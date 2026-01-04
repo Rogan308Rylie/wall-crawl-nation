@@ -1,5 +1,31 @@
 "use client";
 
+
+async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    const res = await fetch(`/api/admin/orders/${orderId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error || "Failed to update order");
+      return;
+    }
+
+    // simplest & safest refresh for now
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
+  }
+}
+
+
 import { useEffect, useState } from "react";
 
 type Order = {
@@ -68,7 +94,7 @@ export default function AdminOrdersPage() {
           <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
   {order.status === "confirmed" && (
     <button
-      onClick={() => console.log("PACK", order.id)}
+      onClick={() => updateOrderStatus(order.id, "packed")}
       style={{
         padding: "6px 10px",
         background: "#111",
@@ -83,7 +109,7 @@ export default function AdminOrdersPage() {
 
   {order.status === "packed" && (
     <button
-      onClick={() => console.log("SHIP", order.id)}
+      onClick={() => updateOrderStatus(order.id, "shipped")}
       style={{
         padding: "6px 10px",
         background: "#111",
@@ -98,7 +124,7 @@ export default function AdminOrdersPage() {
 
   {order.status === "shipped" && (
     <button
-      onClick={() => console.log("DELIVER", order.id)}
+      onClick={() => updateOrderStatus(order.id, "delivered")}
       style={{
         padding: "6px 10px",
         background: "#111",
