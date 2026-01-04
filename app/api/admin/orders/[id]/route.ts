@@ -10,7 +10,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 1️⃣ Read cookies (SYNC in App Router)
@@ -40,7 +40,8 @@ export async function PATCH(
 
     // 4️⃣ Fetch order
     const db = getAdminDb();
-    const orderRef = db.collection("orders").doc(params.id);
+    const { id } = await params;
+    const orderRef = db.collection("orders").doc(id);
     const orderSnap = await orderRef.get();
 
     if (!orderSnap.exists) {
