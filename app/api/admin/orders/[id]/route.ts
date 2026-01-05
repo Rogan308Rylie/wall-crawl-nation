@@ -1,8 +1,10 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
 
-const VALID_TRANSITIONS: Record<string, string[]> = {
+// Allowed transitions (keep your business rules)
+const allowedTransitions: Record<string, string[]> = {
   confirmed: ["packed"],
   packed: ["shipped"],
   shipped: ["delivered"],
@@ -10,66 +12,54 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> } // Next.js 16
 ) {
   try {
-    // 1️⃣ Read cookies (SYNC in App Router)
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-
-    if (!session) {
+    // 🔐 TOKEN-BASED AUTH (no cookies anywhere)
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2️⃣ Verify admin session
-    const decoded = await getAdminAuth().verifySessionCookie(session, true);
+    const token = authHeader.split("Bearer ")[1];
+    const decoded = await getAdminAuth().verifyIdToken(token);
     const uid = decoded.uid;
 
     const db = getAdminDb();
-    const userSnap = await db.collection("users").doc(uid).get();
 
+    // 🔒 Admin check via Firestore (your existing schema)
+    const userSnap = await db.collection("users").doc(uid).get();
     if (!userSnap.exists || userSnap.data()?.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 3️⃣ Parse payload
-    const { status: nextStatus } = await req.json();
+    const { id } = await params;
+    const body = await req.json();
+    const nextStatus: string = body.status;
 
     if (!nextStatus) {
-      return NextResponse.json(
-        { error: "Missing status" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing status" }, { status: 400 });
     }
 
-    // 4️⃣ Fetch order
-    const { id } = await params;
     const orderRef = db.collection("orders").doc(id);
     const orderSnap = await orderRef.get();
 
     if (!orderSnap.exists) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const order = orderSnap.data();
-    const currentStatus = order?.status;
+    const currentStatus = orderSnap.data()?.status;
 
-    // 5️⃣ Validate transition
-    const allowedNext = VALID_TRANSITIONS[currentStatus] || [];
-
-    if (!allowedNext.includes(nextStatus)) {
+    if (
+      !allowedTransitions[currentStatus] ||
+      !allowedTransitions[currentStatus].includes(nextStatus)
+    ) {
       return NextResponse.json(
-        {
-          error: `Invalid status transition from ${currentStatus} → ${nextStatus}`,
-        },
+        { error: `Invalid transition from ${currentStatus} to ${nextStatus}` },
         { status: 400 }
       );
     }
 
-    // 6️⃣ Update Firestore
     await orderRef.update({
       status: nextStatus,
       updatedAt: new Date(),
@@ -77,9 +67,9 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Admin order status update error:", err);
+    console.error(err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to update order" },
       { status: 500 }
     );
   }

@@ -1,33 +1,8 @@
 "use client";
 
-
-async function updateOrderStatus(orderId: string, status: string) {
-  try {
-    const res = await fetch(`/api/admin/orders/${orderId}`, {
-      method: "PATCH",
-      credentials: "include", // include cookies
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error || "Failed to update order");
-      return;
-    }
-
-    // simplest & safest refresh for now
-    window.location.reload();
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong");
-  }
-}
-
-
 import { useEffect, useState } from "react";
+import { getAuth } from "firebase/auth";
+import  firebaseApp  from "@/lib/firebase"; // client firebase init
 
 type Order = {
   id: string;
@@ -46,6 +21,40 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
+  async function updateOrderStatus(orderId: string, status: string) {
+    try {
+      const auth = getAuth(firebaseApp);
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert("Not authenticated");
+        return;
+      }
+
+      const token = await user.getIdToken();
+
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 🔑 correct auth
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to update order");
+        return;
+      }
+
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+  }
+
   useEffect(() => {
     async function loadOrders() {
       const res = await fetch("/api/admin/orders", {
@@ -53,8 +62,6 @@ export default function AdminOrdersPage() {
       });
 
       const data = await res.json();
-
-      // ✅ YOUR API RETURNS AN ARRAY DIRECTLY
       setOrders(data);
       setLoading(false);
     }
@@ -93,52 +100,24 @@ export default function AdminOrdersPage() {
           </ul>
 
           <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
-  {order.status === "confirmed" && (
-    <button
-      onClick={() => updateOrderStatus(order.id, "packed")}
-      style={{
-        padding: "6px 10px",
-        background: "#111",
-        color: "#fff",
-        border: "1px solid #444",
-        cursor: "pointer",
-      }}
-    >
-      Mark as Packed
-    </button>
-  )}
+            {order.status === "confirmed" && (
+              <button onClick={() => updateOrderStatus(order.id, "packed")}>
+                Mark as Packed
+              </button>
+            )}
 
-  {order.status === "packed" && (
-    <button
-      onClick={() => updateOrderStatus(order.id, "shipped")}
-      style={{
-        padding: "6px 10px",
-        background: "#111",
-        color: "#fff",
-        border: "1px solid #444",
-        cursor: "pointer",
-      }}
-    >
-      Mark as Shipped
-    </button>
-  )}
+            {order.status === "packed" && (
+              <button onClick={() => updateOrderStatus(order.id, "shipped")}>
+                Mark as Shipped
+              </button>
+            )}
 
-  {order.status === "shipped" && (
-    <button
-      onClick={() => updateOrderStatus(order.id, "delivered")}
-      style={{
-        padding: "6px 10px",
-        background: "#111",
-        color: "#fff",
-        border: "1px solid #444",
-        cursor: "pointer",
-      }}
-    >
-      Mark as Delivered
-    </button>
-  )}
-</div>
-
+            {order.status === "shipped" && (
+              <button onClick={() => updateOrderStatus(order.id, "delivered")}>
+                Mark as Delivered
+              </button>
+            )}
+          </div>
         </div>
       ))}
     </div>
