@@ -1,14 +1,17 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebaseAdmin";
 
-// ⚠️ TEMPORARY ENDPOINT — DELETE AFTER USE
-export async function POST(req: Request) {
+// ⚠️ TEMPORARY — DELETE AFTER USE
+export async function GET(req: Request) {
   try {
-    const { email } = await req.json();
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
 
     if (!email) {
       return NextResponse.json(
-        { error: "Email required" },
+        { error: "Email query param required" },
         { status: 400 }
       );
     }
