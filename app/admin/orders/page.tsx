@@ -5,6 +5,7 @@ async function updateOrderStatus(orderId: string, status: string) {
   try {
     const res = await fetch(`/api/admin/orders/${orderId}`, {
       method: "PATCH",
+      credentials: "include", // include cookies
       headers: {
         "Content-Type": "application/json",
       },
