@@ -101,20 +101,66 @@ export default function AdminOrdersPage() {
 
           <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
             {order.status === "confirmed" && (
-              <button onClick={() => updateOrderStatus(order.id, "packed")}>
-                Mark as Packed
+              <button
+              onClick={() => updateOrderStatus(order.id, "packed")}
+              style={{
+                padding: "8px 14px",
+                border: "1px solid #888",
+                background: "transparent",
+                color: "#fff",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#222";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+                Mark as Packed 📦
               </button>
             )}
 
             {order.status === "packed" && (
-              <button onClick={() => updateOrderStatus(order.id, "shipped")}>
-                Mark as Shipped
+              <button onClick={() => updateOrderStatus(order.id, "shipped")}
+              style={{
+                padding: "8px 14px",
+                border: "1px solid #888",
+                background: "transparent",
+                color: "#fff",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#222";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+                Mark as Shipped 🚚
               </button>
             )}
 
             {order.status === "shipped" && (
-              <button onClick={() => updateOrderStatus(order.id, "delivered")}>
-                Mark as Delivered
+              <button onClick={() => updateOrderStatus(order.id, "delivered")}
+              style={{
+                padding: "8px 14px",
+                border: "1px solid #888",
+                background: "transparent",
+                color: "#fff",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#222";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+                Mark as Delivered ✅
               </button>
             )}
           </div>
