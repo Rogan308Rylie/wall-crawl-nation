@@ -23,9 +23,13 @@ export async function PATCH(
 
     // 2️⃣ Verify admin session
     const decoded = await getAdminAuth().verifySessionCookie(session, true);
+    const uid = decoded.uid;
 
-    if (!decoded.admin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const db = getAdminDb();
+    const userSnap = await db.collection("users").doc(uid).get();
+
+    if (!userSnap.exists || userSnap.data()?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // 3️⃣ Parse payload
@@ -39,7 +43,6 @@ export async function PATCH(
     }
 
     // 4️⃣ Fetch order
-    const db = getAdminDb();
     const { id } = await params;
     const orderRef = db.collection("orders").doc(id);
     const orderSnap = await orderRef.get();
