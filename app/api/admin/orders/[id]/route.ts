@@ -15,7 +15,7 @@ export async function PATCH(
   try {
     // 1️⃣ Read cookies (SYNC in App Router)
     const cookieStore = await cookies();
-    const session = cookieStore.get("__session")?.value;
+    const session = cookieStore.get("session")?.value;
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
