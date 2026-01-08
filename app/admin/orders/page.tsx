@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import  firebaseApp  from "@/lib/firebase"; // client firebase init
+import firebaseApp from "@/lib/firebase";
+
+type OrderItem = {
+  title: string;
+  quantity: number;
+  price: number;
+};
 
 type Order = {
   id: string;
@@ -10,11 +16,35 @@ type Order = {
   totalAmount: number;
   paymentStatus: string;
   status: string;
-  items: {
-    title: string;
-    quantity: number;
-    price: number;
-  }[];
+  items: OrderItem[];
+  createdAt?: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  deliveryAddress?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    block?: string;
+    hostelNumber?: string;
+    roomNumber?: string;
+    additionalNotes?: string;
+  };
+};
+
+const statusBadgeStyle = (status: string) => {
+  switch (status) {
+    case "confirmed":
+      return { background: "#444", color: "#fff" };
+    case "packed":
+      return { background: "#b58900", color: "#000" };
+    case "shipped":
+      return { background: "#268bd2", color: "#fff" };
+    case "delivered":
+      return { background: "#2aa198", color: "#000" };
+    default:
+      return { background: "#333", color: "#fff" };
+  }
 };
 
 export default function AdminOrdersPage() {
@@ -37,7 +67,7 @@ export default function AdminOrdersPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 🔑 correct auth
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });
@@ -57,11 +87,15 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     async function loadOrders() {
-      const res = await fetch("/api/admin/orders", {
-        cache: "no-store",
+      const res = await fetch("/api/admin/orders", { cache: "no-store" });
+      const data = await res.json();
+
+      data.sort((a: Order, b: Order) => {
+        const aTime = a.createdAt?.seconds ?? 0;
+        const bTime = b.createdAt?.seconds ?? 0;
+        return aTime - bTime; // oldest first
       });
 
-      const data = await res.json();
       setOrders(data);
       setLoading(false);
     }
@@ -82,14 +116,36 @@ export default function AdminOrdersPage() {
           key={order.id}
           style={{
             border: "1px solid #444",
-            padding: "12px",
-            marginBottom: "12px",
+            padding: "14px",
+            marginBottom: "16px",
           }}
         >
           <p><strong>Order ID:</strong> {order.orderId}</p>
-          <p><strong>Status:</strong> {order.status}</p>
+
+          <p>
+            <strong>Status:</strong>{" "}
+            <span
+              style={{
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontSize: "0.85rem",
+                marginLeft: "6px",
+                ...statusBadgeStyle(order.status),
+              }}
+            >
+              {order.status.toUpperCase()}
+            </span>
+          </p>
+
           <p><strong>Payment:</strong> {order.paymentStatus}</p>
           <p><strong>Total:</strong> ₹{order.totalAmount}</p>
+
+          <p>
+            <strong>Ordered at:</strong>{" "}
+            {order.createdAt
+              ? new Date(order.createdAt.seconds * 1000).toLocaleString()
+              : "—"}
+          </p>
 
           <ul>
             {order.items.map((item, i) => (
@@ -99,68 +155,52 @@ export default function AdminOrdersPage() {
             ))}
           </ul>
 
+          <hr style={{ margin: "12px 0", borderColor: "#333" }} />
+
+          <div style={{ fontSize: "0.95rem" }}>
+            <p><strong>Customer Details</strong></p>
+            <p>Name: {order.deliveryAddress?.fullName || "—"}</p>
+            <p>Email: {order.deliveryAddress?.email || "—"}</p>
+            <p>Phone: {order.deliveryAddress?.phone || "—"}</p>
+          </div>
+
+          <div style={{ marginTop: "8px", fontSize: "0.95rem" }}>
+            <p><strong>Delivery Address</strong></p>
+            <p>
+              Block {order.deliveryAddress?.block || "—"}, Hostel{" "}
+              {order.deliveryAddress?.hostelNumber || "—"}, Room{" "}
+              {order.deliveryAddress?.roomNumber || "—"}
+            </p>
+            {order.deliveryAddress?.additionalNotes && (
+              <p>Notes: {order.deliveryAddress.additionalNotes}</p>
+            )}
+          </div>
+
           <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
             {order.status === "confirmed" && (
               <button
-              onClick={() => updateOrderStatus(order.id, "packed")}
-              style={{
-                padding: "8px 14px",
-                border: "1px solid #888",
-                background: "transparent",
-                color: "#fff",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#222";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-                Mark as Packed 📦
+                onClick={() => updateOrderStatus(order.id, "packed")}
+                style={buttonStyle}
+              >
+                📦 Mark as Packed
               </button>
             )}
 
             {order.status === "packed" && (
-              <button onClick={() => updateOrderStatus(order.id, "shipped")}
-              style={{
-                padding: "8px 14px",
-                border: "1px solid #888",
-                background: "transparent",
-                color: "#fff",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#222";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-                Mark as Shipped 🚚
+              <button
+                onClick={() => updateOrderStatus(order.id, "shipped")}
+                style={buttonStyle}
+              >
+                🚚 Mark as Shipped
               </button>
             )}
 
             {order.status === "shipped" && (
-              <button onClick={() => updateOrderStatus(order.id, "delivered")}
-              style={{
-                padding: "8px 14px",
-                border: "1px solid #888",
-                background: "transparent",
-                color: "#fff",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#222";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-                Mark as Delivered ✅
+              <button
+                onClick={() => updateOrderStatus(order.id, "delivered")}
+                style={buttonStyle}
+              >
+                ✅ Mark as Delivered
               </button>
             )}
           </div>
@@ -169,3 +209,12 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
+
+const buttonStyle = {
+  padding: "8px 14px",
+  border: "1px solid #888",
+  background: "transparent",
+  color: "#fff",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
