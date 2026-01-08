@@ -141,11 +141,29 @@ export default function AdminOrdersPage() {
           <p><strong>Total:</strong> ₹{order.totalAmount}</p>
 
           <p>
-            <strong>Ordered at:</strong>{" "}
-            {order.createdAt
-              ? new Date(order.createdAt.seconds * 1000).toLocaleString()
-              : "—"}
-          </p>
+  <strong>Ordered at:</strong>{" "}
+  {order.createdAt
+    ? (() => {
+        // Firestore Timestamp can arrive in different shapes
+        const ts: any = order.createdAt;
+
+        if (typeof ts === "string" || typeof ts === "number") {
+          return new Date(ts).toLocaleString();
+        }
+
+        if (ts.seconds) {
+          return new Date(ts.seconds * 1000).toLocaleString();
+        }
+
+        if (ts._seconds) {
+          return new Date(ts._seconds * 1000).toLocaleString();
+        }
+
+        return "—";
+      })()
+    : "—"}
+</p>
+
 
           <ul>
             {order.items.map((item, i) => (
