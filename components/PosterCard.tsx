@@ -1,23 +1,39 @@
 "use client";
+
+import Image from "next/image";
 import { useCart } from "../context/CartContext";
+
+type PosterCardProps = {
+  id: string;
+  title: string;
+  price: number;
+  imagePath: string;
+};
 
 export default function PosterCard({
   id,
   title,
   price,
-}: {
-  id: number;
-  title: string;
-  price: number;
-}) {
+  imagePath,
+}: PosterCardProps) {
   const { addToCart } = useCart();
 
   return (
-    <div className="border border-white p-4 rounded-lg hover:scale-[1.02] transition">
-      <div className="h-40 bg-gray-800 mb-4 rounded" />
+    <div className="border border-white p-4 rounded-lg hover:scale-[1.02] transition flex flex-col gap-3">
+      <div className="relative w-full aspect-[210/297] bg-gray-800 rounded overflow-hidden">
+        <Image
+          src={imagePath}
+          alt={title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+      </div>
 
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm opacity-80 mb-3">₹{price}</p>
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-sm opacity-80">₹{price}</p>
+      </div>
 
       <button
         onClick={() => addToCart({ id, title, price })}

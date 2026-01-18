@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 type CartItem = {
-  id: number;
+  id: string;
   title: string;
   price: number;
   quantity: number;
@@ -12,11 +12,10 @@ type CartItem = {
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity">) => void;
-  increaseQuantity: (id: number) => void;
-  decreaseQuantity: (id: number) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
   clearCart: () => void;
 };
-
 
 const CartContext = createContext<CartContextType | null>(null);
 
@@ -29,7 +28,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return [];
   });
 
-    useEffect(() => {
+  useEffect(() => {
     localStorage.setItem("wall-crawl-cart", JSON.stringify(cart));
   }, [cart]);
 
@@ -47,33 +46,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
-  function increaseQuantity(id: number) {
-  setCart((prev) =>
-    prev.map((item) =>
-      item.id === id
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
-    )
-  );
-  }
-
-  function decreaseQuantity(id: number) {
-  setCart((prev) =>
-    prev
-      .map((item) =>
+  function increaseQuantity(id: string) {
+    setCart((prev) =>
+      prev.map((item) =>
         item.id === id
-          ? { ...item, quantity: item.quantity - 1 }
+          ? { ...item, quantity: item.quantity + 1 }
           : item
       )
-      .filter((item) => item.quantity > 0)
-  );
+    );
   }
+
+  function decreaseQuantity(id: string) {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
   function clearCart() {
     setCart([]);
   }
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, increaseQuantity,decreaseQuantity, clearCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, increaseQuantity, decreaseQuantity, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );
