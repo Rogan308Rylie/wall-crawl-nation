@@ -35,23 +35,36 @@ export default function LoginPage() {
       await loginWithGoogle();
     } catch (err: any) {
       if (err.code !== "auth/popup-closed-by-user") {
-      setError("Google sign-in failed.");
-    }  } finally {
+        setError("Google sign-in failed.");
+      }
+    } finally {
       setLoading(false);
     }
   }
 
-    useEffect(() => {
-        if (user) {
-            router.push("/");
-        }
-    }, [user, router]);
-    
+  useEffect(() => {
+    async function createSession() {
+      if (!user) return;
+
+      const idToken = await user.getIdToken();
+
+      await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      router.push("/");
+    }
+
+    createSession();
+  }, [user, router]);
+
   return (
     <div className="max-w-md mx-auto mt-20 border border-white rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Welcome Back
-      </h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Welcome Back</h1>
 
       <button
         onClick={handleGoogleLogin}
@@ -84,9 +97,7 @@ export default function LoginPage() {
           className="w-full p-3 border border-white bg-transparent rounded"
         />
 
-        {error && (
-          <p className="text-red-400 text-sm">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-sm">{error}</p>}
 
         <button
           type="submit"

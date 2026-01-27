@@ -1,30 +1,35 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
-import { serverTimestamp } from "firebase-admin/firestore";
+import { FieldValue } from "firebase-admin/firestore";
 import fs from "fs";
 import path from "path";
 
 const adminDb = getAdminDb();
+const adminAuth = getAdminAuth();
+
 export async function POST(req: Request) {
   try {
-    // 🔐 Admin auth check
-    const auth = getAdminAuth();
-    const sessionCookie = req.headers
-      .get("cookie")
-      ?.match(/__session=([^;]+)/)?.[1];
+    // 1️⃣ Read session cookie (App Router SAFE way)
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("__session")?.value;
 
     if (!sessionCookie) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = await auth.verifySessionCookie(sessionCookie, true);
-    if (!decoded.admin) {
+    // 2️⃣ Verify session
+    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const uid = decoded.uid;
+
+    // 3️⃣ Check admin role from Firestore
+    const userSnap = await adminDb.collection("users").doc(uid).get();
+    if (!userSnap.exists || userSnap.data()?.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 📦 Parse form data
+    // 4️⃣ Parse form data
     const formData = await req.formData();
-
     const title = formData.get("title") as string;
     const price = formData.get("price") as string;
     const image = formData.get("image") as File;
@@ -43,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🖼 Save image to /public/posters
+    // 5️⃣ Save image to /public/posters
     const buffer = Buffer.from(await image.arrayBuffer());
     const ext = image.type === "image/png" ? "png" : "jpg";
     const filename = `${title
@@ -59,13 +64,13 @@ export async function POST(req: Request) {
 
     const imagePath = `/posters/${filename}`;
 
-    // 🔥 Write Firestore doc
+    // 6️⃣ Create Firestore doc
     await adminDb.collection("posters").add({
       title,
       price: Number(price),
       imagePath,
       isActive: true,
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json({ success: true });

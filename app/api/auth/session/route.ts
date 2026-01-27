@@ -2,6 +2,49 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAdminAuth } from "@/lib/firebaseAdmin";
 
+/**
+ * 🔐 CREATE SESSION (called after Firebase client login)
+ */
+export async function POST(req: Request) {
+  console.log("🔥 SESSION POST HIT");
+
+  try {
+    const body = await req.json();
+    console.log("📦 SESSION BODY:", body); // ✅ STEP 2
+
+    const { idToken } = body;
+
+    if (!idToken) {
+      console.log("❌ idToken MISSING");
+      return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
+    }
+
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+      expiresIn: 1000 * 60 * 60 * 24 * 5, // 5 days
+    });
+
+    (await cookies()).set("__session", sessionCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+
+    console.log("🍪 SESSION COOKIE SET"); // ✅ STEP 3
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("🚨 Session creation error:", err);
+    return NextResponse.json(
+      { error: "Failed to create session" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * 👤 READ SESSION (used to check current user)
+ */
 export async function GET() {
   const cookieStore = await cookies();
   const session = cookieStore.get("__session")?.value;
