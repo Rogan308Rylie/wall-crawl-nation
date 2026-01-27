@@ -23,10 +23,10 @@ export default function PosterCard({
       <div className="relative w-full aspect-[210/297] bg-gray-800 rounded overflow-hidden">
         <Image
           src={imagePath}
-          alt={title}
+          alt={title || "Poster image"}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
           className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
 
