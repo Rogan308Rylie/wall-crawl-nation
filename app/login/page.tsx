@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { buttons } from "@/lib/ui/buttons";
 
 export default function LoginPage() {
   const { login, loginWithGoogle, user } = useAuth();
@@ -69,7 +70,7 @@ export default function LoginPage() {
       <button
         onClick={handleGoogleLogin}
         disabled={loading}
-        className="w-full mb-4 py-3 border border-white rounded hover:bg-white hover:text-black transition disabled:opacity-50"
+        className={`${buttons.secondary} w-full mb-4`}
       >
         Continue with Google
       </button>
@@ -102,7 +103,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition disabled:opacity-50"
+          className={`${buttons.primary} w-full`}
         >
           {loading ? "Signing in..." : "Login"}
         </button>

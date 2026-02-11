@@ -3,6 +3,7 @@
 import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { buttons } from "@/lib/ui/buttons";
 
 
 
@@ -23,10 +24,13 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div>
-        <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
-        <p>Your cart is empty.</p>
-      </div>
+      <div className="text-center text-white/60">
+  <p className="text-sm">Your cart is empty.</p>
+  <p className="mt-1 text-xs">
+    Add some posters to make your wall look sick.
+  </p>
+</div>
+
     );
   }
 
@@ -41,14 +45,19 @@ export default function CartPage() {
                 <h3 className="font-semibold">{item.title}</h3>
 
                 <div className="flex items-center gap-3 mt-2">
-                    <button onClick={() => decreaseQuantity(item.id)} className="px-2 py-1 border border-white rounded hover:bg-white hover:text-black transition"
+                    <button
+                      onClick={() => decreaseQuantity(item.id)}
+                      className={`${buttons.secondary} px-2 py-1 text-xs`}
                     >
                       −
                     </button>
 
                     <span>Quantity: {item.quantity}</span>
 
-                    <button onClick={() => increaseQuantity(item.id)} className="px-2 py-1 border border-white rounded hover:bg-white hover:text-black transition">
+                    <button
+                      onClick={() => increaseQuantity(item.id)}
+                      className={`${buttons.secondary} px-2 py-1 text-xs`}
+                    >
                       +
                     </button>
                 </div>
@@ -66,10 +75,10 @@ export default function CartPage() {
         Total: ₹{totalAmount}
       </div>
 
-      {cart.length > 0 && (
+     {cart.length > 0 && (
      <button
        onClick={() => router.push("/checkout")}
-       className="w-full mt-6 py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition"
+       className={`${buttons.primary} w-full mt-6`}
      >
        Proceed to Checkout
      </button>

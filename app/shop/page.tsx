@@ -13,7 +13,7 @@ export default async function ShopPage() {
   const postersQuery = query(
     collection(db, "posters"),
     where("isActive", "==", true),
-    orderBy("createdAt", "asc")
+    orderBy("createdAt", "asc"),
   );
 
   const snapshot = await getDocs(postersQuery);
@@ -25,27 +25,29 @@ export default async function ShopPage() {
 
   return (
     <div className="px-2 sm:px-4">
-      {/* tighter, modern heading */}
-      <h1 className="text-xl font-semibold mb-4 tracking-tight">
+      {/* heading */}
+      <h1 className="mb-4 text-xl font-semibold tracking-tight">
         Shop Posters
       </h1>
 
+      {/* empty state */}
       {posters.length === 0 && (
-        <p className="text-white/60 text-sm">
-          No posters available right now.
-        </p>
+        <p className="text-sm text-white/60">No posters available right now.</p>
       )}
 
-      {/* dense, youth-friendly grid */}
+      {/* posters grid */}
       <div
         className="
-          grid
-          grid-cols-2
-          sm:grid-cols-3
-          md:grid-cols-4
-          lg:grid-cols-6
-          gap-3
-        "
+    grid
+    grid-cols-2
+    gap-4
+    sm:grid-cols-3
+    sm:gap-5
+    md:grid-cols-4
+    md:gap-6
+    lg:grid-cols-6
+    lg:gap-7
+  "
       >
         {posters.map((poster) => (
           <PosterCard

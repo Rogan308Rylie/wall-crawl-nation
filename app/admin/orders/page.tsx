@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "@/lib/firebase";
+import { buttons } from "@/lib/ui/buttons";
 
 type OrderItem = {
   title: string;
@@ -198,7 +199,7 @@ export default function AdminOrdersPage() {
             {order.status === "confirmed" && (
               <button
                 onClick={() => updateOrderStatus(order.id, "packed")}
-                style={buttonStyle}
+                className={buttons.primary}
               >
                 📦 Mark as Packed
               </button>
@@ -207,7 +208,7 @@ export default function AdminOrdersPage() {
             {order.status === "packed" && (
               <button
                 onClick={() => updateOrderStatus(order.id, "shipped")}
-                style={buttonStyle}
+                className={buttons.primary}
               >
                 🚚 Mark as Shipped
               </button>
@@ -216,7 +217,7 @@ export default function AdminOrdersPage() {
             {order.status === "shipped" && (
               <button
                 onClick={() => updateOrderStatus(order.id, "delivered")}
-                style={buttonStyle}
+                className={buttons.primary}
               >
                 ✅ Mark as Delivered
               </button>
@@ -227,12 +228,3 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
-
-const buttonStyle = {
-  padding: "8px 14px",
-  border: "1px solid #888",
-  background: "transparent",
-  color: "#fff",
-  borderRadius: "4px",
-  cursor: "pointer",
-};

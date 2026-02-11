@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { buttons } from "@/lib/ui/buttons";
 
 
 type AddressFormState = {
@@ -332,7 +333,7 @@ async function placeOrder() {
               type="button"
               onClick={placeOrder}
               disabled={placing}
-              className={`w-full mt-4 py-3 bg-white text-black font-semibold rounded transition ${ placing ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
+              className={`${buttons.primary} w-full mt-4 ${ placing ? "opacity-50 cursor-not-allowed" : ""}`}
             >
             {placing ? "Placing Order..." : "Place Order"}
            </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { buttons } from "@/lib/ui/buttons";
 
 export default function AdminPostersPage() {
   const [showForm, setShowForm] = useState(false);
@@ -56,7 +57,7 @@ export default function AdminPostersPage() {
 
         <button
           onClick={() => setShowForm(true)}
-          className="px-4 py-2 border border-white rounded hover:bg-white hover:text-black transition"
+          className={buttons.secondary}
         >
           Add Poster
         </button>
@@ -105,7 +106,7 @@ export default function AdminPostersPage() {
           <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              className="px-4 py-2 border border-white rounded hover:bg-white hover:text-black transition"
+              className={buttons.primary}
             >
               Save Poster
             </button>
@@ -113,7 +114,7 @@ export default function AdminPostersPage() {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 border border-white/50 rounded text-white/70 hover:text-white"
+              className={buttons.ghost}
             >
               Cancel
             </button>

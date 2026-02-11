@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { buttons } from "@/lib/ui/buttons";
 
 export default function SignupPage() {
   const { signup, loginWithGoogle, user } = useAuth();
@@ -69,7 +70,7 @@ useEffect(() => {
       <button
         onClick={handleGoogleSignup}
         disabled={loading}
-        className="w-full mb-4 py-3 border border-white rounded flex items-center justify-center gap-3 hover:bg-white hover:text-black transition disabled:opacity-50"
+        className={`${buttons.secondary} w-full mb-4 flex items-center justify-center gap-3`}
         >
         <span className="font-semibold">Continue with Google</span>
       </button>
@@ -115,7 +116,7 @@ useEffect(() => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-white text-black font-semibold rounded hover:opacity-90 transition disabled:opacity-50"
+          className={`${buttons.primary} w-full`}
         >
           {loading ? "Creating account..." : "Sign Up"}
         </button>
