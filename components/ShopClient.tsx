@@ -70,7 +70,13 @@ export default function ShopClient() {
       ...(doc.data() as Omit<Poster, "id">),
     }));
 
-    setPosters((prev) => [...prev, ...newPosters]);
+    // Deduplicate: only add posters that don't already exist
+    setPosters((prev) => {
+      const existingIds = new Set(prev.map(p => p.id));
+      const uniqueNewPosters = newPosters.filter(p => !existingIds.has(p.id));
+      return [...prev, ...uniqueNewPosters];
+    });
+
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
     setLoading(false);
   }
@@ -141,7 +147,7 @@ export default function ShopClient() {
         </h2>
 
         <p className="mt-3 text-sm text-white/60">
-          It's okay. Get your customised design made.
+          It's okay. Get your custom designs made here.
         </p>
 
         <a
