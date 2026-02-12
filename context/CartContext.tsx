@@ -6,6 +6,7 @@ type CartItem = {
   id: string;
   title: string;
   price: number;
+  imagePath: string;
   quantity: number;
 };
 
@@ -23,7 +24,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("wall-crawl-cart");
-      return stored ? JSON.parse(stored) : [];
+      if (!stored) return [];
+
+      const parsed = JSON.parse(stored) as Array<Partial<CartItem>>;
+      return parsed
+        .filter((item): item is Partial<CartItem> & Pick<CartItem, "id" | "title" | "price" | "quantity"> =>
+          Boolean(item.id && item.title && typeof item.price === "number" && typeof item.quantity === "number")
+        )
+        .map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          imagePath: item.imagePath || "/posters/1.png",
+        }));
     }
     return [];
   });

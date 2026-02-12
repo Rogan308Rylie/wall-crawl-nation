@@ -77,7 +77,7 @@ export default function PosterCard({
 
       {/* CTA */}
       <button
-        onClick={() => addToCart({ id, title, price })}
+        onClick={() => addToCart({ id, title, price, imagePath })}
         className={`${buttons.primary} mt-2`}
       >
         Add to Cart
