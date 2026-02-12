@@ -17,7 +17,9 @@ export default function PosterCard({
   price,
   imagePath,
 }: PosterCardProps) {
-  const { addToCart } = useCart();
+  const { cart, addToCart, increaseQuantity, decreaseQuantity } = useCart();
+  const cartItem = cart.find((item) => item.id === id);
+  const quantity = cartItem?.quantity || 0;
 
   return (
     <div
@@ -75,13 +77,38 @@ export default function PosterCard({
         <p className="mt-1.5 text-xs text-white/60">₹{price}</p>
       </div>
 
-      {/* CTA */}
-      <button
-        onClick={() => addToCart({ id, title, price, imagePath })}
-        className={`${buttons.primary} mt-2`}
-      >
-        Add to Cart
-      </button>
+      {/* CTA - Morphs between Add to Cart and Quantity Controls */}
+      {quantity === 0 ? (
+        <button
+          onClick={() => addToCart({ id, title, price, imagePath })}
+          className={`${buttons.primary} mt-auto w-full`}
+        >
+          Add to Cart
+        </button>
+      ) : (
+        <div className="mt-auto flex items-center justify-between gap-2 rounded-xl bg-[#1a1a1a] p-2">
+          <button
+            onClick={() => decreaseQuantity(id)}
+            className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+          >
+            −
+          </button>
+
+          <span
+            key={quantity}
+            className="flex-1 text-center text-sm font-semibold animate-pop"
+          >
+            {quantity}
+          </span>
+
+          <button
+            onClick={() => increaseQuantity(id)}
+            className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+          >
+            +
+          </button>
+        </div>
+      )}
     </div>
   );
 }

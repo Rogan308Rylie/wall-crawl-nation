@@ -16,7 +16,7 @@ export default function Home() {
         </h1>
 
         <p className="mt-6 max-w-xl text-white/60 text-base md:text-lg">
-          Premium A4 wall art inspired by pop culture, individuality and rebellion.
+          Premium wall art inspired by Culture, Individuality and Expression.
         </p>
 
         <div className="mt-10 flex gap-4 flex-wrap justify-center">
@@ -42,7 +42,7 @@ export default function Home() {
       <section className="px-6 py-24">
         <div className="grid md:grid-cols-3 gap-12 text-center">
           <div>
-            <h3 className="text-lg font-semibold">Premium A4 Prints</h3>
+            <h3 className="text-lg font-semibold">Premium Prints</h3>
             <p className="text-white/60 text-sm mt-2">
               Designed to look sharp and bold on any wall.
             </p>
@@ -67,7 +67,7 @@ export default function Home() {
       {/* 5️⃣ FINAL CLOSING CTA */}
       <section className="px-6 py-32 text-center">
         <h2 className="text-4xl md:text-5xl font-semibold">
-          Your Walls Deserve Better.
+          Your Room Should Reflect Your Personality.
         </h2>
 
         <div className="mt-8">

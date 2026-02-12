@@ -39,3 +39,37 @@ body {
 .animate-shimmer {
   animation: shimmer 1.6s infinite;
 }
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pop {
+  animation: pop 150ms ease-out;
+}
+
+@keyframes bgshift {
+  0% {
+    transform: translateX(-10%);
+  }
+  50% {
+    transform: translateX(10%);
+  }
+  100% {
+    transform: translateX(-10%);
+  }
+}
+
+.animate-bgshift {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(173, 216, 230, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(176, 196, 222, 0.12), transparent 40%);
+  animation: bgshift 18s ease-in-out infinite;
+}

@@ -91,7 +91,18 @@ export default function ShopClient() {
   }
 
   return (
-    <div className="px-2 sm:px-4">
+    <div className="
+      relative
+      px-2 sm:px-4
+      bg-gradient-to-br
+      from-[#0a0a0a]
+      via-[#0f0f0f]
+      to-[#0a0a0a]
+      overflow-hidden
+    ">
+      {/* Animated background gradient layer - POWDER BLUE for visibility testing */}
+      <div className="absolute inset-0 -z-10 animate-bgshift opacity-100" />
+
       {/* heading */}
       <h1 className="mb-4 text-xl font-semibold tracking-tight">
         Shop Posters
@@ -105,7 +116,7 @@ export default function ShopClient() {
       {/* posters grid */}
       <div
         className="
-    grid
+      grid
     grid-cols-2
     gap-4
     sm:grid-cols-3
