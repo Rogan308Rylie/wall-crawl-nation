@@ -81,6 +81,7 @@ export default function PosterCard({
       {quantity === 0 ? (
         <button
           onClick={() => addToCart({ id, title, price, imagePath })}
+          onMouseEnter={(e) => (e.currentTarget.style.cursor = "pointer")}
           className={`${buttons.primary} mt-auto w-full`}
         >
           Add to Cart

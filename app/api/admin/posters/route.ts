@@ -8,6 +8,8 @@ import path from "path";
 const adminDb = getAdminDb();
 const adminAuth = getAdminAuth();
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   try {
     // 1️⃣ Read session cookie (App Router SAFE way)
@@ -81,4 +83,15 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+	const snapshot = await getAdminDb().collection("posters").orderBy("createdAt", "desc").get();
+
+	const posters = snapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data(),
+	}));
+
+	return NextResponse.json({ posters });
 }

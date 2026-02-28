@@ -69,7 +69,7 @@ body {
 
 .animate-bgshift {
   background:
-    radial-gradient(circle at 20% 30%, rgba(173, 216, 230, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(176, 196, 222, 0.12), transparent 40%);
+    radial-gradient(circle at 20% 30%, rgba(163, 255, 18, 0.06), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.04), transparent 40%);
   animation: bgshift 18s ease-in-out infinite;
 }
