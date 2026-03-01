@@ -67,20 +67,39 @@ export default function AdminPostersPage() {
 	}
 
 	async function handleSubmitUploads() {
-		if (uploads.length === 0) return;
+		console.log("===== UPLOAD CLICKED =====");
+		console.log("Uploads length:", uploads.length);
+		console.log("Uploads array:", uploads);
+
+		if (uploads.length === 0) {
+			console.log("No uploads found, returning early");
+			return;
+		}
+
 		setUploading(true);
+		console.log("Set uploading to true");
+
 		for (const item of uploads) {
+			console.log("Uploading item:", item.title);
+
 			const fd = new FormData();
-			fd.append("file", item.file);
+			fd.append("image", item.file);
 			fd.append("title", item.title);
 			fd.append("price", item.price);
-			// Assumes you have a POST /api/admin/posters endpoint to handle file upload + metadata
-			await fetch("/api/admin/posters", {
+
+			console.log("Making fetch request to /api/admin/posters");
+
+			const res = await fetch("/api/admin/posters", {
 				method: "POST",
 				body: fd,
 			});
+
+			console.log("Response status:", res.status);
+			console.log("Response:", res);
 		}
+
 		setUploading(false);
+		console.log("Set uploading to false, reloading page");
 		location.reload();
 	}
 
@@ -128,6 +147,7 @@ export default function AdminPostersPage() {
 						))}
 
 						<button
+							type="button"
 							onClick={handleSubmitUploads}
 							disabled={uploading}
 							className="px-4 py-2 bg-green-600 text-black rounded-md"
