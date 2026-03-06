@@ -102,6 +102,26 @@ async function placeOrder() {
     return;
   }
 
+  // ✅ Validate cart items
+  for (const item of cart) {
+    if (!item.id || !item.title || !item.price || !item.type) {
+      alert("Invalid item in cart");
+      return;
+    }
+
+    if (item.type !== "poster" && item.type !== "collection") {
+      alert("Invalid item type");
+      return;
+    }
+
+    if (item.type === "collection") {
+      if (!("posterIds" in item) || !item.posterIds || item.posterIds.length === 0) {
+        alert("Invalid collection item - missing posters");
+        return;
+      }
+    }
+  }
+
   setPlacing(true);
 
   const orderId = crypto.randomUUID();

@@ -6,9 +6,11 @@ import firebaseApp from "@/lib/firebase";
 import { buttons } from "@/lib/ui/buttons";
 
 type OrderItem = {
+  type?: "poster" | "collection";
   title: string;
   quantity: number;
   price: number;
+  posterIds?: string[];
 };
 
 type Order = {
@@ -169,7 +171,39 @@ export default function AdminOrdersPage() {
           <ul>
             {order.items.map((item, i) => (
               <li key={i}>
-                {item.title} × {item.quantity} (₹{item.price})
+                <div style={{ marginBottom: "8px" }}>
+                  <span style={{ marginRight: "8px" }}>
+                    {item.title} × {item.quantity} (₹{item.price})
+                  </span>
+                  {item.type === "collection" && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: "#6366f1",
+                        color: "#fff",
+                        padding: "2px 6px",
+                        borderRadius: "3px",
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      BUNDLE ({item.posterIds?.length || 0} posters)
+                    </span>
+                  )}
+                  {item.type === "poster" && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: "#666",
+                        color: "#fff",
+                        padding: "2px 6px",
+                        borderRadius: "3px",
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      POSTER
+                    </span>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

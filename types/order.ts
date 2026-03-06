@@ -14,12 +14,22 @@ export type DeliveryAddress = {
 
 
 
-export type OrderItem = {
-  id: number;
-  title: string;
-  price: number;
-  quantity: number;
-};
+export type OrderItem =
+  | {
+      type: "poster"
+      id: string
+      title: string
+      price: number
+      quantity: number
+    }
+  | {
+      type: "collection"
+      id: string
+      title: string
+      price: number
+      quantity: number
+      posterIds: string[]
+    }
 
 export type Order = {
   orderId: string;

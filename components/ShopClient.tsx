@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import PosterCard from "./PosterCard";
+import CollectionsCarousel from "./shop/CollectionsCarousel";
 import { buttons } from "@/lib/ui/buttons";
 
 const PAGE_SIZE = 12;
@@ -112,6 +113,9 @@ export default function ShopClient() {
       {posters.length === 0 && !loading && (
         <p className="text-sm text-white/60">No posters available right now.</p>
       )}
+
+      {/* Collections Carousel */}
+      <CollectionsCarousel />
 
       {/* posters grid */}
       <div

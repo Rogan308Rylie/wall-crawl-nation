@@ -45,29 +45,49 @@ export default function CartPage() {
           >
             <div className="flex items-center gap-4">
               <div className="relative h-24 w-16 overflow-hidden rounded-md bg-[#0a0a0a] ring-1 ring-white/5">
-                <Image src={item.imagePath} alt={item.title} fill className="object-contain" sizes="80px" />
+                <Image
+                  src={item.type === "poster" ? item.imagePath : item.coverImage}
+                  alt={item.title}
+                  fill
+                  className="object-contain"
+                  sizes="80px"
+                />
               </div>
 
               <div>
-                <h3 className="text-sm font-medium">{item.title}</h3>
-
-                <div className="mt-2 flex items-center gap-3">
-                  <button
-                    onClick={() => decreaseQuantity(item.id)}
-                    className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
-                  >
-                    -
-                  </button>
-
-                  <span className="text-sm text-white/80">{item.quantity}</span>
-
-                  <button
-                    onClick={() => increaseQuantity(item.id)}
-                    className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
-                  >
-                    +
-                  </button>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-sm font-medium">{item.title}</h3>
+                  {item.type === "collection" && (
+                    <span className="text-xs bg-purple-600/80 text-white px-2 py-0.5 rounded">
+                      Bundle
+                    </span>
+                  )}
                 </div>
+
+                {/* Quantity Controls - Only for Posters */}
+                {item.type === "poster" ? (
+                  <div className="mt-2 flex items-center gap-3">
+                    <button
+                      onClick={() => decreaseQuantity(item.id)}
+                      className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
+                    >
+                      -
+                    </button>
+
+                    <span className="text-sm text-white/80">{item.quantity}</span>
+
+                    <button
+                      onClick={() => increaseQuantity(item.id)}
+                      className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 text-xs text-white/60">
+                    Quantity: 1 <span className="text-white/40">(Collections cannot be stacked)</span>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -80,7 +80,7 @@ export default function PosterCard({
       {/* CTA - Morphs between Add to Cart and Quantity Controls */}
       {quantity === 0 ? (
         <button
-          onClick={() => addToCart({ id, title, price, imagePath })}
+          onClick={() => addToCart({ type: "poster", id, title, price, imagePath })}
           onMouseEnter={(e) => (e.currentTarget.style.cursor = "pointer")}
           className={`${buttons.primary} mt-auto w-full`}
         >

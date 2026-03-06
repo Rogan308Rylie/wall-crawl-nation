@@ -2,17 +2,31 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type CartItem = {
-  id: string;
-  title: string;
-  price: number;
-  imagePath: string;
-  quantity: number;
-};
+export type CartItem =
+  | {
+      type: "poster"
+      id: string
+      title: string
+      price: number
+      quantity: number
+      imagePath: string
+    }
+  | {
+      type: "collection"
+      id: string
+      title: string
+      price: number
+      quantity: number
+      posterIds: string[]
+      coverImage: string
+    }
 
 type CartContextType = {
   cart: CartItem[];
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item:
+    | Omit<Extract<CartItem, { type: "poster" }>, "quantity">
+    | Omit<Extract<CartItem, { type: "collection" }>, "quantity">
+  ) => void;
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
   clearCart: () => void;
@@ -28,16 +42,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const parsed = JSON.parse(stored) as Array<Partial<CartItem>>;
       return parsed
-        .filter((item): item is Partial<CartItem> & Pick<CartItem, "id" | "title" | "price" | "quantity"> =>
-          Boolean(item.id && item.title && typeof item.price === "number" && typeof item.quantity === "number")
+        .filter((item): item is CartItem =>
+          Boolean(item.id && item.title && typeof item.price === "number" && typeof item.quantity === "number" && item.type)
         )
-        .map((item) => ({
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          imagePath: item.imagePath || "/posters/1.png",
-        }));
+        .map((item) => {
+          if (item.type === "collection") {
+            return {
+              type: "collection" as const,
+              id: item.id,
+              title: item.title,
+              price: item.price,
+              quantity: item.quantity,
+              posterIds: item.posterIds || [],
+              coverImage: item.coverImage || "/posters/default-cover.jpg",
+            };
+          }
+          return {
+            type: "poster" as const,
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            imagePath: item.imagePath || "/posters/1.png",
+          };
+        });
     }
     return [];
   });
@@ -46,25 +74,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("wall-crawl-cart", JSON.stringify(cart));
   }, [cart]);
 
-  function addToCart(item: Omit<CartItem, "quantity">) {
+  function addToCart(item:
+    | Omit<Extract<CartItem, { type: "poster" }>, "quantity">
+    | Omit<Extract<CartItem, { type: "collection" }>, "quantity">
+  ) {
     setCart((prev) => {
       const existing = prev.find((p) => p.id === item.id);
 
+      // Collections don't stack - quantity always 1, prevent duplicates
+      if (item.type === "collection") {
+        if (existing) {
+          return prev; // Already in cart, don't add again
+        }
+        return [...prev, { ...item, quantity: 1 } as CartItem];
+      }
+
+      // Posters stack quantities
       if (existing) {
         return prev.map((p) =>
-          p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
+          p.id === item.id ? ({ ...p, quantity: p.quantity + 1 } as CartItem) : p
         );
       }
 
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: 1 } as CartItem];
     });
   }
 
   function increaseQuantity(id: string) {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: item.quantity + 1 }
+        item.id === id && item.type === "poster"
+          ? ({ ...item, quantity: item.quantity + 1 } as CartItem)
           : item
       )
     );
@@ -74,8 +114,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity - 1 }
+          item.id === id && item.type === "poster"
+            ? ({ ...item, quantity: item.quantity - 1 } as CartItem)
             : item
         )
         .filter((item) => item.quantity > 0)
