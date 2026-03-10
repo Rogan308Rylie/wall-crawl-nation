@@ -36,8 +36,8 @@ export default function CollectionPreviewModal({
   const savings = collection.originalTotal - collection.discountedPrice
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-neutral-900 rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto p-6 relative">
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-neutral-900 rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto p-6 relative" onClick={(e) => e.stopPropagation()}>
         {/* Close Button */}
         <button
           onClick={onClose}
