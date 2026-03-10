@@ -81,15 +81,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => {
       const existing = prev.find((p) => p.id === item.id);
 
-      // Collections don't stack - quantity always 1, prevent duplicates
-      if (item.type === "collection") {
-        if (existing) {
-          return prev; // Already in cart, don't add again
-        }
-        return [...prev, { ...item, quantity: 1 } as CartItem];
-      }
-
-      // Posters stack quantities
+      // Both posters and collections stack quantities
       if (existing) {
         return prev.map((p) =>
           p.id === item.id ? ({ ...p, quantity: p.quantity + 1 } as CartItem) : p
@@ -103,7 +95,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   function increaseQuantity(id: string) {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id && item.type === "poster"
+        item.id === id
           ? ({ ...item, quantity: item.quantity + 1 } as CartItem)
           : item
       )
@@ -114,7 +106,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id && item.type === "poster"
+          item.id === id
             ? ({ ...item, quantity: item.quantity - 1 } as CartItem)
             : item
         )

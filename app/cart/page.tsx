@@ -64,30 +64,24 @@ export default function CartPage() {
                   )}
                 </div>
 
-                {/* Quantity Controls - Only for Posters */}
-                {item.type === "poster" ? (
-                  <div className="mt-2 flex items-center gap-3">
-                    <button
-                      onClick={() => decreaseQuantity(item.id)}
-                      className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
-                    >
-                      -
-                    </button>
+                {/* Quantity Controls - For both Posters and Collections */}
+                <div className="mt-2 flex items-center gap-3">
+                  <button
+                    onClick={() => decreaseQuantity(item.id)}
+                    className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
+                  >
+                    -
+                  </button>
 
-                    <span className="text-sm text-white/80">{item.quantity}</span>
+                  <span className="text-sm text-white/80">{item.quantity}</span>
 
-                    <button
-                      onClick={() => increaseQuantity(item.id)}
-                      className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
-                    >
-                      +
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-2 text-xs text-white/60">
-                    Quantity: 1 <span className="text-white/40">(Collections cannot be stacked)</span>
-                  </div>
-                )}
+                  <button
+                    onClick={() => increaseQuantity(item.id)}
+                    className="h-8 w-8 rounded-md bg-[#1a1a1a] text-white/70 transition hover:bg-[#222]"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 
