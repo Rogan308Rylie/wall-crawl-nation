@@ -62,6 +62,7 @@ export default function PosterCard({
           src={imagePath}
           alt={title || "Poster image"}
           fill
+          unoptimized
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
           className="
     object-contain
