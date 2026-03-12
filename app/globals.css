@@ -30,6 +30,17 @@ body {
   color: #ffffff;
 }
 
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+select,
+label[for],
+.cursor-pointer {
+  cursor: pointer;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

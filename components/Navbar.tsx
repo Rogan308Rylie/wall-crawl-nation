@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -9,6 +9,7 @@ import { buttons } from "@/lib/ui/buttons";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { cart } = useCart();
   const { user, logout, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
@@ -26,18 +27,25 @@ export default function Navbar() {
     }`;
   }
 
-  // Logout shortcut for devs: Ctrl + Shift + L
+  // Keyboard shortcuts
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      // Ctrl + Shift + L → Logout
       if (e.ctrlKey && e.shiftKey && e.key === "L") {
         logout();
         console.log("Logged out (dev shortcut)");
+      }
+      // Ctrl + Shift + K → Admin page
+      if (e.ctrlKey && e.shiftKey && e.key === "D") {
+        e.preventDefault();
+        router.push("/admin");
+        console.log("Navigated to admin (dev shortcut)");
       }
     }
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [logout]);
+  }, [logout, router]);
 
   return (
     <nav
