@@ -17,6 +17,7 @@ type Poster = {
   title: string;
   price: number;
   imagePath: string;
+  tags?: string[];
 };
 
 export default function FeaturedPostersGrid() {
@@ -81,6 +82,7 @@ export default function FeaturedPostersGrid() {
           title={poster.title}
           price={poster.price}
           imagePath={poster.imagePath}
+          tags={poster.tags}
         />
       ))}
     </div>

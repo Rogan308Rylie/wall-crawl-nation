@@ -22,6 +22,7 @@ type Poster = {
   title: string;
   price: number;
   imagePath: string;
+  tags?: string[];
 };
 
 export default function ShopClient() {
@@ -138,6 +139,7 @@ export default function ShopClient() {
             title={poster.title}
             price={poster.price}
             imagePath={poster.imagePath}
+            tags={poster.tags}
           />
         ))}
       </div>

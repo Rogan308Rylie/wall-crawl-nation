@@ -9,6 +9,7 @@ type PosterCardProps = {
   title: string;
   price: number;
   imagePath: string;
+  tags?: string[];
 };
 
 export default function PosterCard({
@@ -16,6 +17,7 @@ export default function PosterCard({
   title,
   price,
   imagePath,
+  tags,
 }: PosterCardProps) {
   const { cart, addToCart, increaseQuantity, decreaseQuantity } = useCart();
   const cartItem = cart.find((item) => item.id === id);
@@ -75,6 +77,20 @@ export default function PosterCard({
       <div>
         <h3 className="text-[13px] font-medium leading-snug tracking-wide">{title}</h3>
         <p className="mt-1.5 text-xs text-white/60">₹{price}</p>
+
+        {/* Tag tablets */}
+        {tags && tags.length > 0 && (
+          <div className="flex gap-1 flex-wrap mt-2">
+            {[...tags].sort().map((tag) => (
+              <span
+                key={tag}
+                className="px-1.5 py-0.5 text-[10px] rounded bg-neutral-700 text-white/70"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* CTA - Morphs between Add to Cart and Quantity Controls */}
