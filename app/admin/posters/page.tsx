@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 type Poster = {
@@ -32,11 +32,17 @@ export default function AdminPostersPage() {
 	const [newTagName, setNewTagName] = useState("");
 	const [creatingTag, setCreatingTag] = useState(false);
 
+	// Bulk mode state
+	const [bulkMode, setBulkMode] = useState(false);
+	const [selectedPosters, setSelectedPosters] = useState<string[]>([]);
+	const [selectedTag, setSelectedTag] = useState("");
+	const [bulkLoading, setBulkLoading] = useState(false);
+	const lastClickedIndex = useRef<number | null>(null);
+
 	useEffect(() => {
 		fetch("/api/admin/posters")
 			.then((res) => res.json())
 			.then((data) => {
-				// sort by createdAt ascending (oldest -> newest)
 				const sorted = (data.posters || []).slice().sort((a: any, b: any) => {
 					const aSec = a?.createdAt?.seconds ?? (a?.createdAt ? Date.parse(a.createdAt) / 1000 : 0);
 					const bSec = b?.createdAt?.seconds ?? (b?.createdAt ? Date.parse(b.createdAt) / 1000 : 0);
@@ -47,12 +53,19 @@ export default function AdminPostersPage() {
 			});
 	}, []);
 
-	// Fetch all tags when tag modal is opened
+	// Fetch all tags
 	async function fetchTags() {
 		const res = await fetch("/api/admin/tags/list");
 		const data = await res.json();
 		setAllTags(data.tags || []);
 	}
+
+	// Fetch tags when entering bulk mode
+	useEffect(() => {
+		if (bulkMode) {
+			fetchTags();
+		}
+	}, [bulkMode]);
 
 	function openTagModal(poster: Poster) {
 		setTagModalPoster(poster);
@@ -71,14 +84,12 @@ export default function AdminPostersPage() {
 			updatedTags = [...currentTags, tag];
 		}
 
-		// Update in Firestore
 		await fetch("/api/admin/posters/updateTags", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ posterId: tagModalPoster.id, tags: updatedTags }),
 		});
 
-		// Update local state
 		const updatedPoster = { ...tagModalPoster, tags: updatedTags };
 		setTagModalPoster(updatedPoster);
 		setPosters((prev) =>
@@ -118,6 +129,89 @@ export default function AdminPostersPage() {
 		setPosters((prev) =>
 			prev.map((p) => (p.id === editingPoster.id ? updatedPoster : p))
 		);
+	}
+
+	// Bulk selection with shift-click support
+	function handlePosterSelect(posterId: string, index: number, shiftKey: boolean) {
+		if (shiftKey && lastClickedIndex.current !== null) {
+			const start = Math.min(lastClickedIndex.current, index);
+			const end = Math.max(lastClickedIndex.current, index);
+			const rangeIds = posters.slice(start, end + 1).map((p) => p.id);
+
+			setSelectedPosters((prev) => {
+				const merged = new Set([...prev, ...rangeIds]);
+				return Array.from(merged);
+			});
+		} else {
+			setSelectedPosters((prev) => {
+				if (prev.includes(posterId)) {
+					return prev.filter((id) => id !== posterId);
+				} else {
+					return [...prev, posterId];
+				}
+			});
+		}
+
+		lastClickedIndex.current = index;
+	}
+
+	// Bulk add tag
+	async function bulkAddTag() {
+		if (!selectedTag || selectedPosters.length === 0) return;
+
+		setBulkLoading(true);
+		await fetch("/api/admin/posters/bulkTag", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				posterIds: selectedPosters,
+				tag: selectedTag,
+				action: "add",
+			}),
+		});
+
+		// Update local state
+		setPosters((prev) =>
+			prev.map((p) => {
+				if (selectedPosters.includes(p.id)) {
+					const currentTags = p.tags || [];
+					if (!currentTags.includes(selectedTag)) {
+						return { ...p, tags: [...currentTags, selectedTag] };
+					}
+				}
+				return p;
+			})
+		);
+
+		setBulkLoading(false);
+	}
+
+	// Bulk remove tag
+	async function bulkRemoveTag() {
+		if (!selectedTag || selectedPosters.length === 0) return;
+
+		setBulkLoading(true);
+		await fetch("/api/admin/posters/bulkTag", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				posterIds: selectedPosters,
+				tag: selectedTag,
+				action: "remove",
+			}),
+		});
+
+		// Update local state
+		setPosters((prev) =>
+			prev.map((p) => {
+				if (selectedPosters.includes(p.id)) {
+					return { ...p, tags: (p.tags || []).filter((t) => t !== selectedTag) };
+				}
+				return p;
+			})
+		);
+
+		setBulkLoading(false);
 	}
 
 	if (loading) {
@@ -185,119 +279,232 @@ export default function AdminPostersPage() {
 
 	return (
 		<div>
-			<h1 className="text-2xl font-semibold mb-6">Manage Posters</h1>
+			<div className="flex items-center justify-between mb-6">
+				<h1 className="text-2xl font-semibold">Manage Posters</h1>
 
-			{/* Upload section: styled choose files button */}
-			<div className="mb-6">
-				<label className="inline-flex items-center px-4 py-2 bg-green-600 text-black rounded-md cursor-pointer">
-					Choose files
-					<input type="file" multiple onChange={handleFilesChange} className="hidden" />
-				</label>
-
-				{uploads.length > 0 && (
-					<div className="mt-4">
-						{uploads.map((item, i) => (
-							<div key={i} className="bg-[#1a1a1a] p-4 rounded-xl mb-4">
-								<p className="text-sm mb-2">{item.file.name}</p>
-
-								<input
-									type="text"
-									placeholder="Title"
-									value={item.title}
-									onChange={(e) => {
-										const copy = [...uploads];
-										copy[i].title = e.target.value;
-										setUploads(copy);
-									}}
-									className="w-full mb-2 p-2 bg-black border border-white/10 rounded"
-								/>
-
-								<input
-									type="number"
-									placeholder="Price"
-									value={item.price}
-									onChange={(e) => {
-										const copy = [...uploads];
-										copy[i].price = e.target.value;
-										setUploads(copy);
-									}}
-									className="w-full p-2 bg-black border border-white/10 rounded"
-								/>
-							</div>
-						))}
-
-						<button
-							type="button"
-							onClick={handleSubmitUploads}
-							disabled={uploading}
-							className="px-4 py-2 bg-green-600 text-black rounded-md"
-						>
-							{uploading ? "Uploading..." : "Upload all"}
-						</button>
-					</div>
-				)}
+				{/* Bulk mode toggle */}
+				<button
+					onClick={() => {
+						setBulkMode(!bulkMode);
+						setSelectedPosters([]);
+						setSelectedTag("");
+						lastClickedIndex.current = null;
+					}}
+					className={`px-4 py-2 text-sm rounded-lg transition ${
+						bulkMode
+							? "bg-white text-black font-medium"
+							: "bg-neutral-800 text-white/70 hover:bg-neutral-700"
+					}`}
+					type="button"
+				>
+					{bulkMode ? "Exit Bulk Mode" : "Bulk Tag"}
+				</button>
 			</div>
 
-			{/* Posters grid: 5 per row, smaller cards */}
+			{/* Bulk mode hint */}
+			{bulkMode && (
+				<div className="mb-4 px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">
+					Click posters to select them. Hold <strong>Shift</strong> and click to select a range.
+				</div>
+			)}
+
+			{/* Upload section */}
+			{!bulkMode && (
+				<div className="mb-6">
+					<label className="inline-flex items-center px-4 py-2 bg-green-600 text-black rounded-md cursor-pointer">
+						Choose files
+						<input type="file" multiple onChange={handleFilesChange} className="hidden" />
+					</label>
+
+					{uploads.length > 0 && (
+						<div className="mt-4">
+							{uploads.map((item, i) => (
+								<div key={i} className="bg-[#1a1a1a] p-4 rounded-xl mb-4">
+									<p className="text-sm mb-2">{item.file.name}</p>
+
+									<input
+										type="text"
+										placeholder="Title"
+										value={item.title}
+										onChange={(e) => {
+											const copy = [...uploads];
+											copy[i].title = e.target.value;
+											setUploads(copy);
+										}}
+										className="w-full mb-2 p-2 bg-black border border-white/10 rounded"
+									/>
+
+									<input
+										type="number"
+										placeholder="Price"
+										value={item.price}
+										onChange={(e) => {
+											const copy = [...uploads];
+											copy[i].price = e.target.value;
+											setUploads(copy);
+										}}
+										className="w-full p-2 bg-black border border-white/10 rounded"
+									/>
+								</div>
+							))}
+
+							<button
+								type="button"
+								onClick={handleSubmitUploads}
+								disabled={uploading}
+								className="px-4 py-2 bg-green-600 text-black rounded-md"
+							>
+								{uploading ? "Uploading..." : "Upload all"}
+							</button>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* Posters grid */}
 			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-				{posters.map((poster) => (
-					<div
-						key={poster.id}
-						className="bg-[#1a1a1a] rounded-xl p-3 ring-1 ring-white/5"
-					>
-						<div className="relative w-full aspect-[140/198] mb-3">
-							<Image
-								src={poster.imagePath}
-								alt={poster.title}
-								fill
-								className="object-contain rounded-md"
-							/>
-						</div>
+				{posters.map((poster, index) => {
+					const isSelected = selectedPosters.includes(poster.id);
 
-						<h3 className="font-semibold text-sm truncate">{poster.title}</h3>
-						<p className="text-white/60 text-xs">₹{poster.price}</p>
+					return (
+						<div
+							key={poster.id}
+							className={`relative bg-[#1a1a1a] rounded-xl p-3 ring-1 transition ${
+								bulkMode && isSelected
+									? "ring-green-500 bg-green-950/20"
+									: "ring-white/5"
+							} ${bulkMode ? "cursor-pointer" : ""}`}
+							onClick={
+								bulkMode
+									? (e) => handlePosterSelect(poster.id, index, e.shiftKey)
+									: undefined
+							}
+						>
+							{/* Bulk mode checkbox */}
+							{bulkMode && (
+								<div className="absolute top-2 left-2 z-10">
+									<input
+										type="checkbox"
+										className="w-5 h-5 accent-green-500"
+										checked={isSelected}
+										onChange={() => {}}
+										onClick={(e) => e.stopPropagation()}
+									/>
+								</div>
+							)}
 
-						{/* Tag tablets */}
-						{poster.tags && poster.tags.length > 0 && (
-							<div className="flex gap-1.5 flex-wrap mt-2">
-								{poster.tags.map((tag) => (
-									<div
-										key={tag}
-										className="px-2 py-0.5 text-[10px] rounded bg-neutral-700 text-white/80"
-									>
-										{tag}
-									</div>
-								))}
+							<div className="relative w-full aspect-[140/198] mb-3">
+								<Image
+									src={poster.imagePath}
+									alt={poster.title}
+									fill
+									className="object-contain rounded-md"
+								/>
 							</div>
-						)}
 
-						<div className="flex gap-2 mt-3">
-							<button
-								onClick={() => setEditingPoster(poster)}
-								className="flex-1 px-2 py-1 text-sm rounded-md bg-green-600 text-black hover:bg-green-700"
-								type="button"
-							>
-								Edit
-							</button>
+							<h3 className="font-semibold text-sm truncate">{poster.title}</h3>
+							<p className="text-white/60 text-xs">₹{poster.price}</p>
 
-							<button
-								onClick={() => openTagModal(poster)}
-								className="px-2 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
-								type="button"
-							>
-								+ Tag
-							</button>
+							{/* Tag tablets */}
+							{poster.tags && poster.tags.length > 0 && (
+								<div className="flex gap-1.5 flex-wrap mt-2">
+									{poster.tags.map((tag) => (
+										<div
+											key={tag}
+											className="px-2 py-0.5 text-[10px] rounded bg-neutral-700 text-white/80"
+										>
+											{tag}
+										</div>
+									))}
+								</div>
+							)}
 
-							<button
-								className="flex-1 px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
-								type="button"
-							>
-								Delete
-							</button>
+							{/* Normal mode buttons */}
+							{!bulkMode && (
+								<div className="flex gap-2 mt-3">
+									<button
+										onClick={() => setEditingPoster(poster)}
+										className="flex-1 px-2 py-1 text-sm rounded-md bg-green-600 text-black hover:bg-green-700"
+										type="button"
+									>
+										Edit
+									</button>
+
+									<button
+										onClick={() => openTagModal(poster)}
+										className="px-2 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
+										type="button"
+									>
+										+ Tag
+									</button>
+
+									<button
+										className="flex-1 px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+										type="button"
+									>
+										Delete
+									</button>
+								</div>
+							)}
 						</div>
-					</div>
-				))}
+					);
+				})}
 			</div>
+
+			{/* Bulk actions floating toolbar */}
+			{bulkMode && selectedPosters.length > 0 && (
+				<div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 border border-neutral-700 px-6 py-3 rounded-xl flex gap-4 items-center shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
+					<span className="text-sm font-medium text-white/80">
+						{selectedPosters.length} selected
+					</span>
+
+					<div className="w-px h-6 bg-white/10" />
+
+					<select
+						value={selectedTag}
+						onChange={(e) => setSelectedTag(e.target.value)}
+						className="bg-neutral-800 text-white text-sm px-3 py-1.5 rounded-lg border border-white/10"
+					>
+						<option value="">Select tag</option>
+						{allTags.map((tag) => (
+							<option key={tag} value={tag}>
+								{tag}
+							</option>
+						))}
+					</select>
+
+					<button
+						onClick={bulkAddTag}
+						disabled={!selectedTag || bulkLoading}
+						className="bg-green-600 text-black text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-50 hover:bg-green-700 transition"
+						type="button"
+					>
+						{bulkLoading ? "..." : "Add Tag"}
+					</button>
+
+					<button
+						onClick={bulkRemoveTag}
+						disabled={!selectedTag || bulkLoading}
+						className="bg-red-600 text-white text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-50 hover:bg-red-700 transition"
+						type="button"
+					>
+						{bulkLoading ? "..." : "Remove Tag"}
+					</button>
+
+					<div className="w-px h-6 bg-white/10" />
+
+					<button
+						onClick={() => {
+							setSelectedPosters([]);
+							lastClickedIndex.current = null;
+						}}
+						className="text-white/50 hover:text-white text-sm transition"
+						type="button"
+					>
+						Clear
+					</button>
+				</div>
+			)}
 
 			{/* Edit modal */}
 			{editingPoster && (
