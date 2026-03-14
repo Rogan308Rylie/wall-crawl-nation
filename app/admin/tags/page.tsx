@@ -92,9 +92,24 @@ export default function AdminTagsPage() {
 						{tags.map((tag) => (
 							<div
 								key={tag}
-								className="px-4 py-2 text-sm rounded-lg bg-neutral-800 text-white/80 ring-1 ring-white/5"
+								className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-neutral-800 text-white/80 ring-1 ring-white/5"
 							>
 								{tag}
+								<button
+									onClick={async () => {
+										if (!confirm(`Delete tag "${tag}"?`)) return;
+										await fetch("/api/admin/tags/delete", {
+											method: "POST",
+											headers: { "Content-Type": "application/json" },
+											body: JSON.stringify({ name: tag }),
+										});
+										await fetchTags();
+									}}
+									className="text-white/30 hover:text-red-400 transition text-lg leading-none"
+									type="button"
+								>
+									×
+								</button>
 							</div>
 						))}
 					</div>
