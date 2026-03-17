@@ -77,24 +77,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6️⃣ CUSTOM DESIGNS CTA (Soft Version) */}
-      <section className="px-6 py-28 text-center border-t border-white/10">
-        <h2 className="text-3xl font-semibold">
-          Want Something Personal?
+      {/* 6️⃣ CUSTOM ORDERS CTA */}
+      <section className="px-6 py-28 border-t border-white/10">
+        <h2 className="text-3xl md:text-4xl font-semibold text-center">
+          Want Something Custom?
         </h2>
 
-        <p className="mt-4 text-white/60 text-base">
-          We create custom posters tailored just for you.
-        </p>
+        <div className="mt-12 max-w-xl mx-auto space-y-10">
+          {/* Custom Posters */}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold">Custom Posters</h3>
+            <p className="mt-2 text-white/60 text-sm">
+              We create custom posters tailored just for you. Any design, any vibe.
+            </p>
+            <a
+              href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${buttons.primary} mt-4 inline-block`}
+            >
+              Get Posters
+            </a>
+          </div>
 
-        <a
-          href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${buttons.primary} mt-8 inline-block`}
-        >
-          Chat on WhatsApp
-        </a>
+          {/* Polaroids */}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold">Polaroid Prints</h3>
+            <p className="mt-2 text-white/60 text-sm">
+              Turn your favorite memories into aesthetic polaroid-style prints.
+              <br />
+              Perfect for your wall, desk, or as a gift.
+            </p>
+            <a
+              href="https://wa.me/919306553798?text=Hi%20I%20want%20some%20polaroids"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${buttons.primary} mt-4 inline-block`}
+            >
+              Get Polaroids
+            </a>
+          </div>
+        </div>
       </section>
 
       

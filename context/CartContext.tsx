@@ -4,22 +4,22 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 export type CartItem =
   | {
-      type: "poster"
-      id: string
-      title: string
-      price: number
-      quantity: number
-      imagePath: string
-    }
+    type: "poster"
+    id: string
+    title: string
+    price: number
+    quantity: number
+    imagePath: string
+  }
   | {
-      type: "collection"
-      id: string
-      title: string
-      price: number
-      quantity: number
-      posterIds: string[]
-      coverImage: string
-    }
+    type: "collection"
+    id: string
+    title: string
+    price: number
+    quantity: number
+    posterIds: string[]
+    coverImage: string
+  }
 
 type CartContextType = {
   cart: CartItem[];
