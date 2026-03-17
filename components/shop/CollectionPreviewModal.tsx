@@ -1,6 +1,7 @@
 "use client"
 
 import { useCart } from "@/context/CartContext"
+import { buttons } from "@/lib/ui/buttons"
 
 interface Poster {
   id: string
@@ -107,7 +108,7 @@ export default function CollectionPreviewModal({
               })
               onClose()
             }}
-            className="mt-6 bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-neutral-100 transition"
+            className={`${buttons.primary} mt-6`}
           >
             Add Bundle to Cart
           </button>
