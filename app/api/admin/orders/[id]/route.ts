@@ -96,7 +96,7 @@ export async function PATCH(
           quantity: item.quantity,
           price: item.price,
           imagePath: item.imagePath
-            ? `${SITE_URL}${item.imagePath}`
+            ? item.imagePath.startsWith("http") ? item.imagePath : `${SITE_URL}${item.imagePath}`
             : undefined,
         })),
       };

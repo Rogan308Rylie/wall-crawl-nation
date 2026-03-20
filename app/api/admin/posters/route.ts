@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
+import { getAdminDb, getAdminAuth, getAdminStorage } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import fs from "fs";
-import path from "path";
 
 const adminDb = getAdminDb();
 const adminAuth = getAdminAuth();
@@ -50,21 +48,26 @@ export async function POST(req: Request) {
       );
     }
 
-    // 5️⃣ Save image to /public/posters
+    // 5️⃣ Upload image to Firebase Storage
     const buffer = Buffer.from(await image.arrayBuffer());
     const ext = image.type === "image/png" ? "png" : "jpg";
     const filename = `${title
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")}-${Date.now()}.${ext}`;
 
-    const postersDir = path.join(process.cwd(), "public", "posters");
-    if (!fs.existsSync(postersDir)) {
-      fs.mkdirSync(postersDir, { recursive: true });
-    }
+    const bucket = getAdminStorage();
+    const file = bucket.file(`posters/${filename}`);
 
-    fs.writeFileSync(path.join(postersDir, filename), buffer);
+    await file.save(buffer, {
+      metadata: {
+        contentType: image.type,
+      },
+    });
 
-    const imagePath = `/posters/${filename}`;
+    // Make the file publicly readable
+    await file.makePublic();
+
+    const imagePath = `https://storage.googleapis.com/${bucket.name}/posters/${filename}`;
 
     // 6️⃣ Create Firestore doc
     await adminDb.collection("posters").add({

@@ -14,6 +14,7 @@ export function getAdminApp() {
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
   }
 
@@ -26,4 +27,8 @@ export function getAdminDb() {
 
 export function getAdminAuth() {
   return getAdminApp().auth();
+}
+
+export function getAdminStorage() {
+  return getAdminApp().storage().bucket();
 }
