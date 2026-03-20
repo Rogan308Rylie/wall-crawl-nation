@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAdminDb, getAdminAuth, getAdminStorage } from "@/lib/firebaseAdmin";
+import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { put } from "@vercel/blob";
 
 const adminDb = getAdminDb();
 const adminAuth = getAdminAuth();
@@ -48,26 +49,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // 5️⃣ Upload image to Firebase Storage
-    const buffer = Buffer.from(await image.arrayBuffer());
+    // 5️⃣ Upload image to Vercel Blob Storage
     const ext = image.type === "image/png" ? "png" : "jpg";
-    const filename = `${title
+    const filename = `posters/${title
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")}-${Date.now()}.${ext}`;
 
-    const bucket = getAdminStorage();
-    const file = bucket.file(`posters/${filename}`);
-
-    await file.save(buffer, {
-      metadata: {
-        contentType: image.type,
-      },
+    const blob = await put(filename, image, {
+      access: "public",
+      contentType: image.type,
     });
 
-    // Make the file publicly readable
-    await file.makePublic();
-
-    const imagePath = `https://storage.googleapis.com/${bucket.name}/posters/${filename}`;
+    const imagePath = blob.url;
 
     // 6️⃣ Create Firestore doc
     await adminDb.collection("posters").add({
