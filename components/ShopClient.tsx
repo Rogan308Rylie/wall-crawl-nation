@@ -31,9 +31,41 @@ export default function ShopClient() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [sortBy, setSortBy] = useState("title_asc"); // default sorting
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
-  async function fetchPosters(initial = false) {
+  const sortOptions = [
+    { value: "latest", label: "Sort by: Latest" },
+    { value: "oldest", label: "Sort by: Oldest" },
+    { value: "price_asc", label: "Price: Low to High" },
+    { value: "price_desc", label: "Price: High to Low" },
+    { value: "title_asc", label: "Name: A to Z" },
+    { value: "title_desc", label: "Name: Z to A" },
+  ];
+
+  async function fetchPosters(initial = false, overrideSort?: string) {
     setLoading(true);
+
+    const activeSort = overrideSort || sortBy;
+    let field = "title";
+    let direction: "asc" | "desc" = "asc"; // Default strictly tied to Name: A-Z
+
+    if (activeSort === "latest") {
+      field = "createdAt";
+      direction = "desc";
+    } else if (activeSort === "oldest") {
+      field = "createdAt";
+      direction = "asc";
+    } else if (activeSort === "price_asc") {
+      field = "price";
+      direction = "asc";
+    } else if (activeSort === "price_desc") {
+      field = "price";
+      direction = "desc";
+    } else if (activeSort === "title_desc") {
+      field = "title";
+      direction = "desc";
+    }
 
     let postersQuery;
 
@@ -41,7 +73,7 @@ export default function ShopClient() {
       postersQuery = query(
         collection(db, "posters"),
         where("isActive", "==", true),
-        orderBy("createdAt", "asc"),
+        orderBy(field, direction),
         limit(PAGE_SIZE)
       );
     } else {
@@ -53,13 +85,22 @@ export default function ShopClient() {
       postersQuery = query(
         collection(db, "posters"),
         where("isActive", "==", true),
-        orderBy("createdAt", "asc"),
+        orderBy(field, direction),
         startAfter(lastDoc),
         limit(PAGE_SIZE)
       );
     }
 
-    const snapshot = await getDocs(postersQuery);
+    let snapshot;
+    try {
+      snapshot = await getDocs(postersQuery);
+    } catch (err: any) {
+      console.error("Firestore error (you might need to create an index):", err);
+      // Keep loading false and return to prevent infinite loop
+      setLoading(false);
+      setHasMore(false);
+      return;
+    }
 
     if (snapshot.empty) {
       setHasMore(false);
@@ -86,7 +127,17 @@ export default function ShopClient() {
   useEffect(() => {
     setMounted(true);
     fetchPosters(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function handleSortChange(newSort: string) {
+    setSortBy(newSort);
+    // Reset state before fetching new sorted data
+    setPosters([]);
+    setLastDoc(null);
+    setHasMore(true);
+    fetchPosters(true, newSort);
+  }
 
   if (!mounted) {
     return null;
@@ -105,10 +156,59 @@ export default function ShopClient() {
       {/* Animated background gradient layer - POWDER BLUE for visibility testing */}
       <div className="absolute inset-0 -z-10 animate-bgshift opacity-100" />
 
-      {/* heading */}
-      <h1 className="mb-4 text-xl font-semibold tracking-tight">
-        Shop Posters
-      </h1>
+      {/* header container with sort */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <h1 className="text-xl font-semibold tracking-tight">
+          Shop Posters
+        </h1>
+
+        {/* Custom Sorting Dropdown */}
+        <div className="relative z-30">
+          <button
+            onClick={() => setIsSortOpen(!isSortOpen)}
+            className="flex items-center justify-between w-full sm:w-[200px] bg-[#111] hover:bg-[#1a1a1a] text-sm text-white/90 border border-white/10 rounded-xl px-4 py-2.5 transition-all shadow-lg"
+          >
+            <span className="truncate">
+              {sortOptions.find(o => o.value === sortBy)?.label}
+            </span>
+            <svg
+              className={`w-4 h-4 text-white/50 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {isSortOpen && (
+            <>
+              {/* Invisible overlay to close dropdown when clicking outside */}
+              <div 
+                className="fixed inset-0 z-10" 
+                onClick={() => setIsSortOpen(false)} 
+              />
+              
+              <div className="absolute right-0 sm:left-auto sm:right-0 top-full mt-2 w-full sm:w-[200px] bg-[#111] border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.8)] overflow-hidden z-20 flex flex-col p-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      setIsSortOpen(false);
+                      handleSortChange(option.value);
+                    }}
+                    className={`text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                      sortBy === option.value
+                        ? 'bg-white/10 text-white font-medium'
+                        : 'text-white/60 hover:bg-white/5 hover:text-white/90'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* empty state */}
       {posters.length === 0 && !loading && (

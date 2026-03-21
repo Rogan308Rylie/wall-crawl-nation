@@ -46,7 +46,7 @@ export default function CartPage() {
             <div className="flex items-center gap-4">
               <div className="relative h-24 w-16 overflow-hidden rounded-md bg-[#0a0a0a] ring-1 ring-white/5">
                 <Image
-                  src={item.type === "poster" ? item.imagePath : item.coverImage}
+                  src={(item.type === "poster" ? item.imagePath : item.coverImage) || "/placeholder.jpg"}
                   alt={item.title}
                   fill
                   className="object-contain"

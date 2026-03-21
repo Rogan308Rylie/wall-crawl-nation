@@ -59,7 +59,7 @@ export default function PosterCard({
   "
       >
         <Image
-          src={imagePath}
+          src={imagePath || "/placeholder.jpg"}
           alt={title || "Poster image"}
           fill
           unoptimized

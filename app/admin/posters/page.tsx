@@ -17,6 +17,7 @@ type UploadItem = {
 	file: File;
 	title: string;
 	price: string;
+	tags: string;
 };
 
 export default function AdminPostersPage() {
@@ -31,6 +32,7 @@ export default function AdminPostersPage() {
 	const [allTags, setAllTags] = useState<string[]>([]);
 	const [newTagName, setNewTagName] = useState("");
 	const [creatingTag, setCreatingTag] = useState(false);
+	const [editTagsToAdd, setEditTagsToAdd] = useState("");
 
 	// Bulk mode state
 	const [bulkMode, setBulkMode] = useState(false);
@@ -98,15 +100,44 @@ export default function AdminPostersPage() {
 	}
 
 	async function handleCreateTag() {
-		const trimmed = newTagName.trim().toLowerCase();
-		if (!trimmed) return;
+		const rawTags = newTagName.split(",");
+		const tagsToCreate = rawTags
+			.map((t) => t.trim().toLowerCase())
+			.filter(Boolean);
+
+		if (tagsToCreate.length === 0) return;
 
 		setCreatingTag(true);
-		await fetch("/api/admin/tags/create", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ name: trimmed }),
-		});
+
+		for (const tag of tagsToCreate) {
+			await fetch("/api/admin/tags/create", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name: tag }),
+			});
+		}
+
+		// Also auto-assign the newly created tags to the currently selected poster
+		if (tagModalPoster) {
+			const currentTags = tagModalPoster.tags || [];
+			const uniqueNewTags = tagsToCreate.filter(t => !currentTags.includes(t));
+			
+			if (uniqueNewTags.length > 0) {
+				const updatedTags = [...currentTags, ...uniqueNewTags];
+				
+				await fetch("/api/admin/posters/updateTags", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ posterId: tagModalPoster.id, tags: updatedTags }),
+				});
+
+				const updatedPoster = { ...tagModalPoster, tags: updatedTags };
+				setTagModalPoster(updatedPoster);
+				setPosters((prev) =>
+					prev.map((p) => (p.id === tagModalPoster.id ? updatedPoster : p))
+				);
+			}
+		}
 
 		setNewTagName("");
 		setCreatingTag(false);
@@ -129,6 +160,50 @@ export default function AdminPostersPage() {
 		setPosters((prev) =>
 			prev.map((p) => (p.id === editingPoster.id ? updatedPoster : p))
 		);
+	}
+
+	async function handleAddTagsToEdit() {
+		if (!editingPoster || !editTagsToAdd.trim()) return;
+
+		const rawTags = editTagsToAdd.split(",");
+		const tagsToAdd = rawTags.map((t) => t.trim().toLowerCase()).filter(Boolean);
+
+		if (tagsToAdd.length === 0) return;
+
+		const currentTags = editingPoster.tags || [];
+		const uniqueNewTags = tagsToAdd.filter(t => !currentTags.includes(t));
+
+		if (uniqueNewTags.length === 0) {
+			setEditTagsToAdd("");
+			return;
+		}
+
+		// Ensure tags are created in the database if they don't exist
+		for (const tag of uniqueNewTags) {
+			if (!allTags.includes(tag)) {
+				await fetch("/api/admin/tags/create", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ name: tag }),
+				});
+			}
+		}
+
+		const updatedTags = [...currentTags, ...uniqueNewTags];
+
+		await fetch("/api/admin/posters/updateTags", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ posterId: editingPoster.id, tags: updatedTags }),
+		});
+
+		const updatedPoster = { ...editingPoster, tags: updatedTags };
+		setEditingPoster(updatedPoster);
+		setPosters((prev) =>
+			prev.map((p) => (p.id === editingPoster.id ? updatedPoster : p))
+		);
+		setEditTagsToAdd("");
+		fetchTags(); // Refresh global tags list
 	}
 
 	// Bulk selection with shift-click support
@@ -235,7 +310,8 @@ export default function AdminPostersPage() {
 			files.map((file) => ({
 				file,
 				title: "",
-				price: "",
+				price: "30",
+				tags: "",
 			}))
 		);
 	}
@@ -260,6 +336,9 @@ export default function AdminPostersPage() {
 			fd.append("image", item.file);
 			fd.append("title", item.title);
 			fd.append("price", item.price);
+			if (item.tags.trim()) {
+				fd.append("tags", item.tags);
+			}
 
 			console.log("Making fetch request to /api/admin/posters");
 
@@ -269,7 +348,6 @@ export default function AdminPostersPage() {
 			});
 
 			console.log("Response status:", res.status);
-			console.log("Response:", res);
 		}
 
 		setUploading(false);
@@ -319,31 +397,53 @@ export default function AdminPostersPage() {
 					{uploads.length > 0 && (
 						<div className="mt-4">
 							{uploads.map((item, i) => (
-								<div key={i} className="bg-[#1a1a1a] p-4 rounded-xl mb-4">
-									<p className="text-sm mb-2">{item.file.name}</p>
+								<div key={i} className="bg-[#1a1a1a] p-4 rounded-xl mb-4 border border-white/5">
+									<div className="flex justify-between items-center mb-2">
+										<p className="text-sm font-mono text-white/50">{item.file.name}</p>
+										<button 
+											onClick={() => setUploads(uploads.filter((_, idx) => idx !== i))}
+											className="text-white/20 hover:text-red-500 text-xs transition"
+										>
+											Remove
+										</button>
+									</div>
 
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+										<input
+											type="text"
+											placeholder="Title"
+											value={item.title}
+											onChange={(e) => {
+												const copy = [...uploads];
+												copy[i].title = e.target.value;
+												setUploads(copy);
+											}}
+											className="w-full p-2 bg-black border border-white/10 rounded text-sm"
+										/>
+
+										<input
+											type="number"
+											placeholder="Price"
+											value={item.price}
+											onChange={(e) => {
+												const copy = [...uploads];
+												copy[i].price = e.target.value;
+												setUploads(copy);
+											}}
+											className="w-full p-2 bg-black border border-white/10 rounded text-sm"
+										/>
+									</div>
+									
 									<input
 										type="text"
-										placeholder="Title"
-										value={item.title}
+										placeholder="Tags (comma-separated, e.g. anime, movies)"
+										value={item.tags}
 										onChange={(e) => {
 											const copy = [...uploads];
-											copy[i].title = e.target.value;
+											copy[i].tags = e.target.value;
 											setUploads(copy);
 										}}
-										className="w-full mb-2 p-2 bg-black border border-white/10 rounded"
-									/>
-
-									<input
-										type="number"
-										placeholder="Price"
-										value={item.price}
-										onChange={(e) => {
-											const copy = [...uploads];
-											copy[i].price = e.target.value;
-											setUploads(copy);
-										}}
-										className="w-full p-2 bg-black border border-white/10 rounded"
+										className="w-full p-2 bg-black border border-white/10 rounded text-sm"
 									/>
 								</div>
 							))}
@@ -508,8 +608,14 @@ export default function AdminPostersPage() {
 
 			{/* Edit modal */}
 			{editingPoster && (
-				<div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-					<div className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10">
+				<div 
+					className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+					onClick={() => setEditingPoster(null)}
+				>
+					<div 
+						className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10 max-h-[90vh] overflow-y-auto"
+						onClick={(e) => e.stopPropagation()}
+					>
 						<h2 className="text-lg font-semibold mb-4">Edit Poster</h2>
 
 						<input
@@ -536,11 +642,13 @@ export default function AdminPostersPage() {
 							className="w-full mb-4 p-2 bg-black border border-white/10 rounded"
 						/>
 
-						{/* Tags with remove option */}
-						{editingPoster.tags && editingPoster.tags.length > 0 && (
-							<div className="mb-4">
-								<p className="text-sm text-white/60 mb-2">Tags</p>
-								<div className="flex gap-2 flex-wrap">
+						{/* Tags section */}
+						<div className="mb-4">
+							<p className="text-sm text-white/60 mb-2">Tags</p>
+							
+							{/* Current tags */}
+							{editingPoster.tags && editingPoster.tags.length > 0 && (
+								<div className="flex gap-2 flex-wrap mb-3">
 									{editingPoster.tags.map((tag) => (
 										<div
 											key={tag}
@@ -557,8 +665,30 @@ export default function AdminPostersPage() {
 										</div>
 									))}
 								</div>
+							)}
+
+							{/* Add new tags manually */}
+							<div className="flex gap-2">
+								<input
+									type="text"
+									placeholder="Add tags separated by commas... (e.g. anime, movies)"
+									value={editTagsToAdd}
+									onChange={(e) => setEditTagsToAdd(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") handleAddTagsToEdit();
+									}}
+									className="flex-1 p-2 bg-black border border-white/10 rounded text-sm"
+								/>
+								<button
+									onClick={handleAddTagsToEdit}
+									disabled={!editTagsToAdd.trim()}
+									className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md disabled:opacity-50"
+									type="button"
+								>
+									Add
+								</button>
 							</div>
-						)}
+						</div>
 
 						<div className="flex justify-between">
 							<button
@@ -583,9 +713,15 @@ export default function AdminPostersPage() {
 
 			{/* Tag selector modal */}
 			{tagModalPoster && (
-				<div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-					<div className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10 max-h-[80vh] overflow-y-auto">
-						<div className="flex items-center justify-between mb-6">
+				<div 
+					className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+					onClick={() => setTagModalPoster(null)}
+				>
+					<div 
+						className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10 max-h-[80vh] flex flex-col"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="flex items-center justify-between mb-4">
 							<h2 className="text-lg font-semibold">Add Tags</h2>
 							<button
 								onClick={() => setTagModalPoster(null)}
@@ -596,12 +732,36 @@ export default function AdminPostersPage() {
 							</button>
 						</div>
 
-						<p className="text-sm text-white/50 mb-4 truncate">
+						<p className="text-sm text-white/50 mb-6 truncate">
 							{tagModalPoster.title}
 						</p>
 
+						{/* Create new tag (Moved to top) */}
+						<div className="mb-6 pb-6 border-b border-white/10 shrink-0">
+							<div className="flex gap-2">
+								<input
+									type="text"
+									value={newTagName}
+									onChange={(e) => setNewTagName(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") handleCreateTag();
+									}}
+									placeholder="Add tags (comma-separated)..."
+									className="flex-1 p-2 bg-black border border-white/10 rounded text-sm"
+								/>
+								<button
+									onClick={handleCreateTag}
+									disabled={creatingTag || !newTagName.trim()}
+									className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md disabled:opacity-50"
+									type="button"
+								>
+									{creatingTag ? "..." : "Add"}
+								</button>
+							</div>
+						</div>
+
 						{/* Tag list */}
-						<div className="space-y-2 mb-6">
+						<div className="space-y-2 overflow-y-auto pr-2 pb-2">
 							{allTags.map((tag) => {
 								const isSelected = (tagModalPoster.tags || []).includes(tag);
 								return (
@@ -610,7 +770,7 @@ export default function AdminPostersPage() {
 										onClick={() => handleToggleTag(tag)}
 										className={`w-full text-left px-4 py-2 rounded-lg text-sm transition ${
 											isSelected
-												? "bg-green-600/20 text-green-400 ring-1 ring-green-500/30"
+												? "bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30"
 												: "bg-neutral-800 text-white/70 hover:bg-neutral-700"
 										}`}
 										type="button"
@@ -623,34 +783,9 @@ export default function AdminPostersPage() {
 
 							{allTags.length === 0 && (
 								<p className="text-white/30 text-sm text-center py-4">
-									No tags yet. Create one below.
+									No tags yet. Create one above.
 								</p>
 							)}
-						</div>
-
-						{/* Create new tag */}
-						<div className="border-t border-white/10 pt-4">
-							<p className="text-sm text-white/50 mb-2">+ Create new tag</p>
-							<div className="flex gap-2">
-								<input
-									type="text"
-									value={newTagName}
-									onChange={(e) => setNewTagName(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") handleCreateTag();
-									}}
-									placeholder="Tag name"
-									className="flex-1 p-2 bg-black border border-white/10 rounded text-sm"
-								/>
-								<button
-									onClick={handleCreateTag}
-									disabled={creatingTag || !newTagName.trim()}
-									className="px-3 py-2 bg-green-600 text-black text-sm rounded-md disabled:opacity-50"
-									type="button"
-								>
-									{creatingTag ? "..." : "Add"}
-								</button>
-							</div>
 						</div>
 					</div>
 				</div>

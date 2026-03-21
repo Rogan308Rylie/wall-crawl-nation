@@ -34,6 +34,8 @@ export async function POST(req: Request) {
     const title = formData.get("title") as string;
     const price = formData.get("price") as string;
     const image = formData.get("image") as File;
+    const tagsString = formData.get("tags") as string;
+    const tagsArr = tagsString ? tagsString.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean) : [];
 
     if (!title || !price || !image) {
       return NextResponse.json(
@@ -62,12 +64,27 @@ export async function POST(req: Request) {
 
     const imagePath = blob.url;
 
+    // 5.1 Ensure tags exist in tags collection
+    if (tagsArr.length > 0) {
+      for (const tag of tagsArr) {
+        const tagRef = adminDb.collection("tags").doc(tag);
+        const tagDoc = await tagRef.get();
+        if (!tagDoc.exists) {
+          await tagRef.set({
+            name: tag,
+            createdAt: FieldValue.serverTimestamp(),
+          });
+        }
+      }
+    }
+
     // 6️⃣ Create Firestore doc
     await adminDb.collection("posters").add({
       title,
       price: Number(price),
       imagePath,
       isActive: true,
+      tags: tagsArr,
       createdAt: FieldValue.serverTimestamp(),
     });
 

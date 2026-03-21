@@ -117,7 +117,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
         {/* Current Image with slide */}
         <img
           key={currentIndex}
-          src={currentPoster.imagePath}
+          src={currentPoster.imagePath || "/placeholder.jpg"}
           alt={currentPoster.title}
           className={`
             absolute inset-0 w-full h-full object-contain z-30
