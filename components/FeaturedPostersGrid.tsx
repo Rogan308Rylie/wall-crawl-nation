@@ -30,7 +30,7 @@ export default function FeaturedPostersGrid() {
         const postersQuery = query(
           collection(db, "posters"),
           where("isActive", "==", true),
-          orderBy("createdAt", "asc"),
+          orderBy("createdAt", "desc"),
           limit(6)
         );
 
