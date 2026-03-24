@@ -20,10 +20,10 @@ export default function Home() {
       </div>
 
       {/* 1️⃣ HERO SECTION */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-32 border-b-8 border-black bg-white bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:16px_16px]">
-        <h1 className="text-6xl md:text-[8rem] font-black uppercase leading-[0.8] tracking-tighter text-black w-full break-words">
+      <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-20 md:py-32 border-b-8 border-black bg-white bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:16px_16px]">
+        <h1 className="text-5xl sm:text-7xl md:text-[8rem] font-black uppercase leading-[0.8] tracking-tighter text-black w-full break-words">
           WALL CRAWL <br />
-          <span className="text-[#A3FF12] drop-shadow-[6px_6px_0_black]">NATION.</span>
+          <span className="text-[#A3FF12] drop-shadow-[4px_4px_0_black] md:drop-shadow-[6px_6px_0_black]">NATION.</span>
         </h1>
 
         <p className="mt-12 max-w-2xl bg-black px-6 py-3 text-white font-bold tracking-[0.2em] uppercase border-4 border-black shadow-[8px_8px_0_0_#A3FF12]">
@@ -43,7 +43,7 @@ export default function Home() {
       
       {/* MARQUEE TAPE BOTTOM OF HERO */}
       <div className="w-full overflow-hidden border-b-8 border-black bg-[#A3FF12] py-4 text-black flex whitespace-nowrap">
-        <div className="animate-marquee text-xl font-black uppercase tracking-[0.2em] whitespace-nowrap flex">
+        <div className="animate-marquee text-lg sm:text-xl font-black uppercase tracking-[0.2em] whitespace-nowrap flex">
           {[...Array(4)].map((_, i) => (
             <span key={i} className="pr-4">
                EXCLUSIVE PRINTS // MUSEUM QUALITY // BOLD AESTHETICS // BUILT FOR THE CULTURE // ZERO COMPROMISES // PREMIUM ARCHIVAL PAPER // OWN YOUR SPACE // TRUE EXPRESSION // ELEVATE YOUR WALLS // 
@@ -53,8 +53,8 @@ export default function Home() {
       </div>
 
       {/* 2️⃣ FEATURED POSTERS SECTION */}
-      <section className="px-4 sm:px-6 py-24 border-b-8 border-black bg-white">
-        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black bg-[#A3FF12] border-4 border-black inline-block px-8 py-4 shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-20">
+      <section className="px-4 sm:px-6 py-16 md:py-24 border-b-8 border-black bg-white">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black bg-[#A3FF12] border-4 border-black inline-block px-6 sm:px-8 py-3 sm:py-4 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -track -translate-x-1/2 mb-12 md:mb-20 whitespace-normal sm:whitespace-nowrap text-center">
           Featured Posters
         </h2>
         <FeaturedPostersGrid />
@@ -81,8 +81,8 @@ export default function Home() {
       </section>
 
       {/* 5️⃣ FINAL CLOSING CTA */}
-      <section className="px-6 py-32 text-center bg-[#A3FF12] border-b-8 border-black">
-        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-black drop-shadow-[4px_4px_0_white]">
+      <section className="px-4 sm:px-6 py-20 md:py-32 text-center bg-[#A3FF12] border-b-8 border-black">
+        <h2 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter text-black drop-shadow-[2px_2px_0_white] md:drop-shadow-[4px_4px_0_white]">
           Your Room Should Reflect Your Personality.
         </h2>
 
@@ -94,8 +94,8 @@ export default function Home() {
       </section>
 
       {/* 6️⃣ CUSTOM ORDERS CTA */}
-      <section className="px-6 py-28 bg-white">
-        <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-center text-black bg-[#A3FF12] border-4 border-black inline-block px-8 py-4 shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2">
+      <section className="px-4 sm:px-6 py-20 md:py-28 bg-white">
+        <h2 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter text-center text-black bg-[#A3FF12] border-4 border-black inline-block px-6 sm:px-8 py-3 sm:py-4 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-12">
           Want Something Custom?
         </h2>
 

@@ -211,19 +211,19 @@ export default function ShopClient() {
     ">
 
       {/* header container with sort and search */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 border-b-8 border-black pb-6">
-        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-black flex items-center gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12 border-b-8 border-black pb-8">
+        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-black flex flex-wrap items-center gap-3 sm:gap-4">
           Shop Posters
-          <span className="text-xl font-bold text-white bg-black px-3 py-1 border-2 border-black shadow-[4px_4px_0_0_#A3FF12]">
+          <span className="text-base sm:text-xl font-bold text-white bg-black px-2 sm:px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#A3FF12] sm:shadow-[4px_4px_0_0_#A3FF12]">
             {posters.length} results
           </span>
         </h1>
 
         {/* Toolbar: Search and Sort */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto relative z-30">
+        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto relative z-30">
           
           {/* Smart Tag Search Autocomplete */}
-          <div className="relative w-full sm:w-[320px]" ref={searchContainerRef}>
+          <div className="relative w-full lg:w-[320px]" ref={searchContainerRef}>
             <div 
               className={`flex items-center w-full bg-[#f0f0f0] border-4 transition-all shadow-[6px_6px_0_0_#A3FF12] ${
                 isTagsDropdownOpen ? 'border-black bg-white' : 'border-black hover:bg-white'

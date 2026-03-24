@@ -14,6 +14,7 @@ export default function Navbar() {
   const { user, logout, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
@@ -74,11 +75,16 @@ export default function Navbar() {
       "
     >
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-black uppercase tracking-widest text-black hover:-translate-y-1 hover:drop-shadow-[4px_4px_0_#A3FF12] transition-all">
+        <Link 
+          href="/" 
+          className="text-xl sm:text-2xl font-black uppercase tracking-widest text-black hover:-translate-y-1 hover:drop-shadow-[4px_4px_0_#A3FF12] transition-all"
+          onClick={() => setIsMenuOpen(false)}
+        >
           Wall Crawl Nation
         </Link>
 
-        <div className="flex items-center gap-6">
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex items-center gap-6">
           <Link href="/" className={navLink("/")}>
             Home
           </Link>
@@ -134,7 +140,107 @@ export default function Navbar() {
             </div>
           )}
         </div>
+
+        {/* Mobile menu controls */}
+        <div className="flex lg:hidden items-center gap-4">
+          <Link href="/cart" className="relative p-2 border-4 border-black bg-[#A3FF12] shadow-[4px_4px_0_0_#000]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.1-5.38a1 1 0 0 0-1-1.21H5.74"/></svg>
+            {mounted && cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-black text-black shadow-[2px_2px_0_0_#000]">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 border-4 border-black bg-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all"
+          >
+            {isMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="lg:hidden border-t-8 border-black bg-white p-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
+          <Link 
+            href="/" 
+            className={navLink("/")}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link 
+            href="/shop" 
+            className={navLink("/shop")}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Shop
+          </Link>
+          <Link 
+            href="/cart" 
+            className={navLink("/cart")}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Cart ({cartCount})
+          </Link>
+          
+          <button
+            onClick={() => {
+              toggleNightMode();
+              setIsMenuOpen(false);
+            }}
+            className="w-full text-center py-4 text-sm font-black uppercase tracking-widest text-[#A3FF12] bg-black border-4 border-black shadow-[6px_6px_0_0_#A3FF12] transition-all"
+          >
+            {isDarkMode ? "☾ NIGHT MODE" : "☀ DAY MODE"}
+          </button>
+
+          {!loading && !user && (
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <Link 
+                href="/login" 
+                className="py-4 text-center text-sm font-black uppercase tracking-widest text-black border-4 border-black bg-white shadow-[4px_4px_0_0_black]"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link 
+                href="/signup" 
+                className="py-4 text-center text-sm font-black uppercase tracking-widest text-black border-4 border-black bg-[#A3FF12] shadow-[4px_4px_0_0_black]"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+
+          {!loading && user && (
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="flex items-center gap-4 border-4 border-black p-4 bg-white shadow-[6px_6px_0_0_#000]">
+                 {user.photoURL ? (
+                    <img src={user.photoURL} alt="User" className="h-10 w-10 border-2 border-black" />
+                 ) : (
+                    <div className="h-10 w-10 flex items-center justify-center bg-[#A3FF12] border-2 border-black font-black uppercase">{user.displayName?.[0] || user.email?.[0]}</div>
+                 )}
+                 <div className="flex-1 truncate font-black uppercase text-xs">{user.displayName || user.email}</div>
+              </div>
+              <button 
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
+                className="py-4 text-center text-sm font-black uppercase bg-black text-white border-4 border-black shadow-[4px_4px_0_0_#A3FF12]"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 }

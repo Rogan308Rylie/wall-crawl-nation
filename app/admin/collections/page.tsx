@@ -258,7 +258,7 @@ export default function AdminCollectionsPage() {
             No collections yet. Create one below.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {collections.map(collection => (
               <div
                 key={collection.id}
@@ -357,7 +357,7 @@ export default function AdminCollectionsPage() {
       {/* Poster Selection Grid */}
       <div className="mb-16">
         <h2 className="text-2xl font-black uppercase text-black mb-6">Select Posters (min 2)</h2>
-        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
           {posters.map(poster => (
             <div
               key={poster.id}
@@ -653,7 +653,7 @@ export default function AdminCollectionsPage() {
               <label className="text-lg font-black uppercase tracking-widest text-black block mb-4">
                 Select Posters (min 2)
               </label>
-              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {posters.map(poster => (
                   <div
                     key={poster.id}

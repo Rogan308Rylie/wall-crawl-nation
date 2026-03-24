@@ -552,60 +552,76 @@ export default function AdminPostersPage() {
 				})}
 			</div>
 
-			{/* Bulk actions floating toolbar */}
-			{bulkMode && selectedPosters.length > 0 && (
-				<div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-white border-4 border-black px-6 py-4 flex gap-6 items-center shadow-[12px_12px_0_0_#000]">
-					<span className="text-xl font-black uppercase text-black">
-						<span className="bg-[#A3FF12] px-2 py-1 mr-2 border-2 border-black">{selectedPosters.length}</span> SELECTED
-					</span>
+      {/* Bulk actions floating toolbar */}
+      {bulkMode && selectedPosters.length > 0 && (
+        <div className="fixed bottom-4 sm:bottom-8 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 z-50 bg-white border-4 border-black p-4 sm:px-6 sm:py-4 flex flex-col sm:flex-row gap-4 sm:gap-6 items-center shadow-[8px_8px_0_0_#000] sm:shadow-[12px_12px_0_0_#000] max-h-[40vh] overflow-y-auto">
+          <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+            <span className="text-lg sm:text-xl font-black uppercase text-black">
+              <span className="bg-[#A3FF12] px-2 py-1 mr-2 border-2 border-black">{selectedPosters.length}</span> SELECTED
+            </span>
+            <button
+              onClick={() => {
+                setSelectedPosters([]);
+                lastClickedIndex.current = null;
+              }}
+              className="sm:hidden text-black font-black uppercase hover:text-red-600 transition-colors text-sm"
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
 
-					<div className="w-1 h-10 bg-black" />
+          <div className="hidden sm:block w-1 h-10 bg-black" />
 
-					<select
-						value={selectedTag}
-						onChange={(e) => setSelectedTag(e.target.value)}
-						className="bg-[#f0f0f0] text-black font-bold uppercase text-lg px-4 py-2 border-4 border-black focus:outline-none focus:bg-[#A3FF12] cursor-pointer"
-					>
-						<option value="">Select tag</option>
-						{allTags.map((tag) => (
-							<option key={tag} value={tag}>
-								{tag}
-							</option>
-						))}
-					</select>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <select
+              value={selectedTag}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className="bg-[#f0f0f0] text-black font-bold uppercase text-base sm:text-lg px-4 py-2 border-2 sm:border-4 border-black focus:outline-none focus:bg-[#A3FF12] cursor-pointer w-full sm:w-auto"
+            >
+              <option value="">Select tag</option>
+              {allTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
 
-					<button
-						onClick={bulkAddTag}
-						disabled={!selectedTag || bulkLoading}
-						className="bg-black text-[#A3FF12] text-lg font-black uppercase px-6 py-2 border-4 border-black disabled:opacity-50 hover:bg-white hover:text-black hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all cursor-pointer"
-						type="button"
-					>
-						{bulkLoading ? "..." : "+ Add"}
-					</button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={bulkAddTag}
+                disabled={!selectedTag || bulkLoading}
+                className="flex-1 sm:flex-none bg-black text-[#A3FF12] text-sm sm:text-lg font-black uppercase px-4 sm:px-6 py-2 border-4 border-black disabled:opacity-50 hover:bg-white hover:text-black hover:-translate-y-1 transition-all cursor-pointer"
+                type="button"
+              >
+                {bulkLoading ? "..." : "+ Add"}
+              </button>
 
-					<button
-						onClick={bulkRemoveTag}
-						disabled={!selectedTag || bulkLoading}
-						className="bg-white text-black text-lg font-black uppercase px-6 py-2 border-4 border-black disabled:opacity-50 hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all cursor-pointer"
-						type="button"
-					>
-						{bulkLoading ? "..." : "- Remove"}
-					</button>
+              <button
+                onClick={bulkRemoveTag}
+                disabled={!selectedTag || bulkLoading}
+                className="flex-1 sm:flex-none bg-white text-black text-sm sm:text-lg font-black uppercase px-4 sm:px-6 py-2 border-4 border-black disabled:opacity-50 hover:-translate-y-1 transition-all cursor-pointer"
+                type="button"
+              >
+                {bulkLoading ? "..." : "- Remove"}
+              </button>
+            </div>
+          </div>
 
-					<div className="w-1 h-10 bg-black" />
+          <div className="hidden sm:block w-1 h-10 bg-black" />
 
-					<button
-						onClick={() => {
-							setSelectedPosters([]);
-							lastClickedIndex.current = null;
-						}}
-						className="text-black font-black uppercase hover:text-red-600 transition-colors text-lg"
-						type="button"
-					>
-						Clear
-					</button>
-				</div>
-			)}
+          <button
+            onClick={() => {
+              setSelectedPosters([]);
+              lastClickedIndex.current = null;
+            }}
+            className="hidden sm:block text-black font-black uppercase hover:text-red-600 transition-colors text-lg"
+            type="button"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
 			{/* Edit modal */}
 			{editingPoster && (

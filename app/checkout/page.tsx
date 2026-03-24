@@ -200,8 +200,8 @@ async function placeOrder() {
 }
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4">
-      <h1 className="text-5xl font-black uppercase tracking-tighter text-black mb-12 border-b-8 border-black pb-4 inline-block">Checkout</h1>
+    <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
+      <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black mb-12 border-b-8 border-black pb-4 inline-block">Checkout</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Address Form */}

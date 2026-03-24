@@ -30,8 +30,8 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12">
-      <h1 className="mb-10 text-5xl font-black uppercase tracking-tighter text-black border-b-8 border-black inline-block pr-8 pb-2">Your Cart</h1>
+    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+      <h1 className="mb-10 text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black border-b-8 border-black inline-block pr-8 pb-2">Your Cart</h1>
 
       <div className="space-y-6">
         {cart.map((item) => (
