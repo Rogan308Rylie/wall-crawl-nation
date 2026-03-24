@@ -10,8 +10,12 @@ export default function Home() {
     <main className="min-h-screen bg-transparent">
       {/* MARQUEE TAPE TOP */}
       <div className="w-full overflow-hidden border-b-4 border-black bg-black py-3 text-[#A3FF12] flex whitespace-nowrap">
-        <div className="animate-marquee text-sm font-black uppercase tracking-[0.3em]">
-          {[...Array(10)].map((_, i) => " // NO RULES // JUST ART // WALL CRAWL NATION ")}
+        <div className="animate-marquee text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap flex">
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="pr-4">
+               // NO RULES // JUST ART // WALL CRAWL NATION // REDEFINING SPACES // ART WITHOUT LIMITS // DESIGNED FOR THE BOLD // CURATED COLLECTIONS // REBEL AGAINST BLANK WALLS 
+            </span>
+          ))}
         </div>
       </div>
 
@@ -39,8 +43,12 @@ export default function Home() {
       
       {/* MARQUEE TAPE BOTTOM OF HERO */}
       <div className="w-full overflow-hidden border-b-8 border-black bg-[#A3FF12] py-4 text-black flex whitespace-nowrap">
-        <div className="animate-marquee text-xl font-black uppercase tracking-[0.2em]">
-          {[...Array(10)].map((_, i) => " FREE SHIPPING OVER $50 // NO REFUNDS FOR POSERS // ")}
+        <div className="animate-marquee text-xl font-black uppercase tracking-[0.2em] whitespace-nowrap flex">
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="pr-4">
+               EXCLUSIVE PRINTS // MUSEUM QUALITY // BOLD AESTHETICS // BUILT FOR THE CULTURE // ZERO COMPROMISES // PREMIUM ARCHIVAL PAPER // OWN YOUR SPACE // TRUE EXPRESSION // ELEVATE YOUR WALLS // 
+            </span>
+          ))}
         </div>
       </div>
 
@@ -57,17 +65,17 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8 text-center text-black">
           <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
             <h3 className="text-3xl font-black uppercase tracking-wider">Premium Prints</h3>
-            <p className="font-bold mt-4 text-lg">Designed to look sharp and bold on any wall.</p>
+            <p className="font-bold mt-4 text-lg">Designed to look sharp and bold on any wall. <br /> No compromise in quality</p>
           </div>
 
           <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
             <h3 className="text-3xl font-black uppercase tracking-wider">Secure Payments</h3>
-            <p className="font-bold mt-4 text-lg">Safe checkout powered by Razorpay.</p>
+            <p className="font-bold mt-4 text-lg">Safe checkout powered by Razorpay. <br /> #SaavdhanRahenSatarkRahen</p>
           </div>
 
           <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
             <h3 className="text-3xl font-black uppercase tracking-wider">Fast Processing</h3>
-            <p className="font-bold mt-4 text-lg">Orders confirmed and processed quickly.</p>
+            <p className="font-bold mt-4 text-lg">Orders confirmed and processed quickly <br /> Because who has the time to wait?</p>
           </div>
         </div>
       </section>
@@ -96,7 +104,7 @@ export default function Home() {
           <div className="text-center border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12]">
             <h3 className="text-3xl font-black uppercase">Custom Posters</h3>
             <p className="mt-4 text-black font-bold text-lg">
-              We create custom posters tailored just for you. Any design, any vibe.
+              We create custom posters tailored just for you. <br />  Any design, any vibe.
             </p>
             <a
               href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
@@ -110,11 +118,11 @@ export default function Home() {
 
           {/* Polaroids */}
           <div className="text-center border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12]">
-            <h3 className="text-3xl font-black uppercase">Polaroid Prints</h3>
+            <h3 className="text-3xl font-black uppercase">Polaroid Photos</h3>
             <p className="mt-4 text-black font-bold text-lg">
-              Turn your favorite memories into aesthetic polaroid-style prints.
+              Turn your memories into aesthetic polaroid-style prints.
               <br />
-              Perfect for your wall, desk, or as a gift.
+              Perfect for your walls, desk, or as a gift.
             </p>
             <a
               href="https://wa.me/919306553798?text=Hi%20I%20want%20some%20polaroids"
