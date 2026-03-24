@@ -357,8 +357,8 @@ export default function AdminPostersPage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-2xl font-semibold">Manage Posters</h1>
+			<div className="flex items-center justify-between mb-10 pb-4 border-b-8 border-black">
+				<h1 className="text-5xl font-black uppercase text-black tracking-tighter">Manage Posters</h1>
 
 				{/* Bulk mode toggle */}
 				<button
@@ -368,10 +368,10 @@ export default function AdminPostersPage() {
 						setSelectedTag("");
 						lastClickedIndex.current = null;
 					}}
-					className={`px-4 py-2 text-sm rounded-lg transition ${
+					className={`px-6 py-3 text-lg font-black uppercase tracking-widest border-4 border-black shadow-[4px_4px_0_0_#000] transition-all hover:scale-105 ${
 						bulkMode
-							? "bg-white text-black font-medium"
-							: "bg-neutral-800 text-white/70 hover:bg-neutral-700"
+							? "bg-black text-[#A3FF12]"
+							: "bg-white text-black hover:bg-[#A3FF12]"
 					}`}
 					type="button"
 				>
@@ -381,34 +381,34 @@ export default function AdminPostersPage() {
 
 			{/* Bulk mode hint */}
 			{bulkMode && (
-				<div className="mb-4 px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">
-					Click posters to select them. Hold <strong>Shift</strong> and click to select a range.
+				<div className="mb-8 p-6 bg-[#A3FF12] border-4 border-black shadow-[8px_8px_0_0_#000] text-lg font-bold text-black uppercase">
+					Click posters to select them. Hold <strong className="underline decoration-4">Shift</strong> and click to select a range.
 				</div>
 			)}
 
 			{/* Upload section */}
 			{!bulkMode && (
-				<div className="mb-6">
-					<label className="inline-flex items-center px-4 py-2 bg-green-600 text-black rounded-md cursor-pointer">
+				<div className="mb-12">
+					<label className="inline-block px-8 py-4 bg-[#A3FF12] border-4 border-black shadow-[6px_6px_0_0_#000] font-black uppercase text-2xl hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#000] transition-all cursor-pointer">
 						Choose files
 						<input type="file" multiple onChange={handleFilesChange} className="hidden" />
 					</label>
 
 					{uploads.length > 0 && (
-						<div className="mt-4">
+						<div className="mt-8 space-y-6">
 							{uploads.map((item, i) => (
-								<div key={i} className="bg-[#1a1a1a] p-4 rounded-xl mb-4 border border-white/5">
-									<div className="flex justify-between items-center mb-2">
-										<p className="text-sm font-mono text-white/50">{item.file.name}</p>
+								<div key={i} className="bg-white p-6 border-4 border-black shadow-[8px_8px_0_0_#A3FF12]">
+									<div className="flex justify-between items-center mb-4 border-b-4 border-black pb-2">
+										<p className="text-xl font-bold font-mono text-black">{item.file.name}</p>
 										<button 
 											onClick={() => setUploads(uploads.filter((_, idx) => idx !== i))}
-											className="text-white/20 hover:text-red-500 text-xs transition"
+											className="text-black hover:text-red-600 font-black uppercase shrink-0 transition-colors"
 										>
-											Remove
+											✕ Remove
 										</button>
 									</div>
 
-									<div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 										<input
 											type="text"
 											placeholder="Title"
@@ -418,7 +418,7 @@ export default function AdminPostersPage() {
 												copy[i].title = e.target.value;
 												setUploads(copy);
 											}}
-											className="w-full p-2 bg-black border border-white/10 rounded text-sm"
+											className="w-full p-4 border-4 border-black bg-[#f0f0f0] font-bold uppercase text-black placeholder-black/50 focus:bg-[#A3FF12] focus:outline-none transition-colors"
 										/>
 
 										<input
@@ -430,7 +430,7 @@ export default function AdminPostersPage() {
 												copy[i].price = e.target.value;
 												setUploads(copy);
 											}}
-											className="w-full p-2 bg-black border border-white/10 rounded text-sm"
+											className="w-full p-4 border-4 border-black bg-[#f0f0f0] font-bold uppercase text-black placeholder-black/50 focus:bg-[#A3FF12] focus:outline-none transition-colors"
 										/>
 									</div>
 									
@@ -443,7 +443,7 @@ export default function AdminPostersPage() {
 											copy[i].tags = e.target.value;
 											setUploads(copy);
 										}}
-										className="w-full p-2 bg-black border border-white/10 rounded text-sm"
+										className="w-full p-4 border-4 border-black bg-[#f0f0f0] font-bold uppercase text-black placeholder-black/50 focus:bg-[#A3FF12] focus:outline-none transition-colors"
 									/>
 								</div>
 							))}
@@ -452,9 +452,9 @@ export default function AdminPostersPage() {
 								type="button"
 								onClick={handleSubmitUploads}
 								disabled={uploading}
-								className="px-4 py-2 bg-green-600 text-black rounded-md"
+								className="w-full py-6 bg-black text-[#A3FF12] font-black text-3xl uppercase border-4 border-black hover:bg-white hover:text-black transition-colors"
 							>
-								{uploading ? "Uploading..." : "Upload all"}
+								{uploading ? "Uploading..." : "Upload All"}
 							</button>
 						</div>
 					)}
@@ -462,17 +462,17 @@ export default function AdminPostersPage() {
 			)}
 
 			{/* Posters grid */}
-			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
 				{posters.map((poster, index) => {
 					const isSelected = selectedPosters.includes(poster.id);
 
 					return (
 						<div
 							key={poster.id}
-							className={`relative bg-[#1a1a1a] rounded-xl p-3 ring-1 transition ${
+							className={`relative bg-white border-4 border-black p-4 transition-all ${
 								bulkMode && isSelected
-									? "ring-green-500 bg-green-950/20"
-									: "ring-white/5"
+									? "shadow-[8px_8px_0_0_#A3FF12] bg-[#f0f0f0]"
+									: "shadow-[4px_4px_0_0_#000]"
 							} ${bulkMode ? "cursor-pointer" : ""}`}
 							onClick={
 								bulkMode
@@ -485,7 +485,7 @@ export default function AdminPostersPage() {
 								<div className="absolute top-2 left-2 z-10">
 									<input
 										type="checkbox"
-										className="w-5 h-5 accent-green-500"
+										className="w-6 h-6 border-4 border-black accent-[#A3FF12]"
 										checked={isSelected}
 										onChange={() => {}}
 										onClick={(e) => e.stopPropagation()}
@@ -493,25 +493,25 @@ export default function AdminPostersPage() {
 								</div>
 							)}
 
-							<div className="relative w-full aspect-[140/198] mb-3">
+							<div className="relative w-full aspect-[140/198] mb-4 border-2 border-black">
 								<Image
 									src={poster.imagePath}
 									alt={poster.title}
 									fill
-									className="object-contain rounded-md"
+									className="object-contain"
 								/>
 							</div>
 
-							<h3 className="font-semibold text-sm truncate">{poster.title}</h3>
-							<p className="text-white/60 text-xs">₹{poster.price}</p>
+							<h3 className="font-black text-lg uppercase truncate text-black mb-1">{poster.title}</h3>
+							<p className="text-black font-bold text-lg bg-[#A3FF12] inline-block px-2 border-2 border-black shadow-[2px_2px_0_0_#000]">₹{poster.price}</p>
 
 							{/* Tag tablets */}
 							{poster.tags && poster.tags.length > 0 && (
-								<div className="flex gap-1.5 flex-wrap mt-2">
+								<div className="flex gap-2 flex-wrap mt-4">
 									{poster.tags.map((tag) => (
 										<div
 											key={tag}
-											className="px-2 py-0.5 text-[10px] rounded bg-neutral-700 text-white/80"
+											className="px-2 py-1 text-xs font-black uppercase tracking-widest border-2 border-black bg-black text-[#A3FF12]"
 										>
 											{tag}
 										</div>
@@ -521,25 +521,26 @@ export default function AdminPostersPage() {
 
 							{/* Normal mode buttons */}
 							{!bulkMode && (
-								<div className="flex gap-2 mt-3">
-									<button
-										onClick={() => setEditingPoster(poster)}
-										className="flex-1 px-2 py-1 text-sm rounded-md bg-green-600 text-black hover:bg-green-700"
-										type="button"
-									>
-										Edit
-									</button>
+								<div className="flex flex-col gap-2 mt-6">
+									<div className="flex gap-2">
+										<button
+											onClick={() => setEditingPoster(poster)}
+											className="flex-1 px-3 py-2 text-sm font-black uppercase text-black bg-[#A3FF12] border-2 border-black hover:-translate-y-1 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all"
+											type="button"
+										>
+											Edit
+										</button>
 
+										<button
+											onClick={() => openTagModal(poster)}
+											className="flex-1 px-3 py-2 text-sm font-black uppercase text-black bg-white border-2 border-black hover:-translate-y-1 shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all"
+											type="button"
+										>
+											+ Tag
+										</button>
+									</div>
 									<button
-										onClick={() => openTagModal(poster)}
-										className="px-2 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
-										type="button"
-									>
-										+ Tag
-									</button>
-
-									<button
-										className="flex-1 px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+										className="w-full px-3 py-2 text-sm font-black uppercase text-white bg-black border-2 border-black hover:-translate-y-1 shadow-[2px_2px_0_0_#A3FF12] hover:shadow-[4px_4px_0_0_#A3FF12] transition-all"
 										type="button"
 									>
 										Delete
@@ -553,17 +554,17 @@ export default function AdminPostersPage() {
 
 			{/* Bulk actions floating toolbar */}
 			{bulkMode && selectedPosters.length > 0 && (
-				<div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 border border-neutral-700 px-6 py-3 rounded-xl flex gap-4 items-center shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
-					<span className="text-sm font-medium text-white/80">
-						{selectedPosters.length} selected
+				<div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-white border-4 border-black px-6 py-4 flex gap-6 items-center shadow-[12px_12px_0_0_#000]">
+					<span className="text-xl font-black uppercase text-black">
+						<span className="bg-[#A3FF12] px-2 py-1 mr-2 border-2 border-black">{selectedPosters.length}</span> SELECTED
 					</span>
 
-					<div className="w-px h-6 bg-white/10" />
+					<div className="w-1 h-10 bg-black" />
 
 					<select
 						value={selectedTag}
 						onChange={(e) => setSelectedTag(e.target.value)}
-						className="bg-neutral-800 text-white text-sm px-3 py-1.5 rounded-lg border border-white/10"
+						className="bg-[#f0f0f0] text-black font-bold uppercase text-lg px-4 py-2 border-4 border-black focus:outline-none focus:bg-[#A3FF12] cursor-pointer"
 					>
 						<option value="">Select tag</option>
 						{allTags.map((tag) => (
@@ -576,29 +577,29 @@ export default function AdminPostersPage() {
 					<button
 						onClick={bulkAddTag}
 						disabled={!selectedTag || bulkLoading}
-						className="bg-green-600 text-black text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-50 hover:bg-green-700 transition"
+						className="bg-black text-[#A3FF12] text-lg font-black uppercase px-6 py-2 border-4 border-black disabled:opacity-50 hover:bg-white hover:text-black hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all cursor-pointer"
 						type="button"
 					>
-						{bulkLoading ? "..." : "Add Tag"}
+						{bulkLoading ? "..." : "+ Add"}
 					</button>
 
 					<button
 						onClick={bulkRemoveTag}
 						disabled={!selectedTag || bulkLoading}
-						className="bg-red-600 text-white text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-50 hover:bg-red-700 transition"
+						className="bg-white text-black text-lg font-black uppercase px-6 py-2 border-4 border-black disabled:opacity-50 hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all cursor-pointer"
 						type="button"
 					>
-						{bulkLoading ? "..." : "Remove Tag"}
+						{bulkLoading ? "..." : "- Remove"}
 					</button>
 
-					<div className="w-px h-6 bg-white/10" />
+					<div className="w-1 h-10 bg-black" />
 
 					<button
 						onClick={() => {
 							setSelectedPosters([]);
 							lastClickedIndex.current = null;
 						}}
-						className="text-white/50 hover:text-white text-sm transition"
+						className="text-black font-black uppercase hover:text-red-600 transition-colors text-lg"
 						type="button"
 					>
 						Clear
@@ -609,14 +610,22 @@ export default function AdminPostersPage() {
 			{/* Edit modal */}
 			{editingPoster && (
 				<div 
-					className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+					className="fixed inset-0 bg-[#A3FF12]/90 flex items-center justify-center z-50 p-4"
 					onClick={() => setEditingPoster(null)}
 				>
 					<div 
-						className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10 max-h-[90vh] overflow-y-auto"
+						className="bg-white p-8 w-full max-w-md border-8 border-black shadow-[16px_16px_0_0_#000] max-h-[90vh] overflow-y-auto relative"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<h2 className="text-lg font-semibold mb-4">Edit Poster</h2>
+						<button
+							onClick={() => setEditingPoster(null)}
+							className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors leading-none"
+							type="button"
+						>
+							✕
+						</button>
+
+						<h2 className="text-3xl font-black uppercase text-black mb-8 border-b-8 border-black pb-4 inline-block">Edit Poster</h2>
 
 						<input
 							type="text"
@@ -627,7 +636,7 @@ export default function AdminPostersPage() {
 									title: e.target.value,
 								})
 							}
-							className="w-full mb-4 p-2 bg-black border border-white/10 rounded"
+							className="w-full mb-6 p-4 bg-[#f0f0f0] border-4 border-black text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 						/>
 
 						<input
@@ -639,28 +648,28 @@ export default function AdminPostersPage() {
 									price: Number(e.target.value),
 								})
 							}
-							className="w-full mb-4 p-2 bg-black border border-white/10 rounded"
+							className="w-full mb-6 p-4 bg-[#f0f0f0] border-4 border-black text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 						/>
 
 						{/* Tags section */}
-						<div className="mb-4">
-							<p className="text-sm text-white/60 mb-2">Tags</p>
+						<div className="mb-8">
+							<p className="text-lg font-black uppercase tracking-widest text-black mb-3">Tags</p>
 							
 							{/* Current tags */}
 							{editingPoster.tags && editingPoster.tags.length > 0 && (
-								<div className="flex gap-2 flex-wrap mb-3">
+								<div className="flex gap-3 flex-wrap mb-4">
 									{editingPoster.tags.map((tag) => (
 										<div
 											key={tag}
-											className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-neutral-700 text-white/80"
+											className="flex items-center gap-2 px-3 py-1 text-sm font-black uppercase tracking-widest bg-black text-[#A3FF12] border-4 border-black"
 										>
 											{tag}
 											<button
 												onClick={() => handleRemoveTag(tag)}
-												className="ml-1 text-white/50 hover:text-white transition"
+												className="ml-2 text-white hover:text-red-500 transition-colors text-xl leading-none"
 												type="button"
 											>
-												×
+												✕
 											</button>
 										</div>
 									))}
@@ -668,21 +677,21 @@ export default function AdminPostersPage() {
 							)}
 
 							{/* Add new tags manually */}
-							<div className="flex gap-2">
+							<div className="flex flex-col sm:flex-row gap-4 mt-2">
 								<input
 									type="text"
-									placeholder="Add tags separated by commas... (e.g. anime, movies)"
+									placeholder="Add tags..."
 									value={editTagsToAdd}
 									onChange={(e) => setEditTagsToAdd(e.target.value)}
 									onKeyDown={(e) => {
 										if (e.key === "Enter") handleAddTagsToEdit();
 									}}
-									className="flex-1 p-2 bg-black border border-white/10 rounded text-sm"
+									className="flex-1 p-3 bg-[#f0f0f0] border-4 border-black text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 								/>
 								<button
 									onClick={handleAddTagsToEdit}
 									disabled={!editTagsToAdd.trim()}
-									className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md disabled:opacity-50"
+									className="px-6 py-3 bg-black text-[#A3FF12] font-black uppercase disabled:opacity-50 border-4 border-black hover:bg-white hover:text-black transition-colors"
 									type="button"
 								>
 									Add
@@ -690,21 +699,20 @@ export default function AdminPostersPage() {
 							</div>
 						</div>
 
-						<div className="flex justify-between">
-							<button
-								onClick={() => setEditingPoster(null)}
-								className="text-white/60"
-								type="button"
-							>
-								Cancel
-							</button>
-
+						<div className="flex gap-4 border-t-8 border-black pt-8">
 							<button
 								onClick={handleSaveEdit}
-								className="text-black bg-green-600 px-3 py-1 rounded-md"
+								className="flex-1 py-4 bg-black text-[#A3FF12] font-black uppercase text-xl border-4 border-black hover:bg-white hover:text-black hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all"
 								type="button"
 							>
 								Save
+							</button>
+							<button
+								onClick={() => setEditingPoster(null)}
+								className="flex-1 py-4 bg-white text-black font-black uppercase text-xl border-4 border-black hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000] transition-all"
+								type="button"
+							>
+								Cancel
 							</button>
 						</div>
 					</div>
@@ -714,31 +722,30 @@ export default function AdminPostersPage() {
 			{/* Tag selector modal */}
 			{tagModalPoster && (
 				<div 
-					className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+					className="fixed inset-0 bg-[#A3FF12]/90 flex items-center justify-center z-50 p-4"
 					onClick={() => setTagModalPoster(null)}
 				>
 					<div 
-						className="bg-[#111] p-8 rounded-2xl w-[400px] ring-1 ring-white/10 max-h-[80vh] flex flex-col"
+						className="bg-white p-8 w-full max-w-md border-8 border-black shadow-[16px_16px_0_0_#000] max-h-[80vh] flex flex-col relative"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<div className="flex items-center justify-between mb-4">
-							<h2 className="text-lg font-semibold">Add Tags</h2>
-							<button
-								onClick={() => setTagModalPoster(null)}
-								className="text-white/40 hover:text-white transition text-xl"
-								type="button"
-							>
-								×
-							</button>
-						</div>
+						<button
+							onClick={() => setTagModalPoster(null)}
+							className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors leading-none"
+							type="button"
+						>
+							✕
+						</button>
 
-						<p className="text-sm text-white/50 mb-6 truncate">
+						<h2 className="text-3xl font-black uppercase text-black mb-2 border-b-8 border-black pb-4 inline-block">Add Tags</h2>
+
+						<p className="text-xl font-bold text-black/60 mb-8 truncate uppercase">
 							{tagModalPoster.title}
 						</p>
 
 						{/* Create new tag (Moved to top) */}
-						<div className="mb-6 pb-6 border-b border-white/10 shrink-0">
-							<div className="flex gap-2">
+						<div className="mb-8 pb-8 border-b-4 border-black shrink-0">
+							<div className="flex flex-col sm:flex-row gap-4">
 								<input
 									type="text"
 									value={newTagName}
@@ -746,43 +753,43 @@ export default function AdminPostersPage() {
 									onKeyDown={(e) => {
 										if (e.key === "Enter") handleCreateTag();
 									}}
-									placeholder="Add tags (comma-separated)..."
-									className="flex-1 p-2 bg-black border border-white/10 rounded text-sm"
+									placeholder="Add tags..."
+									className="flex-1 p-3 bg-[#f0f0f0] border-4 border-black text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 								/>
 								<button
 									onClick={handleCreateTag}
 									disabled={creatingTag || !newTagName.trim()}
-									className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md disabled:opacity-50"
+									className="px-6 py-3 bg-black text-[#A3FF12] font-black uppercase disabled:opacity-50 border-4 border-black hover:bg-white hover:text-black transition-colors"
 									type="button"
 								>
-									{creatingTag ? "..." : "Add"}
+									{creatingTag ? "..." : "+ Add"}
 								</button>
 							</div>
 						</div>
 
 						{/* Tag list */}
-						<div className="space-y-2 overflow-y-auto pr-2 pb-2">
+						<div className="space-y-4 overflow-y-auto pr-2 pb-2">
 							{allTags.map((tag) => {
 								const isSelected = (tagModalPoster.tags || []).includes(tag);
 								return (
 									<button
 										key={tag}
 										onClick={() => handleToggleTag(tag)}
-										className={`w-full text-left px-4 py-2 rounded-lg text-sm transition ${
+										className={`w-full text-left px-6 py-4 border-4 border-black text-lg font-black uppercase tracking-widest transition-all ${
 											isSelected
-												? "bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30"
-												: "bg-neutral-800 text-white/70 hover:bg-neutral-700"
+												? "bg-[#A3FF12] text-black shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000]"
+												: "bg-white text-black hover:bg-[#f0f0f0]"
 										}`}
 										type="button"
 									>
-										{isSelected && <span className="mr-2">✓</span>}
+										{isSelected && <span className="mr-4 inline-block border-2 border-black bg-white px-2">✓</span>}
 										{tag}
 									</button>
 								);
 							})}
 
 							{allTags.length === 0 && (
-								<p className="text-white/30 text-sm text-center py-4">
+								<p className="text-black/50 text-xl font-bold text-center py-4 uppercase border-4 border-black p-4">
 									No tags yet. Create one above.
 								</p>
 							)}

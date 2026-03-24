@@ -26,8 +26,20 @@ body {
 }
 
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #000000;
+  overflow-x: hidden;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
 }
 
 a,
@@ -84,3 +96,65 @@ label[for],
     radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.04), transparent 40%);
   animation: bgshift 18s ease-in-out infinite;
 }
+
+html.dark-mode {
+  filter: invert(1);
+}
+
+html.dark-mode img,
+html.dark-mode video,
+html.dark-mode canvas,
+html.dark-mode [data-no-invert="true"] {
+  filter: invert(1);
+}
+
+/* -------------------------------------------------------------------------- */
+/* DYNAMIC RANDOM THEME MAPPING */
+/* Maps all hardcoded #A3FF12 classes to CSS Variables assigned on load */
+/* Primary = block background, Accent = texts and shadows */
+
+.bg-\[\#A3FF12\] { 
+  background-color: var(--dynamic-primary, #A3FF12) !important; 
+  transition: background-color 0.2s, color 0.2s; 
+}
+.hover\:bg-\[\#A3FF12\]:hover { 
+  background-color: var(--dynamic-primary, #A3FF12) !important; 
+}
+button.bg-\[\#A3FF12\]:hover, a.bg-\[\#A3FF12\]:hover { 
+  background-color: var(--dynamic-accent, #9D00FF) !important; 
+}
+
+.border-\[\#A3FF12\] { 
+  border-color: var(--dynamic-primary, #A3FF12) !important; 
+}
+.hover\:border-\[\#A3FF12\]:hover { 
+  border-color: var(--dynamic-primary, #A3FF12) !important; 
+}
+
+.text-\[\#A3FF12\] { 
+  color: var(--dynamic-accent, #9D00FF) !important; 
+  transition: background-color 0.2s, color 0.2s; 
+}
+.hover\:text-\[\#A3FF12\]:hover, .text-\[\#A3FF12\]\:hover:hover { 
+  color: var(--dynamic-accent, #9D00FF) !important; 
+}
+button.text-\[\#A3FF12\]:hover, a.text-\[\#A3FF12\]:hover { 
+  color: var(--dynamic-primary, #A3FF12) !important; 
+}
+
+/* Shadows mapped to Accent */
+.shadow-\[2px_2px_0_0_\#A3FF12\] { box-shadow: 2px 2px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[4px_4px_0_0_\#A3FF12\] { box-shadow: 4px 4px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[6px_6px_0_0_\#A3FF12\] { box-shadow: 6px 6px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[8px_8px_0_0_\#A3FF12\] { box-shadow: 8px 8px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[10px_10px_0_0_\#A3FF12\] { box-shadow: 10px 10px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[12px_12px_0_0_\#A3FF12\] { box-shadow: 12px 12px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.shadow-\[16px_16px_0_0_\#A3FF12\] { box-shadow: 16px 16px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+
+.hover\:shadow-\[2px_2px_0_0_\#A3FF12\]:hover { box-shadow: 2px 2px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[4px_4px_0_0_\#A3FF12\]:hover { box-shadow: 4px 4px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[6px_6px_0_0_\#A3FF12\]:hover { box-shadow: 6px 6px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[8px_8px_0_0_\#A3FF12\]:hover { box-shadow: 8px 8px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[10px_10px_0_0_\#A3FF12\]:hover { box-shadow: 10px 10px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[12px_12px_0_0_\#A3FF12\]:hover { box-shadow: 12px 12px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+.hover\:shadow-\[16px_16px_0_0_\#A3FF12\]:hover { box-shadow: 16px 16px 0 0 var(--dynamic-accent, #9D00FF) !important; }

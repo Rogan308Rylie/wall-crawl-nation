@@ -205,21 +205,16 @@ export default function ShopClient() {
   return (
     <div className="
       relative
-      px-2 sm:px-4
-      bg-gradient-to-br
-      from-[#0a0a0a]
-      via-[#0f0f0f]
-      to-[#0a0a0a]
-      overflow-hidden
+      px-2 sm:px-6 py-12
+      bg-white
+      min-h-screen
     ">
-      {/* Animated background gradient layer - POWDER BLUE for visibility testing */}
-      <div className="absolute inset-0 -z-10 animate-bgshift opacity-100" />
 
       {/* header container with sort and search */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white/90">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 border-b-8 border-black pb-6">
+        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-black flex items-center gap-4">
           Shop Posters
-          <span className="ml-3 text-sm font-normal text-white/40">
+          <span className="text-xl font-bold text-white bg-black px-3 py-1 border-2 border-black shadow-[4px_4px_0_0_#A3FF12]">
             {posters.length} results
           </span>
         </h1>
@@ -228,25 +223,25 @@ export default function ShopClient() {
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto relative z-30">
           
           {/* Smart Tag Search Autocomplete */}
-          <div className="relative w-full sm:w-[280px]" ref={searchContainerRef}>
+          <div className="relative w-full sm:w-[320px]" ref={searchContainerRef}>
             <div 
-              className={`flex items-center w-full bg-[#111] border transition-all rounded-xl overflow-hidden shadow-lg ${
-                isTagsDropdownOpen ? 'border-white/30 ring-1 ring-white/10' : 'border-white/10 hover:border-white/20'
+              className={`flex items-center w-full bg-[#f0f0f0] border-4 transition-all shadow-[6px_6px_0_0_#A3FF12] ${
+                isTagsDropdownOpen ? 'border-black bg-white' : 'border-black hover:bg-white'
               }`}
             >
-              <div className="pl-3 text-white/40">
-                <Search size={16} />
+              <div className="pl-4 text-black">
+                <Search size={20} className="stroke-[3px]" />
               </div>
               <input
                 type="text"
-                placeholder="Search tags (e.g. anime, minimal)..."
+                placeholder="SEARCH TAGS..."
                 value={tagSearch}
                 onFocus={() => setIsTagsDropdownOpen(true)}
                 onChange={(e) => {
                   setTagSearch(e.target.value);
                   setIsTagsDropdownOpen(true);
                 }}
-                className="w-full bg-transparent text-sm text-white/90 px-3 py-2.5 outline-none placeholder:text-white/30"
+                className="w-full bg-transparent text-black font-black uppercase px-3 py-3 outline-none placeholder:text-black/40"
               />
               {tagSearch && (
                 <button 
@@ -254,9 +249,9 @@ export default function ShopClient() {
                     setTagSearch("");
                     setIsTagsDropdownOpen(true);
                   }}
-                  className="pr-3 text-white/40 hover:text-white transition-colors"
+                  className="pr-4 text-black hover:text-[#A3FF12] bg-black p-1 m-1 border-2 border-transparent transition-colors"
                 >
-                  <X size={14} />
+                  <X size={18} className="stroke-[3px] text-white" />
                 </button>
               )}
             </div>
@@ -265,13 +260,13 @@ export default function ShopClient() {
             <AnimatePresence>
               {isTagsDropdownOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute left-0 right-0 top-full mt-2 bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.8)] overflow-hidden z-50 flex flex-col max-h-[300px]"
+                  className="absolute left-0 right-0 top-full mt-4 bg-white border-4 border-black shadow-[8px_8px_0_0_#A3FF12] z-50 flex flex-col max-h-[300px]"
                 >
-                  <div className="overflow-y-auto p-1 py-1.5 custom-scrollbar">
+                  <div className="overflow-y-auto p-2 custom-scrollbar flex flex-col gap-1">
                     {allTags
                       .filter(t => !selectedTags.includes(t)) // Don't show already selected tags in the list
                       .filter(t => tagSearch ? t.toLowerCase().includes(tagSearch.toLowerCase()) : true)
@@ -282,21 +277,21 @@ export default function ShopClient() {
                             toggleTag(tag);
                             setTagSearch(""); // clear search on select
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-left font-black uppercase tracking-widest text-black hover:bg-[#A3FF12] border-2 border-transparent hover:border-black transition-colors"
                         >
-                          <Tag size={12} className="text-white/30" />
+                          <Tag size={16} className="text-black stroke-[3px]" />
                           <span>{tag}</span>
                         </button>
                       ))}
                     
                     {/* Empty State for Search */}
                     {tagSearch && allTags.filter(t => t.toLowerCase().includes(tagSearch.toLowerCase()) && !selectedTags.includes(t)).length === 0 && (
-                       <p className="text-xs text-white/30 text-center py-4">No matching tags found.</p>
+                       <p className="text-sm font-bold uppercase text-black/50 text-center py-6">No matching tags found.</p>
                     )}
 
                     {/* All tags used up hint */}
                     {!tagSearch && allTags.length > 0 && allTags.filter(t => !selectedTags.includes(t)).length === 0 && (
-                      <p className="text-xs text-white/30 text-center py-4">All available tags selected.</p>
+                      <p className="text-sm font-bold uppercase text-black/50 text-center py-6">All available tags selected.</p>
                     )}
                   </div>
                 </motion.div>
@@ -305,29 +300,29 @@ export default function ShopClient() {
           </div>
 
           {/* Custom Sorting Dropdown */}
-          <div className="relative w-full sm:w-[200px]" ref={sortContainerRef}>
+          <div className="relative w-full sm:w-[240px]" ref={sortContainerRef}>
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="flex items-center justify-between w-full bg-[#111] hover:bg-white/5 text-sm text-white/90 border border-white/10 rounded-xl px-4 py-2.5 transition-all shadow-lg"
+              className="flex items-center justify-between w-full bg-[#A3FF12] text-black font-black uppercase text-sm border-4 border-black px-4 py-3 shadow-[6px_6px_0_0_#000] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_#000] active:shadow-[0_0_0_0_#000] transition-all"
             >
-              <span className="flex items-center gap-2 truncate text-white/70">
-                <SlidersHorizontal size={14} className="text-white/40" />
-                <span className="text-white/90">{sortOptions.find((o) => o.value === sortBy)?.label}</span>
+              <span className="flex items-center gap-2 truncate">
+                <SlidersHorizontal size={18} className="stroke-[3px]" />
+                <span>{sortOptions.find((o) => o.value === sortBy)?.label}</span>
               </span>
               <ChevronDown 
-                size={14} 
-                className={`text-white/40 transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} 
+                size={18} 
+                className={`stroke-[3px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} 
               />
             </button>
 
             <AnimatePresence>
               {isSortOpen && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-full bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.8)] overflow-hidden z-20 flex flex-col p-1"
+                  className="absolute right-0 top-full mt-4 w-full bg-white border-4 border-black shadow-[8px_8px_0_0_#A3FF12] overflow-hidden z-20 flex flex-col p-2 gap-1"
                 >
                   {sortOptions.map((option) => (
                     <button
@@ -336,14 +331,14 @@ export default function ShopClient() {
                         setIsSortOpen(false);
                         handleSortChange(option.value);
                       }}
-                      className={`flex items-center justify-between text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                      className={`flex items-center justify-between text-left px-4 py-3 font-black uppercase text-sm border-2 border-transparent transition-colors ${
                         sortBy === option.value
-                          ? "bg-white/10 text-white font-medium"
-                          : "text-white/60 hover:bg-white/5 hover:text-white/90"
+                          ? "bg-black text-[#A3FF12]"
+                          : "text-black hover:border-black hover:bg-[#A3FF12]"
                       }`}
                     >
                       {option.label}
-                      {sortBy === option.value && <Check size={14} className="text-white/70" />}
+                      {sortBy === option.value && <Check size={18} className="text-[#A3FF12] stroke-[3px]" />}
                     </button>
                   ))}
                 </motion.div>
@@ -361,9 +356,9 @@ export default function ShopClient() {
             initial={{ opacity: 0, height: 0, marginBottom: 0 }}
             animate={{ opacity: 1, height: "auto", marginBottom: 32 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-            className="flex flex-wrap items-center gap-2 overflow-hidden"
+            className="flex flex-wrap items-center gap-3 overflow-hidden"
           >
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/30 mr-1 flex items-center gap-1.5">
+            <span className="text-sm font-black uppercase tracking-widest text-black mr-2 flex items-center gap-1.5 bg-[#A3FF12] border-2 border-black px-2 py-1 shadow-[2px_2px_0_0_#000]">
               Active Filters
             </span>
             
@@ -374,10 +369,10 @@ export default function ShopClient() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 key={tag}
                 onClick={() => toggleTag(tag)}
-                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-white text-black hover:bg-neutral-200 shadow-[0_0_15px_rgba(255,255,255,0.15)]"
+                className="group flex items-center gap-2 px-3 py-1.5 border-2 border-black text-sm font-black uppercase transition-all bg-black text-[#A3FF12] shadow-[4px_4px_0_0_#A3FF12] hover:-translate-y-[2px] hover:shadow-[6px_6px_0_0_#A3FF12] active:translate-y-0 active:shadow-[0_0_0_0_#000]"
               >
                 {tag}
-                <X size={12} className="text-black/50 group-hover:text-black transition-colors" />
+                <X size={16} className="text-[#A3FF12] group-hover:text-white transition-colors border-2 border-transparent group-hover:border-white" />
               </motion.button>
             ))}
 
@@ -389,7 +384,7 @@ export default function ShopClient() {
                 setHasMore(true);
                 fetchPosters(true, sortBy, []);
               }}
-              className="text-xs font-medium text-white/30 hover:text-red-400 underline underline-offset-4 ml-2 px-2 py-1.5 transition-colors"
+              className="text-sm font-black uppercase text-black hover:text-white hover:bg-black border-2 border-transparent hover:border-black ml-4 px-3 py-1.5 transition-colors"
             >
               Clear all
             </button>
@@ -406,8 +401,8 @@ export default function ShopClient() {
       {/* empty state */}
 
       {posters.length === 0 && !loading && (
-        <div className="py-20 text-center">
-          <p className="text-sm text-white/60">
+        <div className="py-24 text-center border-4 border-black bg-[#f0f0f0] shadow-[12px_12px_0_0_#A3FF12] my-12">
+          <p className="text-2xl font-black uppercase text-black">
             {selectedTags.length > 0 
               ? `No posters found with tags: ${selectedTags.join(", ")}` 
               : "No posters available right now."}
@@ -421,7 +416,7 @@ export default function ShopClient() {
                 setHasMore(true);
                 fetchPosters(true, sortBy, []);
               }}
-              className="mt-4 text-xs text-white/40 hover:text-white underline"
+              className="mt-6 border-2 border-black bg-black text-[#A3FF12] font-black uppercase tracking-widest px-4 py-2 shadow-[4px_4px_0_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#000] transition-all"
             >
               Clear filters
             </button>
@@ -458,7 +453,7 @@ export default function ShopClient() {
 
       {/* Load More Button */}
       {hasMore && (
-        <div className="mt-12 flex justify-center">
+        <div className="mt-16 flex justify-center">
           <button
             onClick={() => fetchPosters(false)}
             disabled={loading}
@@ -470,20 +465,20 @@ export default function ShopClient() {
       )}
 
       {/* Custom Design CTA */}
-      <div className="mt-20 border-t border-white/10 pt-12 text-center">
-        <h2 className="text-xl font-semibold">
+      <div className="mt-28 border-t-8 border-black pt-20 pb-12 text-center bg-[#A3FF12] relative w-[100vw] left-1/2 -translate-x-1/2">
+        <h2 className="text-5xl font-black uppercase tracking-tight text-black drop-shadow-[4px_4px_0_white]">
           Didn't find what you were looking for?
         </h2>
 
-        <p className="mt-3 text-sm text-white/60">
+        <p className="mt-6 text-xl font-bold uppercase text-black border-4 border-black inline-block bg-white px-6 py-2 shadow-[4px_4px_0_0_#000]">
           It's okay. Get your custom designs made here.
         </p>
-
+        <br />
         <a
           href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
           target="_blank"
           rel="noopener noreferrer"
-          className={`${buttons.primary} mt-6 inline-block`}
+          className={`${buttons.primary} mt-10`}
         >
           Chat on WhatsApp
         </a>

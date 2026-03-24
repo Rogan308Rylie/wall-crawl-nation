@@ -1,10 +1,10 @@
 export const buttons = {
   primary:
-    "inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3FF12] px-6 py-3 text-sm font-semibold text-black shadow-[0_0_15px_rgba(163,255,18,0.2)] transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(163,255,18,0.4)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none",
+    "inline-flex items-center justify-center gap-2 border-4 border-black bg-[#A3FF12] px-8 py-4 text-base font-black uppercase tracking-widest text-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-2 active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50",
 
   secondary:
-    "inline-flex items-center justify-center gap-2 rounded-xl border border-[#222] bg-transparent px-6 py-3 text-sm font-medium text-[#F5F5F5] transition-all duration-200 hover:border-[#A3FF12] hover:text-[#A3FF12] hover:shadow-[0_0_15px_rgba(163,255,18,0.15)] active:scale-95",
+    "inline-flex items-center justify-center gap-2 border-4 border-black bg-white px-8 py-4 text-base font-black uppercase tracking-widest text-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 hover:translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-2 active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)]",
 
   ghost:
-    "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#B3B3B3] transition-colors hover:text-[#A3FF12]",
+    "inline-flex items-center gap-2 border-2 border-transparent px-3 py-2 text-sm font-black uppercase tracking-wider text-black transition-colors hover:border-black hover:bg-black hover:text-[#A3FF12]",
 };

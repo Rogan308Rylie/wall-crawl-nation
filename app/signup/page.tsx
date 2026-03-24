@@ -62,8 +62,8 @@ useEffect(() => {
 
 
   return (
-    <div className="max-w-md mx-auto mt-20 border border-white rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">
+    <div className="max-w-md mx-auto mt-20 border-8 border-black bg-white p-8 shadow-[12px_12px_0_0_#A3FF12]">
+      <h1 className="text-4xl font-black mb-8 text-center uppercase tracking-tighter text-black">
         Create Account
       </h1>
 
@@ -75,7 +75,7 @@ useEffect(() => {
         <span className="font-semibold">Continue with Google</span>
       </button>
 
-<div className="text-center text-sm opacity-70 mb-4">
+<div className="text-center text-sm font-bold uppercase tracking-widest text-black mb-6">
   or continue with email
 </div>
 
@@ -87,7 +87,7 @@ useEffect(() => {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-3 border border-white bg-transparent rounded"
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
         />  
 
 
@@ -97,7 +97,7 @@ useEffect(() => {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 border border-white bg-transparent rounded"
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
         />
 
         <input
@@ -106,7 +106,7 @@ useEffect(() => {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 border border-white bg-transparent rounded"
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
         />
 
         {error && (

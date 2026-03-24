@@ -37,77 +37,74 @@ export default async function AdminLayout({
 
   // ✅ ONLY ADMINS REACH HERE
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-black via-[#0d0d0d] to-black">
-      {/* Animated background layer */}
-      <div className="fixed inset-0 -z-20 opacity-30 animate-bgshift" />
-
+    <div className="flex min-h-screen bg-[#f0f0f0] text-black">
       {/* Sidebar */}
       <aside className="
         w-64
         flex-shrink-0
-        border-r
-        border-white/10
-        bg-black/40
-        backdrop-blur-sm
-        p-6
+        border-r-8
+        border-black
+        bg-white
+        p-8
         sticky
         top-0
         h-screen
         overflow-y-auto
+        z-10
       ">
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold tracking-wide">
+        <div className="mb-10 border-b-4 border-black pb-4">
+          <h2 className="text-4xl font-black uppercase tracking-tighter text-black">
             WCN
           </h2>
-          <p className="text-l text-white/40 mt-1">Admin Dashboard</p>
+          <p className="text-sm font-bold text-black uppercase mt-2 bg-[#A3FF12] inline-block px-2 py-1 border-2 border-black shadow-[2px_2px_0_0_#000]">Admin</p>
         </div>
 
-        <nav className="space-y-1">
-          <h3 className="text-xs uppercase tracking-widest text-white/40 mb-4 font-semibold">
+        <nav className="space-y-3">
+          <h3 className="text-xs font-black uppercase tracking-widest text-black/50 mb-6">
             Navigation
           </h3>
 
           <Link
             href="/admin"
-            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
           >
             Dashboard
           </Link>
 
           <Link
             href="/admin/orders"
-            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
           >
             Orders
           </Link>
 
           <Link
             href="/admin/posters"
-            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
           >
             Posters
           </Link>
 
           <Link
             href="/admin/collections"
-            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
           >
             Collections
           </Link>
 
           <Link
             href="/admin/tags"
-            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
           >
             Tags
           </Link>
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-white/10 mt-8 pt-6">
+        <div className="border-t-4 border-black mt-10 pt-6">
           <Link
             href="/"
-            className="text-xs text-white/50 hover:text-white/80 transition"
+            className="text-sm font-black uppercase text-black hover:text-[#A3FF12] hover:bg-black px-3 py-2 border-2 border-transparent hover:border-black transition-all inline-block"
           >
             ← Back to Site
           </Link>
@@ -115,17 +112,8 @@ export default async function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-10 overflow-y-auto">
-        <div className="
-          mx-auto
-          max-w-6xl
-          rounded-2xl
-          bg-[#111]
-          p-8
-          ring-1
-          ring-white/10
-          shadow-[0_20px_40px_rgba(0,0,0,0.4)]
-        ">
+      <main className="flex-1 p-12 overflow-y-auto bg-[#f0f0f0]">
+        <div className="mx-auto max-w-7xl">
           {children}
         </div>
       </main>

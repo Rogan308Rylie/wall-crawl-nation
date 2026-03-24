@@ -43,19 +43,19 @@ export default function AdminTagsPage() {
 	}
 
 	if (loading) {
-		return <p className="text-white/60">Loading tags...</p>;
+		return <p className="text-2xl font-black uppercase text-black">Loading tags...</p>;
 	}
 
 	return (
 		<div>
-			<h1 className="text-2xl font-semibold mb-6">Manage Tags</h1>
+			<h1 className="text-5xl font-black mb-10 pb-4 border-b-8 border-black text-black uppercase tracking-tighter inline-block pr-8">Manage Tags</h1>
 
 			{/* Create new tag */}
-			<div className="bg-[#1a1a1a] p-6 rounded-xl ring-1 ring-white/5 mb-8">
-				<h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide mb-4">
+			<div className="bg-white p-8 border-4 border-black shadow-[12px_12px_0_0_#A3FF12] mb-12">
+				<h2 className="text-xl font-black text-black uppercase tracking-widest mb-6 border-b-4 border-black inline-block pb-2">
 					Create New Tag
 				</h2>
-				<div className="flex gap-3">
+				<div className="flex flex-col md:flex-row gap-4">
 					<input
 						type="text"
 						value={newTagName}
@@ -64,12 +64,12 @@ export default function AdminTagsPage() {
 							if (e.key === "Enter") handleCreateTag();
 						}}
 						placeholder="Enter tag name..."
-						className="flex-1 p-3 bg-black border border-white/10 rounded-lg text-sm focus:outline-none focus:border-white/30 transition"
+						className="flex-1 p-4 bg-[#f0f0f0] border-4 border-black text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 					/>
 					<button
 						onClick={handleCreateTag}
 						disabled={creating || !newTagName.trim()}
-						className="px-6 py-3 bg-green-600 text-black font-medium text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
+						className="px-8 py-4 bg-black text-[#A3FF12] font-black uppercase text-xl border-4 border-black hover:bg-white hover:text-black hover:-translate-y-1 shadow-[6px_6px_0_0_#000] disabled:opacity-50 transition-all cursor-pointer"
 						type="button"
 					>
 						{creating ? "Creating..." : "Create Tag"}
@@ -78,21 +78,21 @@ export default function AdminTagsPage() {
 			</div>
 
 			{/* Existing tags list */}
-			<div className="bg-[#1a1a1a] p-6 rounded-xl ring-1 ring-white/5">
-				<h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide mb-4">
+			<div className="bg-white p-8 border-4 border-black shadow-[12px_12px_0_0_#A3FF12]">
+				<h2 className="text-xl font-black text-black uppercase tracking-widest mb-6 border-b-4 border-black inline-block pb-2">
 					All Tags ({tags.length})
 				</h2>
 
 				{tags.length === 0 ? (
-					<p className="text-white/30 text-sm py-4">
+					<p className="text-black/50 text-xl font-bold uppercase py-4">
 						No tags created yet. Use the form above to create your first tag.
 					</p>
 				) : (
-					<div className="flex gap-2 flex-wrap">
+					<div className="flex gap-4 flex-wrap">
 						{tags.map((tag) => (
 							<div
 								key={tag}
-								className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-neutral-800 text-white/80 ring-1 ring-white/5"
+								className="flex items-center gap-3 px-4 py-2 text-lg font-black uppercase tracking-widest bg-black text-[#A3FF12] border-4 border-black shadow-[4px_4px_0_0_#A3FF12]"
 							>
 								{tag}
 								<button
@@ -105,10 +105,10 @@ export default function AdminTagsPage() {
 										});
 										await fetchTags();
 									}}
-									className="text-white/30 hover:text-red-400 transition text-lg leading-none"
+									className="text-white hover:text-red-500 transition-colors text-2xl leading-none font-black ml-2"
 									type="button"
 								>
-									×
+									✕
 								</button>
 							</div>
 						))}

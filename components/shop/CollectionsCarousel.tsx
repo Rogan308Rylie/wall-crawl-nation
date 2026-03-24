@@ -48,12 +48,12 @@ export default function CollectionsCarousel() {
   }
 
   return (
-    <div className="mt-16 mb-16">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight mb-2">
+    <div className="mt-16 mb-16 border-t-8 border-black pt-16">
+      <div className="mb-8 p-6 border-4 border-black shadow-[8px_8px_0_0_#A3FF12] bg-white inline-block">
+        <h2 className="text-4xl font-black uppercase tracking-tighter mb-4 text-black">
           Collections
         </h2>
-        <p className="text-sm text-white/60">
+        <p className="font-bold border-2 border-black inline-block px-3 py-1 bg-[#A3FF12] text-black uppercase">
           Curated bundles with stacked poster previews
         </p>
       </div>

@@ -38,15 +38,15 @@ type Order = {
 const statusBadgeStyle = (status: string) => {
   switch (status) {
     case "confirmed":
-      return { background: "#444", color: "#fff" };
+      return "bg-[#A3FF12] text-black border-2 border-black drop-shadow-[2px_2px_0_#000]";
     case "packed":
-      return { background: "#b58900", color: "#000" };
+      return "bg-black text-[#A3FF12] border-2 border-transparent";
     case "shipped":
-      return { background: "#268bd2", color: "#fff" };
+      return "bg-blue-600 text-white border-2 border-black drop-shadow-[2px_2px_0_#000]";
     case "delivered":
-      return { background: "#2aa198", color: "#000" };
+      return "bg-green-600 text-white border-2 border-black drop-shadow-[2px_2px_0_#000]";
     default:
-      return { background: "#333", color: "#fff" };
+      return "bg-white text-black border-2 border-black drop-shadow-[2px_2px_0_#000]";
   }
 };
 
@@ -106,45 +106,38 @@ export default function AdminOrdersPage() {
     loadOrders();
   }, []);
 
-  if (loading) return <p>Loading orders…</p>;
+  if (loading) return <p className="text-2xl font-black uppercase text-black">Loading orders…</p>;
 
   return (
     <div>
-      <h1>Orders</h1>
+      <h1 className="text-5xl font-black uppercase tracking-tighter text-black mb-8 border-b-8 border-black inline-block pr-8 pb-2">Orders</h1>
 
-      {orders.length === 0 && <p>No orders found.</p>}
+      {orders.length === 0 && <p className="text-2xl font-black uppercase">No orders found.</p>}
 
       {orders.map((order) => (
         <div
           key={order.id}
-          style={{
-            border: "1px solid #444",
-            padding: "14px",
-            marginBottom: "16px",
-          }}
+          className="bg-white border-4 border-black p-8 mb-10 shadow-[12px_12px_0_0_#A3FF12]"
         >
-          <p><strong>Order ID:</strong> {order.orderId}</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b-4 border-black pb-4">
+            <p className="text-xl font-bold uppercase text-black"><strong>Order ID:</strong> {order.orderId}</p>
 
-          <p>
-            <strong>Status:</strong>{" "}
-            <span
-              style={{
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontSize: "0.85rem",
-                marginLeft: "6px",
-                ...statusBadgeStyle(order.status),
-              }}
-            >
-              {order.status.toUpperCase()}
-            </span>
-          </p>
+            <div className="flex items-center gap-4">
+              <span className="text-xl font-bold uppercase text-black">Status:</span>
+              <span
+                className={`px-3 py-1 text-sm font-black uppercase tracking-widest ${statusBadgeStyle(order.status)}`}
+              >
+                {order.status}
+              </span>
+            </div>
+          </div>
 
-          <p><strong>Payment:</strong> {order.paymentStatus}</p>
-          <p><strong>Total:</strong> ₹{order.totalAmount}</p>
-
-          <p>
-  <strong>Ordered at:</strong>{" "}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <p className="text-lg text-black font-bold uppercase"><strong>Payment:</strong> <span className="underline decoration-[#A3FF12] decoration-4">{order.paymentStatus}</span></p>
+            <p className="text-lg text-black font-bold uppercase"><strong>Total:</strong> <span className="bg-[#A3FF12] border-2 border-black shadow-[2px_2px_0_0_#000] px-2">₹{order.totalAmount}</span></p>
+            
+            <p className="text-lg text-black font-bold uppercase flex items-center gap-2">
+              <strong>Ordered at:</strong>{" "}
   {order.createdAt
     ? (() => {
         // Firestore Timestamp can arrive in different shapes
@@ -165,71 +158,57 @@ export default function AdminOrdersPage() {
         return "—";
       })()
     : "—"}
-</p>
+            </p>
+          </div>
 
-
-          <ul>
+          <ul className="mb-6 space-y-3">
             {order.items.map((item, i) => (
-              <li key={i}>
-                <div style={{ marginBottom: "8px" }}>
-                  <span style={{ marginRight: "8px" }}>
-                    {item.title} × {item.quantity} (₹{item.price})
+              <li key={i} className="flex flex-wrap items-center gap-3">
+                <span className="text-xl font-black uppercase text-black">
+                  {item.title} × {item.quantity} (₹{item.price})
+                </span>
+                {item.type === "collection" && (
+                  <span
+                    className="inline-block bg-black text-[#A3FF12] border-2 border-black px-3 py-1 text-sm font-black tracking-widest uppercase shadow-[2px_2px_0_0_#A3FF12]"
+                  >
+                    BUNDLE ({item.posterIds?.length || 0} posters)
                   </span>
-                  {item.type === "collection" && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        backgroundColor: "#6366f1",
-                        color: "#fff",
-                        padding: "2px 6px",
-                        borderRadius: "3px",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      BUNDLE ({item.posterIds?.length || 0} posters)
-                    </span>
-                  )}
-                  {item.type === "poster" && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        backgroundColor: "#666",
-                        color: "#fff",
-                        padding: "2px 6px",
-                        borderRadius: "3px",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      POSTER
-                    </span>
-                  )}
-                </div>
+                )}
+                {item.type === "poster" && (
+                  <span
+                    className="inline-block bg-black text-white border-2 border-black px-3 py-1 text-sm font-black tracking-widest uppercase shadow-[2px_2px_0_0_#A3FF12]"
+                  >
+                    POSTER
+                  </span>
+                )}
               </li>
             ))}
           </ul>
 
-          <hr style={{ margin: "12px 0", borderColor: "#333" }} />
+          <hr className="my-6 border-b-4 border-black" />
 
-          <div style={{ fontSize: "0.95rem" }}>
-            <p><strong>Customer Details</strong></p>
-            <p>Name: {order.deliveryAddress?.fullName || "—"}</p>
-            <p>Email: {order.deliveryAddress?.email || "—"}</p>
-            <p>Phone: {order.deliveryAddress?.phone || "—"}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="text-black font-bold text-lg uppercase space-y-2 border-l-4 border-black pl-4">
+              <p className="font-black text-xl mb-3">Customer Details</p>
+              <p>Name: {order.deliveryAddress?.fullName || "—"}</p>
+              <p>Email: {order.deliveryAddress?.email || "—"}</p>
+              <p>Phone: {order.deliveryAddress?.phone || "—"}</p>
+            </div>
+
+            <div className="text-black font-bold text-lg uppercase space-y-2 border-l-4 border-black pl-4">
+              <p className="font-black text-xl mb-3">Delivery Address</p>
+              <p>
+                Block {order.deliveryAddress?.block || "—"}, Hostel{" "}
+                {order.deliveryAddress?.hostelNumber || "—"}, Room{" "}
+                {order.deliveryAddress?.roomNumber || "—"}
+              </p>
+              {order.deliveryAddress?.additionalNotes && (
+                <p>Notes: {order.deliveryAddress.additionalNotes}</p>
+              )}
+            </div>
           </div>
 
-          <div style={{ marginTop: "8px", fontSize: "0.95rem" }}>
-            <p><strong>Delivery Address</strong></p>
-            <p>
-              Block {order.deliveryAddress?.block || "—"}, Hostel{" "}
-              {order.deliveryAddress?.hostelNumber || "—"}, Room{" "}
-              {order.deliveryAddress?.roomNumber || "—"}
-            </p>
-            {order.deliveryAddress?.additionalNotes && (
-              <p>Notes: {order.deliveryAddress.additionalNotes}</p>
-            )}
-          </div>
-
-          <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+          <div className="mt-8 flex flex-wrap gap-4 pt-6 border-t-4 border-black">
             {order.status === "confirmed" && (
               <button
                 onClick={() => updateOrderStatus(order.id, "packed")}

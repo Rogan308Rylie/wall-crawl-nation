@@ -238,81 +238,84 @@ export default function AdminCollectionsPage() {
   return (
     <div>
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
+      <div className="mb-12 border-b-8 border-black pb-8">
+        <h1 className="text-5xl font-black uppercase tracking-tighter text-black mb-4">
           Manage Collections
         </h1>
-        <p className="text-white/60">
-          Create, edit, and delete poster bundles with discount prices
+        <p className="text-xl font-bold uppercase text-black bg-[#A3FF12] inline-block px-4 py-2 border-4 border-black shadow-[4px_4px_0_0_#000]">
+          Create, edit, and delete poster bundles
         </p>
       </div>
 
       {/* ──────────────── Existing Collections ──────────────── */}
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Existing Collections</h2>
+      <div className="mb-16">
+        <h2 className="text-3xl font-black uppercase text-black tracking-widest border-b-4 border-black inline-block pb-2 mb-8">Existing Collections</h2>
 
         {collectionsLoading ? (
-          <div className="text-white/50 text-sm">Loading collections...</div>
+          <div className="text-black/50 text-xl font-bold uppercase">Loading collections...</div>
         ) : collections.length === 0 ? (
-          <div className="text-white/40 text-sm p-6 border border-white/10 rounded-lg text-center">
+          <div className="text-black/50 text-xl font-bold uppercase p-8 border-4 border-black bg-white shadow-[8px_8px_0_0_#A3FF12] text-center">
             No collections yet. Create one below.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collections.map(collection => (
               <div
                 key={collection.id}
                 className="
-                  bg-[#1a1a1a]
-                  border
-                  border-white/10
-                  rounded-xl
-                  p-5
+                  bg-white
+                  border-4
+                  border-black
+                  shadow-[8px_8px_0_0_#A3FF12]
+                  p-6
                   transition-all
-                  hover:border-white/20
+                  hover:-translate-y-1
+                  hover:shadow-[12px_12px_0_0_#A3FF12]
                 "
               >
-                <h3 className="text-lg font-semibold mb-1 truncate">
+                <h3 className="text-2xl font-black uppercase text-black mb-2 truncate">
                   {collection.title}
                 </h3>
 
                 {collection.description && (
-                  <p className="text-sm text-white/50 mb-3 line-clamp-2">
+                  <p className="text-lg font-bold text-black/60 mb-4 line-clamp-2 border-l-4 border-black pl-3">
                     {collection.description}
                   </p>
                 )}
 
-                <div className="text-sm text-white/60 mb-1">
-                  {collection.posterIds?.length || 0} posters
+                <div className="text-lg font-black uppercase text-black mb-4">
+                  <span className="bg-black text-[#A3FF12] px-2 py-1">{collection.posterIds?.length || 0} posters</span>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm mb-4">
-                  <span className="text-white/40 line-through">
+                <div className="flex items-center gap-4 text-xl font-black mb-6 flex-wrap">
+                  <span className="text-black/40 line-through">
                     ₹{collection.originalTotal}
                   </span>
-                  <span className="text-green-400 font-semibold">
+                  <span className="text-black bg-[#A3FF12] px-3 border-2 border-black">
                     ₹{collection.discountedPrice}
                   </span>
                   {collection.originalTotal > 0 && (
-                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                    <span className="text-sm border-2 border-black bg-white text-black px-2 py-1 uppercase">
                       {Math.round((1 - collection.discountedPrice / collection.originalTotal) * 100)}% off
                     </span>
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   <button
                     onClick={() => openEdit(collection)}
                     className="
                       flex-1
                       bg-white
                       text-black
-                      px-3 py-2
-                      rounded-lg
-                      text-sm
-                      font-medium
-                      hover:bg-white/90
-                      transition
+                      border-4
+                      border-black
+                      px-4 py-3
+                      text-lg
+                      font-black
+                      uppercase
+                      hover:bg-[#A3FF12]
+                      transition-colors
                     "
                   >
                     Edit
@@ -323,21 +326,21 @@ export default function AdminCollectionsPage() {
                     disabled={deletingId === collection.id}
                     className="
                       flex-1
-                      bg-red-600/20
-                      text-red-400
-                      border
-                      border-red-500/30
-                      px-3 py-2
-                      rounded-lg
-                      text-sm
-                      font-medium
-                      hover:bg-red-600/30
-                      transition
+                      bg-black
+                      text-white
+                      border-4
+                      border-black
+                      px-4 py-3
+                      text-lg
+                      font-black
+                      uppercase
+                      hover:text-red-500
+                      transition-colors
                       disabled:opacity-50
                       disabled:cursor-not-allowed
                     "
                   >
-                    {deletingId === collection.id ? "Deleting..." : "Delete"}
+                    {deletingId === collection.id ? "..." : "Delete"}
                   </button>
                 </div>
               </div>
@@ -347,47 +350,47 @@ export default function AdminCollectionsPage() {
       </div>
 
       {/* ──────────────── Create New Collection ──────────────── */}
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Create New Collection</h2>
+      <div className="mb-8">
+        <h2 className="text-3xl font-black uppercase text-black tracking-widest border-b-4 border-black inline-block pb-2">Create New Collection</h2>
       </div>
 
       {/* Poster Selection Grid */}
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Select Posters (min 2)</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="mb-16">
+        <h2 className="text-2xl font-black uppercase text-black mb-6">Select Posters (min 2)</h2>
+        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
           {posters.map(poster => (
             <div
               key={poster.id}
               onClick={() => togglePoster(poster.id)}
               className={`
                 cursor-pointer
-                border
-                rounded-lg
-                p-3
+                border-4
+                p-4
+                bg-white
                 transition-all
                 ${selectedPosters.includes(poster.id)
-                  ? "border-green-500 bg-green-500/10 ring-2 ring-green-500/50"
-                  : "border-white/20 bg-white/5 hover:border-white/40"
+                  ? "border-black shadow-[8px_8px_0_0_#A3FF12] bg-[#f0f0f0]"
+                  : "border-black shadow-[4px_4px_0_0_#000] hover:shadow-[8px_8px_0_0_#000]"
                 }
               `}
             >
               <img
                 src={poster.imagePath}
                 alt={poster.title}
-                className="w-full h-40 object-cover rounded mb-3"
+                className="w-full h-40 object-contain border-2 border-black mb-4 p-2 bg-white"
               />
 
-              <div className="text-sm font-medium truncate">
+              <div className="text-lg font-black uppercase text-black truncate mb-2">
                 {poster.title}
               </div>
 
-              <div className="text-xs text-white/60 mt-1">
+              <div className="text-md font-bold text-black border-2 border-black inline-block px-2 bg-[#A3FF12]">
                 ₹{poster.price}
               </div>
 
               {selectedPosters.includes(poster.id) && (
-                <div className="text-xs text-green-400 mt-2 font-semibold">
-                  ✓ Selected
+                <div className="text-sm text-black bg-[#A3FF12] border-2 border-black mt-4 font-black uppercase px-2 py-1 text-center">
+                  Selected
                 </div>
               )}
             </div>
@@ -396,12 +399,12 @@ export default function AdminCollectionsPage() {
       </div>
 
       {/* Collection Creator Panel */}
-      <div className="bg-[#1a1a1a] p-8 rounded-xl ring-1 ring-white/10">
-        <h2 className="text-lg font-semibold mb-6">Bundle Details</h2>
+      <div className="bg-white p-8 border-4 border-black shadow-[12px_12px_0_0_#A3FF12] mb-12">
+        <h2 className="text-2xl font-black uppercase text-black mb-8 border-b-4 border-black inline-block pb-2">Bundle Details</h2>
 
         {/* Title */}
         <div className="mb-6">
-          <label className="text-sm font-medium text-white/70 block mb-2">
+          <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
             Collection Title
           </label>
           <input
@@ -411,25 +414,24 @@ export default function AdminCollectionsPage() {
             onChange={(e) => setTitle(e.target.value)}
             className="
               w-full
-              px-4 py-2.5
-              bg-black/40
-              border
-              border-white/20
-              rounded-lg
-              text-white
-              placeholder:text-white/40
+              p-4
+              bg-[#f0f0f0]
+              border-4
+              border-black
+              text-black
+              font-bold
+              uppercase
+              placeholder-black/50
+              focus:bg-[#A3FF12]
               focus:outline-none
-              focus:border-white/40
-              focus:ring-1
-              focus:ring-white/20
-              transition
+              transition-colors
             "
           />
         </div>
 
         {/* Description */}
         <div className="mb-6">
-          <label className="text-sm font-medium text-white/70 block mb-2">
+          <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
             Description (optional)
           </label>
           <textarea
@@ -438,27 +440,26 @@ export default function AdminCollectionsPage() {
             onChange={(e) => setDescription(e.target.value)}
             className="
               w-full
-              px-4 py-2.5
-              bg-black/40
-              border
-              border-white/20
-              rounded-lg
-              text-white
-              placeholder:text-white/40
+              p-4
+              bg-[#f0f0f0]
+              border-4
+              border-black
+              text-black
+              font-bold
+              uppercase
+              placeholder-black/50
+              focus:bg-[#A3FF12]
               focus:outline-none
-              focus:border-white/40
-              focus:ring-1
-              focus:ring-white/20
-              transition
+              transition-colors
               resize-none
-              h-24
+              h-32
             "
           />
         </div>
 
         {/* Cover Image */}
-        <div className="mb-6">
-          <label className="text-sm font-medium text-white/70 block mb-2">
+        <div className="mb-8">
+          <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
             Cover Image Path
           </label>
           <input
@@ -468,35 +469,34 @@ export default function AdminCollectionsPage() {
             onChange={(e) => setCoverImage(e.target.value)}
             className="
               w-full
-              px-4 py-2.5
-              bg-black/40
-              border
-              border-white/20
-              rounded-lg
-              text-white
-              placeholder:text-white/40
+              p-4
+              bg-[#f0f0f0]
+              border-4
+              border-black
+              text-black
+              font-bold
+              uppercase
+              placeholder-black/50
+              focus:bg-[#A3FF12]
               focus:outline-none
-              focus:border-white/40
-              focus:ring-1
-              focus:ring-white/20
-              transition
+              transition-colors
             "
           />
         </div>
 
         {/* Pricing Section */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           <div>
-            <label className="text-sm font-medium text-white/70 block mb-2">
+            <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
               Original Total
             </label>
-            <div className="px-4 py-2.5 bg-black/40 border border-white/20 rounded-lg text-white/80 font-medium">
+            <div className="p-4 bg-[#f0f0f0] border-4 border-black text-black font-bold text-xl uppercase">
               ₹{originalTotal}
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-white/70 block mb-2">
+            <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
               Discounted Price
             </label>
             <input
@@ -506,18 +506,17 @@ export default function AdminCollectionsPage() {
               onChange={(e) => setDiscountedPrice(e.target.value)}
               className="
                 w-full
-                px-4 py-2.5
-                bg-black/40
-                border
-                border-white/20
-                rounded-lg
-                text-white
-                placeholder:text-white/40
+                p-4
+                bg-[#f0f0f0]
+                border-4
+                border-black
+                text-black
+                font-bold
+                uppercase
+                placeholder-black/50
+                focus:bg-[#A3FF12]
                 focus:outline-none
-                focus:border-white/40
-                focus:ring-1
-                focus:ring-white/20
-                transition
+                transition-colors
               "
             />
           </div>
@@ -525,8 +524,8 @@ export default function AdminCollectionsPage() {
 
         {/* Discount Badge Preview */}
         {originalTotal > 0 && discountedPrice && Number(discountedPrice) < originalTotal && (
-          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-            <p className="text-sm text-green-400">
+          <div className="mb-8 p-4 bg-[#A3FF12] border-4 border-black shadow-[4px_4px_0_0_#000]">
+            <p className="text-xl font-bold text-black uppercase">
               You&apos;re offering a {Math.round((1 - Number(discountedPrice) / originalTotal) * 100)}% discount
             </p>
           </div>
@@ -549,13 +548,16 @@ export default function AdminCollectionsPage() {
           disabled={loading || selectedPosters.length < 2}
           className={`
             w-full
-            px-6 py-3
-            rounded-lg
-            font-medium
-            transition
+            py-6
+            border-4
+            border-black
+            font-black
+            text-2xl
+            uppercase
+            transition-all
             ${loading || selectedPosters.length < 2
-              ? "bg-white/20 text-white/50 cursor-not-allowed"
-              : "bg-white text-black hover:bg-white/90"
+              ? "bg-[#e0e0e0] text-black/40 cursor-not-allowed"
+              : "bg-black text-[#A3FF12] hover:bg-white hover:text-black hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#000] shadow-[4px_4px_0_0_#000]"
             }
           `}
         >
@@ -564,36 +566,36 @@ export default function AdminCollectionsPage() {
       </div>
 
       {/* Info Section */}
-      <div className="mt-8 p-6 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-        <p className="text-sm text-blue-300">
-          💡 <strong>Tip:</strong> Select at least 2 posters, set a discount price lower than the original total, and click Create Collection.
+      <div className="mt-8 p-6 bg-white border-4 border-black shadow-[8px_8px_0_0_#A3FF12]">
+        <p className="text-lg font-bold text-black uppercase">
+          <span className="bg-[#A3FF12] border-2 border-black px-2 pb-1 mr-2">TIP</span> Select at least 2 posters, set a discount price lower than the original total, and click Create Collection.
         </p>
       </div>
 
       {/* ──────────────── Edit Collection Modal ──────────────── */}
       {editingCollection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-[#A3FF12]/90 backdrop-blur-sm"
             onClick={() => setEditingCollection(null)}
           />
 
           {/* Modal */}
-          <div className="relative bg-[#111] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 m-4 shadow-2xl">
+          <div className="relative bg-white border-8 border-black w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 m-4 shadow-[16px_16px_0_0_#000]">
             {/* Close button */}
             <button
               onClick={() => setEditingCollection(null)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white text-2xl transition"
+              className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors"
             >
               ✕
             </button>
 
-            <h2 className="text-2xl font-bold mb-6">Edit Collection</h2>
+            <h2 className="text-4xl font-black uppercase text-black mb-10 border-b-8 border-black pb-4 inline-block">Edit Collection</h2>
 
             {/* Edit Title */}
             <div className="mb-6">
-              <label className="text-sm font-medium text-white/70 block mb-2">
+              <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
                 Collection Title
               </label>
               <input
@@ -603,25 +605,24 @@ export default function AdminCollectionsPage() {
                 onChange={(e) => setEditTitle(e.target.value)}
                 className="
                   w-full
-                  px-4 py-2.5
-                  bg-black/40
-                  border
-                  border-white/10
-                  rounded-lg
-                  text-white
-                  placeholder:text-white/40
+                  p-4
+                  bg-[#f0f0f0]
+                  border-4
+                  border-black
+                  text-black
+                  font-bold
+                  uppercase
+                  placeholder-black/50
+                  focus:bg-[#A3FF12]
                   focus:outline-none
-                  focus:border-white/40
-                  focus:ring-1
-                  focus:ring-white/20
-                  transition
+                  transition-colors
                 "
               />
             </div>
 
             {/* Edit Description */}
-            <div className="mb-6">
-              <label className="text-sm font-medium text-white/70 block mb-2">
+            <div className="mb-8">
+              <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
                 Description (optional)
               </label>
               <textarea
@@ -630,63 +631,62 @@ export default function AdminCollectionsPage() {
                 onChange={(e) => setEditDescription(e.target.value)}
                 className="
                   w-full
-                  px-4 py-2.5
-                  bg-black/40
-                  border
-                  border-white/10
-                  rounded-lg
-                  text-white
-                  placeholder:text-white/40
+                  p-4
+                  bg-[#f0f0f0]
+                  border-4
+                  border-black
+                  text-black
+                  font-bold
+                  uppercase
+                  placeholder-black/50
+                  focus:bg-[#A3FF12]
                   focus:outline-none
-                  focus:border-white/40
-                  focus:ring-1
-                  focus:ring-white/20
-                  transition
+                  transition-colors
                   resize-none
-                  h-24
+                  h-32
                 "
               />
             </div>
 
             {/* Edit Poster Selection Grid */}
-            <div className="mb-6">
-              <label className="text-sm font-medium text-white/70 block mb-3">
+            <div className="mb-8">
+              <label className="text-lg font-black uppercase tracking-widest text-black block mb-4">
                 Select Posters (min 2)
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {posters.map(poster => (
                   <div
                     key={poster.id}
                     onClick={() => toggleEditPoster(poster.id)}
                     className={`
                       cursor-pointer
-                      border
-                      rounded-lg
-                      p-2.5
+                      border-4
+                      p-2
+                      bg-white
                       transition-all
                       ${editSelectedPosters.includes(poster.id)
-                        ? "border-green-500 bg-green-500/10 ring-2 ring-green-500/50"
-                        : "border-white/10 bg-white/5 hover:border-white/30"
+                        ? "border-black shadow-[4px_4px_0_0_#A3FF12] bg-[#f0f0f0]"
+                        : "border-black shadow-none hover:shadow-[4px_4px_0_0_#000]"
                       }
                     `}
                   >
                     <img
                       src={poster.imagePath}
                       alt={poster.title}
-                      className="w-full h-28 object-cover rounded mb-2"
+                      className="w-full h-28 object-contain border-2 border-black mb-3 p-1 bg-white"
                     />
 
-                    <div className="text-xs font-medium truncate">
+                    <div className="text-md font-black uppercase text-black truncate mb-1">
                       {poster.title}
                     </div>
 
-                    <div className="text-xs text-white/60 mt-0.5">
+                    <div className="text-sm font-bold text-black border-2 border-black px-1 inline-block bg-[#A3FF12]">
                       ₹{poster.price}
                     </div>
 
                     {editSelectedPosters.includes(poster.id) && (
-                      <div className="text-xs text-green-400 mt-1 font-semibold">
-                        ✓ Selected
+                      <div className="text-xs text-black font-black uppercase tracking-widest bg-[#A3FF12] border-2 border-black px-1 mt-2 mb-1 text-center">
+                        Selected
                       </div>
                     )}
                   </div>
@@ -695,18 +695,18 @@ export default function AdminCollectionsPage() {
             </div>
 
             {/* Edit Pricing */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-2 gap-6 mb-8 mt-8 border-t-4 border-black pt-8">
               <div>
-                <label className="text-sm font-medium text-white/70 block mb-2">
+                <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
                   Original Total
                 </label>
-                <div className="px-4 py-2.5 bg-black/40 border border-white/10 rounded-lg text-white/80 font-medium">
+                <div className="p-4 bg-[#f0f0f0] border-4 border-black text-black font-bold text-xl uppercase">
                   ₹{editOriginalTotal}
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-white/70 block mb-2">
+                <label className="text-lg font-black uppercase tracking-widest text-black block mb-3">
                   Discounted Price
                 </label>
                 <input
@@ -716,18 +716,17 @@ export default function AdminCollectionsPage() {
                   onChange={(e) => setEditDiscountedPrice(e.target.value)}
                   className="
                     w-full
-                    px-4 py-2.5
-                    bg-black/40
-                    border
-                    border-white/10
-                    rounded-lg
-                    text-white
-                    placeholder:text-white/40
+                    p-4
+                    bg-[#f0f0f0]
+                    border-4
+                    border-black
+                    text-black
+                    font-bold
+                    uppercase
+                    placeholder-black/50
+                    focus:bg-[#A3FF12]
                     focus:outline-none
-                    focus:border-white/40
-                    focus:ring-1
-                    focus:ring-white/20
-                    transition
+                    transition-colors
                   "
                 />
               </div>
@@ -735,8 +734,8 @@ export default function AdminCollectionsPage() {
 
             {/* Edit Discount Badge Preview */}
             {editOriginalTotal > 0 && editDiscountedPrice && Number(editDiscountedPrice) < editOriginalTotal && (
-              <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400">
+              <div className="mb-8 p-4 bg-[#A3FF12] border-4 border-black shadow-[4px_4px_0_0_#000]">
+                <p className="text-xl font-bold text-black uppercase">
                   You&apos;re offering a {Math.round((1 - Number(editDiscountedPrice) / editOriginalTotal) * 100)}% discount
                 </p>
               </div>
@@ -754,19 +753,22 @@ export default function AdminCollectionsPage() {
             )}
 
             {/* Edit Actions */}
-            <div className="flex gap-3">
+            <div className="flex gap-4 border-t-8 border-black pt-8 mt-8">
               <button
                 onClick={saveEdit}
                 disabled={editLoading || editSelectedPosters.length < 2}
                 className={`
                   flex-1
-                  px-6 py-3
-                  rounded-lg
-                  font-medium
-                  transition
+                  py-4
+                  border-4
+                  border-black
+                  font-black
+                  text-xl
+                  uppercase
+                  transition-all
                   ${editLoading || editSelectedPosters.length < 2
-                    ? "bg-white/20 text-white/50 cursor-not-allowed"
-                    : "bg-white text-black hover:bg-white/90"
+                    ? "bg-[#e0e0e0] text-black/40 cursor-not-allowed"
+                    : "bg-black text-[#A3FF12] hover:bg-white hover:text-black hover:-translate-y-1 shadow-[4px_4px_0_0_#000] hover:shadow-[6px_6px_0_0_#000]"
                   }
                 `}
               >
@@ -776,14 +778,19 @@ export default function AdminCollectionsPage() {
               <button
                 onClick={() => setEditingCollection(null)}
                 className="
-                  px-6 py-3
-                  rounded-lg
-                  font-medium
-                  border
-                  border-white/20
-                  text-white/70
-                  hover:bg-white/5
-                  transition
+                  flex-1
+                  py-4
+                  border-4
+                  border-black
+                  font-black
+                  text-xl
+                  uppercase
+                  bg-white
+                  text-black
+                  hover:-translate-y-1 
+                  shadow-[4px_4px_0_0_#000] 
+                  hover:shadow-[6px_6px_0_0_#000]
+                  transition-all
                 "
               >
                 Cancel

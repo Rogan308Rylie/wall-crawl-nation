@@ -99,7 +99,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
       onMouseLeave={() => setPaused(false)}
     >
       {/* Image Container */}
-      <div className="group relative w-full aspect-[210/297] rounded-xl bg-[#0a0a0a] overflow-hidden ring-1 ring-white/5 mb-4">
+      <div className="group relative w-full aspect-[210/297] bg-[#f0f0f0] overflow-hidden border-4 border-black mb-4">
         {/* Clickable Overlay (z-35 is above image z-30 but below buttons z-40) */}
         <div 
           className="absolute inset-0 z-35 cursor-pointer"
@@ -154,14 +154,14 @@ export default function CollectionCard({ collection }: { collection: Collection 
         )}
 
         {/* Discount Badge */}
-        <div className="absolute top-3 right-3 z-40 bg-red-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
+        <div className="absolute top-3 right-3 z-40 bg-[#A3FF12] border-2 border-black text-black px-3 py-1 text-sm font-black uppercase shadow-[4px_4px_0_0_#000]">
           {discountPercent}% OFF
         </div>
       </div>
 
       {/* Poster Indicator Dots */}
       {posters.length > 1 && (
-        <div className="flex justify-center gap-1.5 mb-3">
+        <div className="flex justify-center gap-2 mb-4">
           {posters.map((_: any, i: number) => (
             <button
               key={i}
@@ -172,10 +172,10 @@ export default function CollectionCard({ collection }: { collection: Collection 
                 const dir = i > currentIndex ? "left" : "right"
                 slideTo(i, dir)
               }}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`w-3 h-3 border-2 border-black transition-all ${
                 i === currentIndex
-                  ? "bg-white w-3"
-                  : "bg-neutral-600 hover:bg-neutral-500"
+                  ? "bg-[#A3FF12] w-6"
+                  : "bg-white hover:bg-black"
               }`}
               aria-label={`Go to poster ${i + 1}`}
             />
@@ -184,28 +184,28 @@ export default function CollectionCard({ collection }: { collection: Collection 
       )}
 
       {/* Collection Info Card */}
-      <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f] rounded-xl p-4 ring-1 ring-white/10">
-        <h3 className="font-semibold text-sm leading-tight">
+      <div className="bg-white border-4 border-black p-4 shadow-[8px_8px_0_0_#A3FF12]">
+        <h3 className="font-black text-xl uppercase leading-tight text-black">
           {collection.title}
         </h3>
 
-        <p className="text-xs text-white/60 mt-2">
+        <p className="text-sm font-bold text-[#A3FF12] border-2 border-black inline-block px-2 py-0.5 mt-2 bg-black uppercase">
           {posters.length} posters in this bundle
         </p>
 
         {collection.description && (
-          <p className="text-xs text-white/50 mt-2 line-clamp-2">
+          <p className="text-sm font-bold text-black mt-4 border-l-4 border-black pl-3 line-clamp-2">
             {collection.description}
           </p>
         )}
 
         {/* Pricing */}
-        <div className="mt-4 pt-4 border-t border-white/10">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="line-through text-xs text-white/50">
+        <div className="mt-6 pt-4 border-t-4 border-black">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="line-through text-sm font-black text-black/50">
               ₹{collection.originalTotal}
             </span>
-            <span className="text-lg font-semibold text-white">
+            <span className="text-2xl font-black text-black bg-[#A3FF12] px-2 py-1 border-2 border-black shadow-[4px_4px_0_0_#000]">
               ₹{collection.discountedPrice}
             </span>
           </div>
@@ -228,24 +228,24 @@ export default function CollectionCard({ collection }: { collection: Collection 
               Add Bundle
             </button>
           ) : (
-            <div className="flex items-center justify-between gap-2 rounded-xl bg-[#1a1a1a] p-2">
+            <div className="flex items-center justify-between gap-2 border-4 border-black bg-white p-2">
               <button
                 onClick={() => decreaseQuantity(collection.id)}
-                className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+                className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
               >
                 −
               </button>
 
               <span
                 key={quantity}
-                className="flex-1 text-center text-sm font-semibold animate-pop"
+                className="flex-1 text-center text-xl font-black text-black animate-pop"
               >
                 {quantity}
               </span>
 
               <button
                 onClick={() => increaseQuantity(collection.id)}
-                className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+                className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
               >
                 +
               </button>

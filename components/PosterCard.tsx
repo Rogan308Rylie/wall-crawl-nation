@@ -31,15 +31,16 @@ export default function PosterCard({
     flex
     flex-col
     gap-4
-    rounded-2xl
-    bg-gradient-to-b
-    from-[#141414]
-    to-[#0d0d0d]
+    border-4
+    border-black
+    bg-white
     p-4
+    shadow-[8px_8px_0_0_#A3FF12]
     transition-all
-    duration-300
+    duration-200
     hover:-translate-y-1
-    hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)]
+    hover:translate-x-1
+    hover:shadow-[12px_12px_0_0_#A3FF12]
   "
     >
       {/* Poster frame */}
@@ -48,14 +49,13 @@ export default function PosterCard({
     relative
     w-full
     aspect-[210/297]
-    rounded-xl
-    bg-[#0a0a0a]
+    bg-[#f0f0f0]
     flex
     items-center
     justify-center
     overflow-hidden
-    ring-1
-    ring-white/5
+    border-4
+    border-black
   "
       >
         <Image
@@ -76,16 +76,16 @@ export default function PosterCard({
 
       {/* Text */}
       <div>
-        <h3 className="text-[13px] font-medium leading-snug tracking-wide">{title}</h3>
-        <p className="mt-1.5 text-xs text-white/60">₹{price}</p>
+        <h3 className="text-lg font-black uppercase leading-snug tracking-widest text-black">{title}</h3>
+        <p className="mt-1.5 text-base font-bold text-black border-2 border-black inline-block px-2 bg-[#A3FF12]">₹{price}</p>
 
         {/* Tag tablets */}
         {tags && tags.length > 0 && (
-          <div className="flex gap-1 flex-wrap mt-2">
+          <div className="flex gap-2 flex-wrap mt-4">
             {[...tags].sort().map((tag) => (
               <span
                 key={tag}
-                className="px-1.5 py-0.5 text-[10px] rounded bg-neutral-700 text-white/70"
+                className="border-2 border-black px-2 py-0.5 text-xs font-black uppercase text-black bg-white"
               >
                 {tag}
               </span>
@@ -104,24 +104,24 @@ export default function PosterCard({
           Add to Cart
         </button>
       ) : (
-        <div className="mt-auto flex items-center justify-between gap-2 rounded-xl bg-[#1a1a1a] p-2">
+        <div className="mt-auto flex items-center justify-between gap-2 border-4 border-black bg-white p-2">
           <button
             onClick={() => decreaseQuantity(id)}
-            className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+            className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
           >
             −
           </button>
 
           <span
             key={quantity}
-            className="flex-1 text-center text-sm font-semibold animate-pop"
+            className="flex-1 text-center text-xl font-black text-black animate-pop"
           >
             {quantity}
           </span>
 
           <button
             onClick={() => increaseQuantity(id)}
-            className="h-8 w-8 flex items-center justify-center rounded-md bg-[#111] text-white/70 hover:bg-[#222] transition"
+            className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
           >
             +
           </button>

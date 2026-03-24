@@ -1,25 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { buttons } from "@/lib/ui/buttons";
 import FeaturedPostersGrid from "@/components/FeaturedPostersGrid";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-[#0d0d0d] to-black">
+    <main className="min-h-screen bg-transparent">
+      {/* MARQUEE TAPE TOP */}
+      <div className="w-full overflow-hidden border-b-4 border-black bg-black py-3 text-[#A3FF12] flex whitespace-nowrap">
+        <div className="animate-marquee text-sm font-black uppercase tracking-[0.3em]">
+          {[...Array(10)].map((_, i) => " // NO RULES // JUST ART // WALL CRAWL NATION ")}
+        </div>
+      </div>
+
       {/* 1️⃣ HERO SECTION */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-36">
-        <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight max-w-4xl">
-          Built for Rebels.
-          <br />
-          Framed for Legends.
+      <section className="flex flex-col items-center justify-center text-center px-6 py-32 border-b-8 border-black bg-white bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:16px_16px]">
+        <h1 className="text-6xl md:text-[8rem] font-black uppercase leading-[0.8] tracking-tighter text-black w-full break-words">
+          WALL CRAWL <br />
+          <span className="text-[#A3FF12] drop-shadow-[6px_6px_0_black]">NATION.</span>
         </h1>
 
-        <p className="mt-6 max-w-xl text-white/60 text-base md:text-lg">
+        <p className="mt-12 max-w-2xl bg-black px-6 py-3 text-white font-bold tracking-[0.2em] uppercase border-4 border-black shadow-[8px_8px_0_0_#A3FF12]">
           Premium wall art inspired by Culture, Individuality and Expression.
         </p>
 
-        <div className="mt-10 flex gap-4 flex-wrap justify-center">
+        <div className="mt-16 flex gap-6 flex-wrap justify-center">
           <Link href="/shop" className={buttons.primary}>
             Shop Posters
           </Link>
@@ -29,48 +36,49 @@ export default function Home() {
           </Link>
         </div>
       </section>
+      
+      {/* MARQUEE TAPE BOTTOM OF HERO */}
+      <div className="w-full overflow-hidden border-b-8 border-black bg-[#A3FF12] py-4 text-black flex whitespace-nowrap">
+        <div className="animate-marquee text-xl font-black uppercase tracking-[0.2em]">
+          {[...Array(10)].map((_, i) => " FREE SHIPPING OVER $50 // NO REFUNDS FOR POSERS // ")}
+        </div>
+      </div>
 
       {/* 2️⃣ FEATURED POSTERS SECTION */}
-      <section className="px-4 sm:px-6 py-24">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-10">
+      <section className="px-4 sm:px-6 py-24 border-b-8 border-black bg-white">
+        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black bg-[#A3FF12] border-4 border-black inline-block px-8 py-4 shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-20">
           Featured Posters
         </h2>
         <FeaturedPostersGrid />
       </section>
 
       {/* 4️⃣ QUALITY / TRUST SECTION */}
-      <section className="px-6 py-24">
-        <div className="grid md:grid-cols-3 gap-12 text-center">
-          <div>
-            <h3 className="text-lg font-semibold">Premium Prints</h3>
-            <p className="text-white/60 text-sm mt-2">
-              Designed to look sharp and bold on any wall.
-            </p>
+      <section className="px-6 py-24 border-b-8 border-black bg-black">
+        <div className="grid md:grid-cols-3 gap-8 text-center text-black">
+          <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
+            <h3 className="text-3xl font-black uppercase tracking-wider">Premium Prints</h3>
+            <p className="font-bold mt-4 text-lg">Designed to look sharp and bold on any wall.</p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Secure Payments</h3>
-            <p className="text-white/60 text-sm mt-2">
-              Safe checkout powered by Razorpay.
-            </p>
+          <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
+            <h3 className="text-3xl font-black uppercase tracking-wider">Secure Payments</h3>
+            <p className="font-bold mt-4 text-lg">Safe checkout powered by Razorpay.</p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Fast Processing</h3>
-            <p className="text-white/60 text-sm mt-2">
-              Orders confirmed and processed quickly.
-            </p>
+          <div className="border-4 border-black p-8 bg-white shadow-[12px_12px_0_0_#A3FF12] hover:-translate-y-2 hover:translate-x-2 transition-transform">
+            <h3 className="text-3xl font-black uppercase tracking-wider">Fast Processing</h3>
+            <p className="font-bold mt-4 text-lg">Orders confirmed and processed quickly.</p>
           </div>
         </div>
       </section>
 
       {/* 5️⃣ FINAL CLOSING CTA */}
-      <section className="px-6 py-32 text-center">
-        <h2 className="text-4xl md:text-5xl font-semibold">
+      <section className="px-6 py-32 text-center bg-[#A3FF12] border-b-8 border-black">
+        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-black drop-shadow-[4px_4px_0_white]">
           Your Room Should Reflect Your Personality.
         </h2>
 
-        <div className="mt-8">
+        <div className="mt-12">
           <Link href="/shop" className={buttons.primary}>
             Explore Posters
           </Link>
@@ -78,32 +86,32 @@ export default function Home() {
       </section>
 
       {/* 6️⃣ CUSTOM ORDERS CTA */}
-      <section className="px-6 py-28 border-t border-white/10">
-        <h2 className="text-3xl md:text-4xl font-semibold text-center">
+      <section className="px-6 py-28 bg-white">
+        <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-center text-black bg-[#A3FF12] border-4 border-black inline-block px-8 py-4 shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2">
           Want Something Custom?
         </h2>
 
-        <div className="mt-12 max-w-xl mx-auto space-y-10">
+        <div className="mt-20 max-w-xl mx-auto space-y-12">
           {/* Custom Posters */}
-          <div className="text-center">
-            <h3 className="text-lg font-semibold">Custom Posters</h3>
-            <p className="mt-2 text-white/60 text-sm">
+          <div className="text-center border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12]">
+            <h3 className="text-3xl font-black uppercase">Custom Posters</h3>
+            <p className="mt-4 text-black font-bold text-lg">
               We create custom posters tailored just for you. Any design, any vibe.
             </p>
             <a
               href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
               target="_blank"
               rel="noopener noreferrer"
-              className={`${buttons.primary} mt-4 inline-block`}
+              className={`${buttons.primary} mt-8`}
             >
               Get Posters
             </a>
           </div>
 
           {/* Polaroids */}
-          <div className="text-center">
-            <h3 className="text-lg font-semibold">Polaroid Prints</h3>
-            <p className="mt-2 text-white/60 text-sm">
+          <div className="text-center border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12]">
+            <h3 className="text-3xl font-black uppercase">Polaroid Prints</h3>
+            <p className="mt-4 text-black font-bold text-lg">
               Turn your favorite memories into aesthetic polaroid-style prints.
               <br />
               Perfect for your wall, desk, or as a gift.
@@ -112,7 +120,7 @@ export default function Home() {
               href="https://wa.me/919306553798?text=Hi%20I%20want%20some%20polaroids"
               target="_blank"
               rel="noopener noreferrer"
-              className={`${buttons.primary} mt-4 inline-block`}
+              className={`${buttons.primary} mt-8`}
             >
               Get Polaroids
             </a>

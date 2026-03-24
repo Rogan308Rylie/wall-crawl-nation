@@ -200,15 +200,15 @@ async function placeOrder() {
 }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+    <div className="max-w-6xl mx-auto py-12 px-4">
+      <h1 className="text-5xl font-black uppercase tracking-tighter text-black mb-12 border-b-8 border-black pb-4 inline-block">Checkout</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Address Form */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Delivery Details</h2>
+        <div className="border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12] bg-white">
+          <h2 className="text-3xl font-black uppercase tracking-widest text-black mb-8">Delivery Details</h2>
 
-          <form className="space-y-4">
+          <form className="space-y-6">
   {/* Name */}
   <input
     type="text"
@@ -218,7 +218,7 @@ async function placeOrder() {
     onChange={(e) =>
       setAddress({ ...address, fullName: e.target.value })
     }
-    className="w-full p-3 border border-white bg-transparent rounded"
+    className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
   />
 
   {/* Phone */}
@@ -230,7 +230,7 @@ async function placeOrder() {
     onChange={(e) =>
       setAddress({ ...address, phone: e.target.value })
     }
-    className="w-full p-3 border border-white bg-transparent rounded"
+    className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
   />
 
   {/* Gender */}
@@ -240,18 +240,18 @@ async function placeOrder() {
     onChange={(e) =>
       setAddress({ ...address, gender: e.target.value as AddressFormState["gender"] })
     }
-    className={`w-full p-3 border border-white bg-black rounded ${ address.gender === "" ? "text-gray-400" : "text-white"}`}>
+    className={`w-full p-4 border-4 border-black bg-[#f0f0f0] font-bold uppercase appearance-none focus:outline-none focus:bg-[#A3FF12] transition-colors cursor-pointer ${ address.gender === "" ? "text-black/50" : "text-black"}`}>
         
-    <option value="" disabled className="text-gray-400">
+    <option value="" disabled className="text-black/50">
       Select Gender
     </option>
-    <option value="female" className="bg-black text-white">
+    <option value="female" className="bg-white text-black font-bold uppercase">
       Female
     </option>
-    <option value="male" className="bg-black text-white">
+    <option value="male" className="bg-white text-black font-bold uppercase">
       Male
     </option>
-    <option value="other" className="bg-black text-white">
+    <option value="other" className="bg-white text-black font-bold uppercase">
       Other
     </option>
   </select>
@@ -265,7 +265,7 @@ async function placeOrder() {
     onChange={(e) =>
       setAddress({ ...address, email: e.target.value })
     }
-    className="w-full p-3 border border-white bg-transparent rounded"
+    className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
   />
 
   {/* Hostel Number */}
@@ -280,7 +280,7 @@ async function placeOrder() {
     const value = e.target.value.replace(/\D/g, "");
     setAddress({ ...address, hostelNumber: value });
   }}
-  className="w-full p-3 border border-white bg-transparent rounded"
+  className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 />
 
 <div className="flex gap-4">
@@ -294,7 +294,7 @@ async function placeOrder() {
       onChange={(e) =>
         setAddress({ ...address, roomNumber: e.target.value })
       }
-      className="w-full p-3 border border-white bg-transparent rounded"
+      className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
     />
 
     <input
@@ -309,7 +309,7 @@ async function placeOrder() {
       .toUpperCase();
     setAddress({ ...address, block: value });
   }}
-  className="w-full p-3 border border-white bg-transparent rounded"
+  className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
 />
 
 </div>
@@ -323,7 +323,7 @@ async function placeOrder() {
       setAddress({ ...address, additionalNotes: e.target.value })
     }
     rows={3}
-    className="w-full p-3 border border-white bg-transparent rounded"
+    className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
   />
           </form>
 
@@ -331,31 +331,31 @@ async function placeOrder() {
         </div>
 
         {/* Order Summary */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+        <div className="h-fit sticky top-24 border-4 border-black p-8 shadow-[12px_12px_0_0_#A3FF12] bg-white">
+          <h2 className="text-3xl font-black uppercase tracking-widest text-black mb-8 border-b-4 border-black pb-4">Order Summary</h2>
 
-          <div className="space-y-4 border border-white p-4 rounded-lg">
+          <div className="space-y-4">
             {cart.map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <span>
+              <div key={item.id} className="flex justify-between items-center bg-[#f0f0f0] p-4 border-4 border-black">
+                <span className="font-bold uppercase text-black">
                   {item.title} × {item.quantity}
                 </span>
-                <span>₹{item.price * item.quantity}</span>
+                <span className="font-black text-xl text-black bg-[#A3FF12] px-2 py-1 border-2 border-black">₹{item.price * item.quantity}</span>
               </div>
             ))}
 
-            <div className="border-t border-white pt-4 flex justify-between font-bold text-lg">
+            <div className="border-t-8 border-black pt-6 mt-8 flex justify-between font-black text-3xl uppercase text-black items-center">
               <span>Total</span>
-              <span>₹{totalAmount}</span>
+              <span className="text-[#A3FF12] bg-black px-4 py-2 drop-shadow-[4px_4px_0_#A3FF12]">₹{totalAmount}</span>
             </div>
 
             <button
               type="button"
               onClick={placeOrder}
               disabled={placing}
-              className={`${buttons.primary} w-full mt-4 ${ placing ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`${buttons.primary} w-full mt-8 text-2xl py-6 ${ placing ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-            {placing ? "Placing Order..." : "Place Order"}
+            {placing ? "Processing..." : "Pay Now"}
            </button>
           </div>
         </div>
