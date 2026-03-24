@@ -21,12 +21,12 @@ export default function Home() {
 
       {/* 1️⃣ HERO SECTION */}
       <section className="flex flex-col items-center justify-center text-center px-4 sm:px-6 py-20 md:py-32 border-b-8 border-black bg-white bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:16px_16px]">
-        <h1 className="text-5xl sm:text-7xl md:text-[8rem] font-black uppercase leading-[0.8] tracking-tighter text-black w-full break-words">
+        <h1 className="text-[13vw] sm:text-7xl md:text-[8rem] font-black uppercase leading-[1] sm:leading-[0.8] tracking-tighter text-black w-full break-words">
           WALL CRAWL <br />
           <span className="text-[#A3FF12] drop-shadow-[4px_4px_0_black] md:drop-shadow-[6px_6px_0_black]">NATION.</span>
         </h1>
 
-        <p className="mt-12 max-w-2xl bg-black px-6 py-3 text-white font-bold tracking-[0.2em] uppercase border-4 border-black shadow-[8px_8px_0_0_#A3FF12]">
+        <p className="mt-12 max-w-2xl bg-black px-6 py-4 text-white font-bold tracking-[0.2em] uppercase border-4 border-black shadow-[8px_8px_0_0_#A3FF12] text-sm sm:text-base">
           Premium wall art inspired by Culture, Individuality and Expression.
         </p>
 
@@ -52,9 +52,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 2️⃣ FEATURED POSTERS SECTION */}
       <section className="px-4 sm:px-6 py-16 md:py-24 border-b-8 border-black bg-white">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black bg-[#A3FF12] border-4 border-black inline-block px-6 sm:px-8 py-3 sm:py-4 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -track -translate-x-1/2 mb-12 md:mb-20 whitespace-normal sm:whitespace-nowrap text-center">
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black bg-[#A3FF12] border-4 border-black inline-block px-10 py-5 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-12 md:mb-20 text-center">
           Featured Posters
         </h2>
         <FeaturedPostersGrid />
@@ -94,8 +93,8 @@ export default function Home() {
       </section>
 
       {/* 6️⃣ CUSTOM ORDERS CTA */}
-      <section className="px-4 sm:px-6 py-20 md:py-28 bg-white">
-        <h2 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter text-center text-black bg-[#A3FF12] border-4 border-black inline-block px-6 sm:px-8 py-3 sm:py-4 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-12">
+      <section className="px-4 sm:px-6 py-20 md:py-28 bg-white overflow-hidden">
+        <h2 className="text-2xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter text-center text-black bg-[#A3FF12] border-4 border-black inline-block px-10 py-5 shadow-[6px_6px_0_0_black] md:shadow-[8px_8px_0_0_black] -rotate-2 relative left-1/2 -translate-x-1/2 mb-12">
           Want Something Custom?
         </h2>
 

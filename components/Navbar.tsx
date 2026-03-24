@@ -77,7 +77,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4">
         <Link 
           href="/" 
-          className="text-xl sm:text-2xl font-black uppercase tracking-widest text-black hover:-translate-y-1 hover:drop-shadow-[4px_4px_0_#A3FF12] transition-all"
+          className="text-lg sm:text-2xl font-black uppercase tracking-widest text-black hover:-translate-y-1 hover:drop-shadow-[4px_4px_0_#A3FF12] transition-all"
           onClick={() => setIsMenuOpen(false)}
         >
           Wall Crawl Nation

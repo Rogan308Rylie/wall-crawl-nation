@@ -74,10 +74,9 @@ export default function PosterCard({
         />
       </div>
 
-      {/* Text */}
       <div>
-        <h3 className="text-lg font-black uppercase leading-snug tracking-widest text-black">{title}</h3>
-        <p className="mt-1.5 text-base font-bold text-black border-2 border-black inline-block px-2 bg-[#A3FF12]">₹{price}</p>
+        <h3 className="text-base sm:text-lg font-black uppercase leading-snug tracking-widest text-black">{title}</h3>
+        <p className="mt-1.5 text-sm sm:text-base font-bold text-black border-2 border-black inline-block px-2 bg-[#A3FF12]">₹{price}</p>
 
         {/* Tag tablets */}
         {tags && tags.length > 0 && (
@@ -85,7 +84,7 @@ export default function PosterCard({
             {[...tags].sort().map((tag) => (
               <span
                 key={tag}
-                className="border-2 border-black px-2 py-0.5 text-xs font-black uppercase text-black bg-white"
+                className="border-2 border-black px-2 py-0.5 text-[9px] sm:text-xs font-black uppercase text-black bg-white"
               >
                 {tag}
               </span>
@@ -107,7 +106,7 @@ export default function PosterCard({
         <div className="mt-auto flex items-center justify-between gap-2 border-4 border-black bg-white p-2">
           <button
             onClick={() => decreaseQuantity(id)}
-            className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
+            className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-lg sm:text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
           >
             −
           </button>
@@ -121,7 +120,7 @@ export default function PosterCard({
 
           <button
             onClick={() => increaseQuantity(id)}
-            className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
+            className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-lg sm:text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
           >
             +
           </button>

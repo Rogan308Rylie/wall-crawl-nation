@@ -154,7 +154,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
         )}
 
         {/* Discount Badge */}
-        <div className="absolute top-3 right-3 z-40 bg-[#A3FF12] border-2 border-black text-black px-3 py-1 text-sm font-black uppercase shadow-[4px_4px_0_0_#000]">
+        <div className="absolute top-2 right-2 z-40 bg-[#A3FF12] border-2 border-black text-black px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-sm font-black uppercase shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]">
           {discountPercent}% OFF
         </div>
       </div>
@@ -185,11 +185,10 @@ export default function CollectionCard({ collection }: { collection: Collection 
 
       {/* Collection Info Card */}
       <div className="bg-white border-4 border-black p-4 shadow-[8px_8px_0_0_#A3FF12]">
-        <h3 className="font-black text-xl uppercase leading-tight text-black">
+        <h3 className="font-black text-lg sm:text-xl uppercase leading-tight text-black">
           {collection.title}
         </h3>
-
-        <p className="text-sm font-bold text-[#A3FF12] border-2 border-black inline-block px-2 py-0.5 mt-2 bg-black uppercase">
+        <p className="text-[9px] sm:text-sm font-bold text-[#A3FF12] border-2 border-black inline-block px-1.5 sm:px-2 py-0.5 mt-2 bg-black uppercase">
           {posters.length} posters in this bundle
         </p>
 
@@ -202,10 +201,10 @@ export default function CollectionCard({ collection }: { collection: Collection 
         {/* Pricing */}
         <div className="mt-6 pt-4 border-t-4 border-black">
           <div className="flex items-center gap-3 mb-4">
-            <span className="line-through text-sm font-black text-black/50">
+            <span className="line-through text-[10px] sm:text-sm font-black text-black/50">
               ₹{collection.originalTotal}
             </span>
-            <span className="text-2xl font-black text-black bg-[#A3FF12] px-2 py-1 border-2 border-black shadow-[4px_4px_0_0_#000]">
+            <span className="text-lg sm:text-2xl font-black text-black bg-[#A3FF12] px-2 py-1 border-2 border-black shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]">
               ₹{collection.discountedPrice}
             </span>
           </div>
@@ -231,7 +230,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
             <div className="flex items-center justify-between gap-2 border-4 border-black bg-white p-2">
               <button
                 onClick={() => decreaseQuantity(collection.id)}
-                className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
+                className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-lg sm:text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
               >
                 −
               </button>
@@ -243,9 +242,9 @@ export default function CollectionCard({ collection }: { collection: Collection 
                 {quantity}
               </span>
 
-              <button
+               <button
                 onClick={() => increaseQuantity(collection.id)}
-                className="h-10 w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
+                className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-lg sm:text-xl hover:bg-black hover:text-[#A3FF12] transition-colors"
               >
                 +
               </button>

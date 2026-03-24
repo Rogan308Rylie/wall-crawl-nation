@@ -241,7 +241,7 @@ export default function ShopClient() {
                   setTagSearch(e.target.value);
                   setIsTagsDropdownOpen(true);
                 }}
-                className="w-full bg-transparent text-black font-black uppercase px-3 py-3 outline-none placeholder:text-black/40"
+                className="w-full bg-transparent text-black font-black uppercase px-3 py-2 sm:py-3 outline-none placeholder:text-black/40 text-sm sm:text-base"
               />
               {tagSearch && (
                 <button 
@@ -303,10 +303,10 @@ export default function ShopClient() {
           <div className="relative w-full sm:w-[240px]" ref={sortContainerRef}>
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="flex items-center justify-between w-full bg-[#A3FF12] text-black font-black uppercase text-sm border-4 border-black px-4 py-3 shadow-[6px_6px_0_0_#000] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_#000] active:shadow-[0_0_0_0_#000] transition-all"
+              className="flex items-center justify-between w-full bg-[#A3FF12] text-black font-black uppercase text-xs sm:text-sm border-4 border-black px-3 sm:px-4 py-2 sm:py-3 shadow-[6px_6px_0_0_#000] hover:translate-y-[2px] hover:shadow-[4px_4px_0_0_#000] active:shadow-[0_0_0_0_#000] transition-all"
             >
               <span className="flex items-center gap-2 truncate">
-                <SlidersHorizontal size={18} className="stroke-[3px]" />
+                <SlidersHorizontal size={16} className="sm:size-[18px] stroke-[3px]" />
                 <span>{sortOptions.find((o) => o.value === sortBy)?.label}</span>
               </span>
               <ChevronDown 
