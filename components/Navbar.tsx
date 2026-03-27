@@ -13,30 +13,12 @@ export default function Navbar() {
   const { cart } = useCart();
   const { user, logout, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("nightMode");
-    if (saved === "true") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark-mode");
-    }
   }, []);
-
-  const toggleNightMode = () => {
-    const newState = !isDarkMode;
-    setIsDarkMode(newState);
-    if (newState) {
-      document.documentElement.classList.add("dark-mode");
-      localStorage.setItem("nightMode", "true");
-    } else {
-      document.documentElement.classList.remove("dark-mode");
-      localStorage.setItem("nightMode", "false");
-    }
-  };
 
   function navLink(path: string) {
     const isActive = pathname === path;
@@ -102,14 +84,6 @@ export default function Navbar() {
             )}
           </Link>
 
-          <button
-            onClick={toggleNightMode}
-            className="w-32 text-center px-4 py-2 text-sm font-black uppercase tracking-widest text-[#A3FF12] bg-black border-2 border-transparent hover:border-black hover:-translate-y-1 shadow-[4px_4px_0_0_#A3FF12] hover:shadow-[6px_6px_0_0_#A3FF12] transition-all cursor-pointer"
-            title="Toggle Night Mode"
-          >
-            {mounted ? (isDarkMode ? "☾ NIGHT" : "☀ DAY") : "☀ DAY"}
-          </button>
-
           {!loading && !user && (
             <>
               <Link href="/login" className="px-4 py-2 text-sm font-black uppercase tracking-widest text-black border-2 border-transparent hover:border-black transition-all">
@@ -136,7 +110,7 @@ export default function Navbar() {
                 </div>
               )}
 
-              <span className="max-w-[140px] truncate text-xs font-black uppercase tracking-widest text-black">{user.displayName || user.email}</span>
+              <span className="max-w-[1400px] truncate text-xs font-black uppercase tracking-widest text-black">{user.displayName || user.email}</span>
             </div>
           )}
         </div>
@@ -188,16 +162,6 @@ export default function Navbar() {
           >
             Cart ({cartCount})
           </Link>
-          
-          <button
-            onClick={() => {
-              toggleNightMode();
-              setIsMenuOpen(false);
-            }}
-            className="w-full text-center py-4 text-sm font-black uppercase tracking-widest text-[#A3FF12] bg-black border-4 border-black shadow-[6px_6px_0_0_#A3FF12] transition-all"
-          >
-            {isDarkMode ? "☾ NIGHT MODE" : "☀ DAY MODE"}
-          </button>
 
           {!loading && !user && (
             <div className="grid grid-cols-2 gap-4 mt-2">

@@ -12,22 +12,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 body {
   background-color: #ffffff;
   color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
 
@@ -97,24 +85,13 @@ label[for],
   animation: bgshift 18s ease-in-out infinite;
 }
 
-html.dark-mode {
-  filter: invert(1);
-}
-
-html.dark-mode img,
-html.dark-mode video,
-html.dark-mode canvas,
-html.dark-mode [data-no-invert="true"] {
-  filter: invert(1);
-}
-
 /* -------------------------------------------------------------------------- */
 /* DYNAMIC RANDOM THEME MAPPING */
-/* Maps all hardcoded #A3FF12 classes to CSS Variables assigned on load */
-/* Primary = block background, Accent = texts and shadows */
+/* Maps all hardcoded #A3FF12 classes to CSS Variables assigned by RandomTheme component */
 
 .bg-\[\#A3FF12\] { 
   background-color: var(--dynamic-primary, #A3FF12) !important; 
+  color: #000000 !important; /* Force black text for legibility on neon */
   transition: background-color 0.2s, color 0.2s; 
 }
 .hover\:bg-\[\#A3FF12\]:hover { 

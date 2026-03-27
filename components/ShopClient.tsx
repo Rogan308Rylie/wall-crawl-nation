@@ -45,6 +45,7 @@ export default function ShopClient() {
   // Refs for click outside
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const sortContainerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const sortOptions = [
     { value: "latest", label: "Sort by: Latest" },
@@ -176,6 +177,25 @@ export default function ShopClient() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        fetchPosters(false);
+      }
+    }, {
+      rootMargin: "200px", // pre-fetch before reaching the bottom
+    });
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading]);
 
   function handleSortChange(newSort: string) {
     setSortBy(newSort);
@@ -451,18 +471,27 @@ export default function ShopClient() {
         ))}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="mt-16 flex justify-center">
-          <button
-            onClick={() => fetchPosters(false)}
-            disabled={loading}
-            className={`${buttons.secondary} ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            {loading ? "Loading..." : "Load More"}
-          </button>
-        </div>
-      )}
+      {/* Infinite Scroll Sentinel */}
+      <div 
+        ref={sentinelRef}
+        id="infinite-scroll-sentinel" 
+        className="h-20 mt-8 mb-16 flex items-center justify-center"
+      >
+        {hasMore ? (
+          <div className="flex flex-col items-center gap-4">
+            {loading && (
+              <div className="flex items-center gap-3 bg-black text-[#A3FF12] px-6 py-3 border-4 border-black shadow-[6px_6px_0_0_#A3FF12] animate-bounce">
+                <div className="w-4 h-4 bg-[#A3FF12] rounded-full animate-ping" />
+                <span className="font-black uppercase tracking-widest text-sm">Loading More Fire...</span>
+              </div>
+            )}
+          </div>
+        ) : posters.length > 0 && (
+          <div className="bg-white border-4 border-black px-6 py-3 shadow-[6px_6px_0_0_#000]">
+            <span className="font-black uppercase tracking-widest text-sm text-black">You've reached the end of the wall.</span>
+          </div>
+        )}
+      </div>
 
       {/* Custom Design CTA */}
       <div className="mt-28 border-t-8 border-black pt-20 pb-12 text-center bg-[#A3FF12] relative w-[100vw] left-1/2 -translate-x-1/2">
