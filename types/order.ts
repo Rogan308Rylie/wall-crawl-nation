@@ -1,11 +1,17 @@
 export type DeliveryAddress = {
+  isNitkkr?: boolean;
   fullName: string;
   phone: string;
   email: string;
 
-  hostelNumber: string;
-  roomNumber: string;
-  block: string;
+  hostelNumber?: string;
+  roomNumber?: string;
+  block?: string;
+
+  addressLine?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
 
   gender: "male" | "female" | "other";
 

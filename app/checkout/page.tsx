@@ -11,12 +11,17 @@ import { buttons } from "@/lib/ui/buttons";
 
 
 type AddressFormState = {
+  isNitkkr: boolean;
   fullName: string;
   phone: string;
   email: string;
   hostelNumber: string;
   roomNumber: string;
   block: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  pincode: string;
   gender: "" | "male" | "female" | "other";
   additionalNotes: string;
 };
@@ -31,12 +36,17 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   
 const initialAddressState: AddressFormState = {
+  isNitkkr: true,
   fullName: "",
   phone: "",
   email: "",
   hostelNumber: "",
   roomNumber: "",
   block: "",
+  addressLine: "",
+  city: "",
+  state: "",
+  pincode: "",
   gender: "",        // ✅ truly empty initially
   additionalNotes: "",
 };
@@ -93,13 +103,22 @@ async function placeOrder() {
     !address.fullName ||
     !address.phone ||
     !address.gender ||
-    !address.email ||
-    !address.hostelNumber ||
-    !address.roomNumber ||
-    !address.block
+    !address.email
   ) {
     alert("Please fill all required delivery details.");
     return;
+  }
+
+  if (address.isNitkkr) {
+    if (!address.hostelNumber || !address.roomNumber || !address.block) {
+      alert("Please fill all required hostel delivery details.");
+      return;
+    }
+  } else {
+    if (!address.addressLine || !address.city || !address.state || !address.pincode) {
+      alert("Please fill all required address details.");
+      return;
+    }
   }
 
   // ✅ Validate cart items
@@ -127,13 +146,38 @@ async function placeOrder() {
   const orderId = crypto.randomUUID();
 
   try {
+    const finalAddress = address.isNitkkr
+      ? {
+          isNitkkr: true,
+          fullName: address.fullName,
+          phone: address.phone,
+          email: address.email,
+          gender: address.gender,
+          hostelNumber: address.hostelNumber,
+          roomNumber: address.roomNumber,
+          block: address.block,
+          additionalNotes: address.additionalNotes,
+        }
+      : {
+          isNitkkr: false,
+          fullName: address.fullName,
+          phone: address.phone,
+          email: address.email,
+          gender: address.gender,
+          addressLine: address.addressLine,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          additionalNotes: address.additionalNotes,
+        };
+
     // 1️⃣ Create internal order (UNPAID)
     await setDoc(doc(db, "orders", orderId), {
       orderId,
       userId: user.uid,
       items: cart,
       totalAmount,
-      deliveryAddress: address,
+      deliveryAddress: finalAddress,
       status: "pending",
       paymentStatus: "created",
       createdAt: serverTimestamp(),
@@ -209,6 +253,18 @@ async function placeOrder() {
           <h2 className="text-3xl font-black uppercase tracking-widest text-black mb-8">Delivery Details</h2>
 
           <form className="space-y-6">
+            <div className="flex items-center justify-between p-4 border-4 border-black bg-[#A3FF12] mb-6">
+              <span className="font-black uppercase text-black text-xl">Deliver to NITKKR?</span>
+              <button
+                type="button"
+                onClick={() => setAddress({ ...address, isNitkkr: !address.isNitkkr })}
+                className={`w-16 h-8 border-4 border-black rounded-full flex items-center transition-colors ${
+                  address.isNitkkr ? "bg-black justify-end" : "bg-white justify-start"
+                } px-1`}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 border-black ${address.isNitkkr ? "bg-[#A3FF12]" : "bg-black"}`}></div>
+              </button>
+            </div>
   {/* Name */}
   <input
     type="text"
@@ -268,51 +324,107 @@ async function placeOrder() {
     className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
   />
 
-  {/* Hostel Number */}
-  <input
-  type="text"
-  placeholder="Hostel Number"
-  required
-  inputMode="numeric"
-  pattern="[0-9]*"
-  value={address.hostelNumber}
-  onChange={(e) => {
-    const value = e.target.value.replace(/\D/g, "");
-    setAddress({ ...address, hostelNumber: value });
-  }}
-  className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
-/>
+  {address.isNitkkr ? (
+    <>
+      {/* Hostel Number */}
+      <input
+        type="text"
+        placeholder="Hostel Number"
+        required
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={address.hostelNumber}
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "");
+          setAddress({ ...address, hostelNumber: value });
+        }}
+        className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+      />
 
-<div className="flex gap-4">
-  
-  {/* Room + Block */}
-    <input
-      type="text"
-      placeholder="Room Number"
-      required
-      value={address.roomNumber}
-      onChange={(e) =>
-        setAddress({ ...address, roomNumber: e.target.value })
-      }
-      className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
-    />
+      <div className="flex gap-4">
+        {/* Room + Block */}
+        <input
+          type="text"
+          placeholder="Room Number"
+          required
+          value={address.roomNumber}
+          onChange={(e) =>
+            setAddress({ ...address, roomNumber: e.target.value })
+          }
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+        />
 
-    <input
-  type="text"
-  placeholder="Block"
-  required
-  maxLength={1}
-  value={address.block}
-  onChange={(e) => {
-    const value = e.target.value
-      .replace(/[^a-zA-Z]/g, "")
-      .toUpperCase();
-    setAddress({ ...address, block: value });
-  }}
-  className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
-/>
+        <input
+          type="text"
+          placeholder="Block"
+          required
+          maxLength={1}
+          value={address.block}
+          onChange={(e) => {
+            const value = e.target.value
+              .replace(/[^a-zA-Z]/g, "")
+              .toUpperCase();
+            setAddress({ ...address, block: value });
+          }}
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+        />
+      </div>
+    </>
+  ) : (
+    <>
+      {/* Address Line */}
+      <input
+        type="text"
+        placeholder="Address Line"
+        required
+        value={address.addressLine}
+        onChange={(e) =>
+          setAddress({ ...address, addressLine: e.target.value })
+        }
+        className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+      />
 
-</div>
+      <div className="flex gap-4">
+        {/* City + State */}
+        <input
+          type="text"
+          placeholder="City"
+          required
+          value={address.city}
+          onChange={(e) =>
+            setAddress({ ...address, city: e.target.value })
+          }
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+        />
+        <input
+          type="text"
+          placeholder="State"
+          required
+          value={address.state}
+          onChange={(e) =>
+            setAddress({ ...address, state: e.target.value })
+          }
+          className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+        />
+      </div>
+      
+      {/* Pincode */}
+      <input
+        type="text"
+        placeholder="Pincode"
+        required
+        inputMode="numeric"
+        pattern="[0-9]*"
+        maxLength={6}
+        value={address.pincode}
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "");
+          setAddress({ ...address, pincode: value });
+        }}
+        className="w-full p-4 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+      />
+    </>
+  )}
 
 
   {/* Notes */}

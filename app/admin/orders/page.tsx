@@ -25,12 +25,17 @@ type Order = {
     nanoseconds: number;
   };
   deliveryAddress?: {
+    isNitkkr?: boolean;
     fullName?: string;
     email?: string;
     phone?: string;
     block?: string;
     hostelNumber?: string;
     roomNumber?: string;
+    addressLine?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
     additionalNotes?: string;
   };
 };
@@ -197,11 +202,18 @@ export default function AdminOrdersPage() {
 
             <div className="text-black font-bold text-lg uppercase space-y-2 border-l-4 border-black pl-4">
               <p className="font-black text-xl mb-3">Delivery Address</p>
-              <p>
-                Block {order.deliveryAddress?.block || "—"}, Hostel{" "}
-                {order.deliveryAddress?.hostelNumber || "—"}, Room{" "}
-                {order.deliveryAddress?.roomNumber || "—"}
-              </p>
+              {order.deliveryAddress?.isNitkkr !== false ? (
+                <p>
+                  Block {order.deliveryAddress?.block || "—"}, Hostel{" "}
+                  {order.deliveryAddress?.hostelNumber || "—"}, Room{" "}
+                  {order.deliveryAddress?.roomNumber || "—"}
+                </p>
+              ) : (
+                <p>
+                  {order.deliveryAddress?.addressLine || "—"}<br />
+                  {order.deliveryAddress?.city || "—"}, {order.deliveryAddress?.state || "—"} - {order.deliveryAddress?.pincode || "—"}
+                </p>
+              )}
               {order.deliveryAddress?.additionalNotes && (
                 <p>Notes: {order.deliveryAddress.additionalNotes}</p>
               )}
