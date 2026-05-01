@@ -24,7 +24,12 @@ export default function CartPage() {
     return (
       <div className="text-center text-black border-4 border-black p-12 bg-white shadow-[12px_12px_0_0_#A3FF12] max-w-2xl mx-auto mt-20">
         <p className="text-2xl font-black uppercase">Your cart is empty.</p>
-        <p className="mt-4 font-bold border-2 border-black inline-block px-4 py-2 bg-[#A3FF12]">Add some posters to make your wall look sick.</p>
+        <p className="mt-4 mb-8 font-bold border-2 border-black inline-block px-4 py-2 bg-[#A3FF12]">Add some posters to make your wall look sick.</p>
+        <div>
+          <button onClick={() => router.push("/shop")} className={buttons.primary}>
+            Go to Shop
+          </button>
+        </div>
       </div>
     );
   }

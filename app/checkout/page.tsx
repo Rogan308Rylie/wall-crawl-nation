@@ -215,6 +215,7 @@ async function placeOrder() {
     }
 
     // ✅ ONLY after server confirms
+    sessionStorage.setItem("lastOrderSummary", JSON.stringify(cart));
     clearCart();
     router.replace("/thank-you");
   } catch (err) {
