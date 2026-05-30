@@ -1,10 +1,36 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // ── Server-side admin guard ──────────────────────────────────
+  // 1. Check session cookie exists
+  const cookieStore = await cookies();
+  const session = cookieStore.get("__session")?.value;
+
+  if (!session) {
+    redirect("/");
+  }
+
+  // 2. Verify session cookie is valid + check admin role in Firestore
+  try {
+    const decoded = await getAdminAuth().verifySessionCookie(session!, true);
+    const snap = await getAdminDb().collection("users").doc(decoded.uid).get();
+
+    if (!snap.exists || snap.data()?.role !== "admin") {
+      redirect("/");
+    }
+  } catch {
+    // Invalid or expired session
+    redirect("/");
+  }
+  // ─────────────────────────────────────────────────────────────
+
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <aside
