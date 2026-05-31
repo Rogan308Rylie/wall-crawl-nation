@@ -5,9 +5,26 @@ import { useEffect, useState } from "react";
 import { DeliveryAddress, Order } from "@/types/order";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { buttons } from "@/lib/ui/buttons";
+
+export function calculateDeliveryFee(
+  cartTotal: number,
+  isFirstTimeCustomer: boolean,
+  isNITKKR: boolean
+): number {
+  if (isNITKKR) return 0;
+  if (isFirstTimeCustomer) return 80;
+  
+  if (cartTotal < 150) {
+    return 80;
+  }
+  if (cartTotal < 350) {
+    return 80;
+  }
+  return 40;
+}
 
 
 type AddressFormState = {
@@ -34,6 +51,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [placing, setPlacing] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isFirstTimeCustomer, setIsFirstTimeCustomer] = useState<boolean | null>(null);
+  const [checkingCustomer, setCheckingCustomer] = useState(true);
   
 const initialAddressState: AddressFormState = {
   isNitkkr: true,
@@ -65,15 +84,47 @@ const initialAddressState: AddressFormState = {
   }
 }, [user, loading, router]);
 
+    useEffect(() => {
+      if (!user) return;
+      const uid = user.uid;
+      async function checkReturning() {
+        try {
+          const q = query(
+            collection(db, "orders"),
+            where("userId", "==", uid),
+            where("paymentStatus", "==", "paid"),
+            limit(1)
+          );
+          const snapshot = await getDocs(q);
+          setIsFirstTimeCustomer(snapshot.empty);
+        } catch (err) {
+          console.error("Error checking order history:", err);
+          setIsFirstTimeCustomer(true); // Fallback: treat as first-time to avoid blocking
+        } finally {
+          setCheckingCustomer(false);
+        }
+      }
+      checkReturning();
+    }, [user]);
+
   
     if (!mounted || loading || !user) {
       return null;
     }
 
-  const totalAmount = cart.reduce(
+  const cartTotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const isNITKKR = address.isNitkkr;
+  const deliveryFee = checkingCustomer
+    ? 0
+    : calculateDeliveryFee(cartTotal, !!isFirstTimeCustomer, isNITKKR);
+
+  const totalAmount = cartTotal + deliveryFee;
+
+  const isReturningBelowMin = !checkingCustomer && isFirstTimeCustomer === false && cartTotal < 150;
   
   async function createRazorpayOrder(amount: number, orderId: string) {
   const res = await fetch("/api/razorpay/create-order", {
@@ -93,6 +144,16 @@ console.log("NEW RAZORPAY PLACE ORDER CALLED");
 
 async function placeOrder() {
   if (!user) return;
+
+  if (checkingCustomer) {
+    alert("Verifying customer status, please wait a moment.");
+    return;
+  }
+
+  if (isReturningBelowMin) {
+    alert("Minimum order amount for returning customers is ₹150.");
+    return;
+  }
 
   if (cart.length === 0) {
     alert("Your cart is empty.");
@@ -176,6 +237,8 @@ async function placeOrder() {
       orderId,
       userId: user.uid,
       items: cart,
+      cartTotal,
+      deliveryFee,
       totalAmount,
       deliveryAddress: finalAddress,
       status: "pending",
@@ -457,6 +520,41 @@ async function placeOrder() {
               </div>
             ))}
 
+            {/* Delivery Fee Line Item */}
+            <div className="flex justify-between items-center bg-[#f0f0f0] p-4 border-4 border-black mt-4">
+              <span className="font-bold uppercase text-black flex items-center gap-2">
+                Delivery
+                {isNITKKR && (
+                  <span className="text-xs font-black bg-black text-[#A3FF12] px-2 py-0.5 uppercase shadow-[2px_2px_0_0_#A3FF12] animate-pulse">
+                    FREE
+                  </span>
+                )}
+              </span>
+              <span className="font-black text-xl text-black bg-white px-3 py-1 border-2 border-black">
+                {checkingCustomer ? (
+                  <span className="animate-pulse text-xs text-black/40 font-black uppercase">Verifying...</span>
+                ) : deliveryFee === 0 ? (
+                  <span className="text-green-600 font-black">₹0</span>
+                ) : (
+                  `₹${deliveryFee}`
+                )}
+              </span>
+            </div>
+
+            {/* Minimum Order Warning */}
+            {isReturningBelowMin && (
+              <div className="p-4 bg-red-500 text-white font-black uppercase border-4 border-black shadow-[4px_4px_0_0_#000] text-xs leading-snug tracking-wider">
+                ⚠️ MINIMUM ORDER FOR RETURNING CUSTOMERS IS ₹150. PLEASE ADD ₹{150 - cartTotal} MORE TO CART.
+              </div>
+            )}
+
+            {/* Reduced Delivery Nudge */}
+            {!checkingCustomer && isFirstTimeCustomer === false && !isNITKKR && cartTotal >= 150 && cartTotal < 350 && (
+              <div className="p-4 bg-[#A3FF12] text-black font-black uppercase border-4 border-black shadow-[4px_4px_0_0_#000] text-xs leading-snug tracking-wider">
+                💡 ADD ₹{350 - cartTotal} MORE TO REDUCE YOUR DELIVERY FEE TO ₹40!
+              </div>
+            )}
+
             <div className="border-t-8 border-black pt-6 mt-8 flex justify-between font-black text-3xl uppercase text-black items-center">
               <span>Total</span>
               <span className="text-[#A3FF12] bg-black px-4 py-2 drop-shadow-[4px_4px_0_#A3FF12]">₹{totalAmount}</span>
@@ -465,11 +563,13 @@ async function placeOrder() {
             <button
               type="button"
               onClick={placeOrder}
-              disabled={placing}
-              className={`${buttons.primary} w-full mt-8 text-2xl py-6 ${ placing ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={placing || isReturningBelowMin || checkingCustomer}
+              className={`${buttons.primary} w-full mt-8 text-2xl py-6 ${
+                placing || isReturningBelowMin || checkingCustomer ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-            {placing ? "Processing..." : "Pay Now"}
-           </button>
+              {checkingCustomer ? "Verifying..." : placing ? "Processing..." : "Pay Now"}
+            </button>
           </div>
         </div>
       </div>

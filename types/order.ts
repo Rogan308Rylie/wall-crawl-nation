@@ -41,6 +41,8 @@ export type Order = {
   orderId: string;
   items: OrderItem[];
   totalAmount: number;
+  cartTotal?: number;
+  deliveryFee?: number;
 
   deliveryAddress: DeliveryAddress;
 

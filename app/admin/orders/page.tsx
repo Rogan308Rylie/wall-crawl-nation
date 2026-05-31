@@ -17,6 +17,8 @@ type Order = {
   id: string;
   orderId: string;
   totalAmount: number;
+  cartTotal?: number;
+  deliveryFee?: number;
   paymentStatus: string;
   status: string;
   items: OrderItem[];
@@ -139,7 +141,17 @@ export default function AdminOrdersPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <p className="text-lg text-black font-bold uppercase"><strong>Payment:</strong> <span className="underline decoration-[#A3FF12] decoration-4">{order.paymentStatus}</span></p>
-            <p className="text-lg text-black font-bold uppercase"><strong>Total:</strong> <span className="bg-[#A3FF12] border-2 border-black shadow-[2px_2px_0_0_#000] px-2">₹{order.totalAmount}</span></p>
+            <p className="text-lg text-black font-bold uppercase">
+              <strong>Total:</strong>{" "}
+              <span className="bg-[#A3FF12] border-2 border-black shadow-[2px_2px_0_0_#000] px-2 mr-2">
+                ₹{order.totalAmount}
+              </span>
+              {typeof order.deliveryFee === "number" && (
+                <span className="text-xs text-black/60 font-bold lowercase">
+                  (₹{order.cartTotal ?? (order.totalAmount - order.deliveryFee)} + ₹{order.deliveryFee} delivery)
+                </span>
+              )}
+            </p>
             
             <p className="text-lg text-black font-bold uppercase flex items-center gap-2">
               <strong>Ordered at:</strong>{" "}
