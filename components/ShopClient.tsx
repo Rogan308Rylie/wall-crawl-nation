@@ -45,7 +45,7 @@ export default function ShopClient() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagSearch, setTagSearch] = useState("");
   const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
-  
+
   // Refs for click outside
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const sortContainerRef = useRef<HTMLDivElement>(null);
@@ -174,7 +174,7 @@ export default function ShopClient() {
         setIsSortOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -245,13 +245,12 @@ export default function ShopClient() {
 
         {/* Toolbar: Search and Sort */}
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto relative z-30">
-          
+
           {/* Smart Tag Search Autocomplete */}
           <div className="relative w-full lg:w-[320px]" ref={searchContainerRef}>
-            <div 
-              className={`flex items-center w-full bg-[#f0f0f0] border-4 transition-all shadow-[6px_6px_0_0_#A3FF12] ${
-                isTagsDropdownOpen ? 'border-black bg-white' : 'border-black hover:bg-white'
-              }`}
+            <div
+              className={`flex items-center w-full bg-[#f0f0f0] border-4 transition-all shadow-[6px_6px_0_0_#A3FF12] ${isTagsDropdownOpen ? 'border-black bg-white' : 'border-black hover:bg-white'
+                }`}
             >
               <div className="pl-4 text-black">
                 <Search size={20} className="stroke-[3px]" />
@@ -268,7 +267,7 @@ export default function ShopClient() {
                 className="w-full bg-transparent text-black font-black uppercase px-3 py-2 sm:py-3 outline-none placeholder:text-black/40 text-sm sm:text-base"
               />
               {tagSearch && (
-                <button 
+                <button
                   onClick={() => {
                     setTagSearch("");
                     setIsTagsDropdownOpen(true);
@@ -307,10 +306,10 @@ export default function ShopClient() {
                           <span>{tag}</span>
                         </button>
                       ))}
-                    
+
                     {/* Empty State for Search */}
                     {tagSearch && allTags.filter(t => t.toLowerCase().includes(tagSearch.toLowerCase()) && !selectedTags.includes(t)).length === 0 && (
-                       <p className="text-sm font-bold uppercase text-black/50 text-center py-6">No matching tags found.</p>
+                      <p className="text-sm font-bold uppercase text-black/50 text-center py-6">No matching tags found.</p>
                     )}
 
                     {/* All tags used up hint */}
@@ -333,15 +332,15 @@ export default function ShopClient() {
                 <SlidersHorizontal size={16} className="sm:size-[18px] stroke-[3px]" />
                 <span>{sortOptions.find((o) => o.value === sortBy)?.label}</span>
               </span>
-              <ChevronDown 
-                size={18} 
-                className={`stroke-[3px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} 
+              <ChevronDown
+                size={18}
+                className={`stroke-[3px] transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}
               />
             </button>
 
             <AnimatePresence>
               {isSortOpen && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
@@ -355,11 +354,10 @@ export default function ShopClient() {
                         setIsSortOpen(false);
                         handleSortChange(option.value);
                       }}
-                      className={`flex items-center justify-between text-left px-4 py-3 font-black uppercase text-sm border-2 border-transparent transition-colors ${
-                        sortBy === option.value
+                      className={`flex items-center justify-between text-left px-4 py-3 font-black uppercase text-sm border-2 border-transparent transition-colors ${sortBy === option.value
                           ? "bg-black text-[#A3FF12]"
                           : "text-black hover:border-black hover:bg-[#A3FF12]"
-                      }`}
+                        }`}
                     >
                       {option.label}
                       {sortBy === option.value && <Check size={18} className="text-[#A3FF12] stroke-[3px]" />}
@@ -376,7 +374,7 @@ export default function ShopClient() {
       {/* Active Tags / Filters Row */}
       <AnimatePresence>
         {selectedTags.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0, marginBottom: 0 }}
             animate={{ opacity: 1, height: "auto", marginBottom: 32 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0 }}
@@ -385,7 +383,7 @@ export default function ShopClient() {
             <span className="text-sm font-black uppercase tracking-widest text-black mr-2 flex items-center gap-1.5 bg-[#A3FF12] border-2 border-black px-2 py-1 shadow-[2px_2px_0_0_#000]">
               Active Filters
             </span>
-            
+
             {selectedTags.map((tag) => (
               <motion.button
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -417,7 +415,7 @@ export default function ShopClient() {
       </AnimatePresence>
 
       {/* Collections Carousel */}
-      <div 
+      <div
         ref={carouselRef as any}
         className={`scroll-animate ${carouselInView ? "scroll-animate-active" : ""}`}
       >
@@ -432,8 +430,8 @@ export default function ShopClient() {
       {posters.length === 0 && !loading && (
         <div className="py-24 text-center border-4 border-black bg-[#f0f0f0] shadow-[12px_12px_0_0_#A3FF12] my-12">
           <p className="text-2xl font-black uppercase text-black">
-            {selectedTags.length > 0 
-              ? `No posters found with tags: ${selectedTags.join(", ")}` 
+            {selectedTags.length > 0
+              ? `No posters found with tags: ${selectedTags.join(", ")}`
               : "No posters available right now."}
           </p>
           {selectedTags.length > 0 && (
@@ -457,9 +455,8 @@ export default function ShopClient() {
       {/* posters grid */}
       <div
         ref={gridRef as any}
-        className={`grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7 stagger-children scroll-animate ${
-          gridInView ? "scroll-animate-active" : ""
-        }`}
+        className={`grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7 stagger-children scroll-animate ${gridInView ? "scroll-animate-active" : ""
+          }`}
       >
         {posters.map((poster) => (
           <PosterCard
@@ -474,9 +471,9 @@ export default function ShopClient() {
       </div>
 
       {/* Infinite Scroll Sentinel */}
-      <div 
+      <div
         ref={sentinelRef}
-        id="infinite-scroll-sentinel" 
+        id="infinite-scroll-sentinel"
         className="h-20 mt-8 mb-16 flex items-center justify-center"
       >
         {hasMore ? (

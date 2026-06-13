@@ -23,9 +23,8 @@ export default function Navbar() {
   function navLink(path: string) {
     const isActive = pathname === path;
 
-    return `relative px-4 py-2 border-2 text-sm font-black uppercase tracking-widest transition-all duration-200 ${
-      isActive ? "border-black bg-black text-[#A3FF12] shadow-[4px_4px_0_0_#A3FF12]" : "border-transparent text-black hover:border-black hover:shadow-[4px_4px_0_0_#000]"
-    }`;
+    return `relative px-4 py-2 border-2 text-sm font-black uppercase tracking-widest transition-all duration-200 ${isActive ? "border-black bg-black text-[#A3FF12] shadow-[4px_4px_0_0_#A3FF12]" : "border-transparent text-black hover:border-black hover:shadow-[4px_4px_0_0_#000]"
+      }`;
   }
 
   // Keyboard shortcuts
@@ -57,8 +56,8 @@ export default function Navbar() {
       "
     >
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="text-lg sm:text-2xl font-black uppercase tracking-widest text-black hover:-translate-y-1 hover:drop-shadow-[4px_4px_0_#A3FF12] transition-all"
           onClick={() => setIsMenuOpen(false)}
         >
@@ -118,14 +117,14 @@ export default function Navbar() {
         {/* Mobile menu controls */}
         <div className="flex lg:hidden items-center gap-4">
           <Link href="/cart" className="relative p-2 border-4 border-black bg-[#A3FF12] shadow-[4px_4px_0_0_#000]">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.1-5.38a1 1 0 0 0-1-1.21H5.74"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.1-5.38a1 1 0 0 0-1-1.21H5.74" /></svg>
             {mounted && cartCount > 0 && (
               <span className="absolute -top-2 -right-2 border-2 border-black bg-white px-1.5 py-0.5 text-[10px] font-black text-black shadow-[2px_2px_0_0_#000]">
                 {cartCount}
               </span>
             )}
           </Link>
-          <button 
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="p-2 border-4 border-black bg-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all"
           >
@@ -141,22 +140,22 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="lg:hidden border-t-8 border-black bg-white p-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className={navLink("/")}
             onClick={() => setIsMenuOpen(false)}
           >
             Home
           </Link>
-          <Link 
-            href="/shop" 
+          <Link
+            href="/shop"
             className={navLink("/shop")}
             onClick={() => setIsMenuOpen(false)}
           >
             Shop
           </Link>
-          <Link 
-            href="/cart" 
+          <Link
+            href="/cart"
             className={navLink("/cart")}
             onClick={() => setIsMenuOpen(false)}
           >
@@ -165,15 +164,15 @@ export default function Navbar() {
 
           {!loading && !user && (
             <div className="grid grid-cols-2 gap-4 mt-2">
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="py-4 text-center text-sm font-black uppercase tracking-widest text-black border-4 border-black bg-white shadow-[4px_4px_0_0_black]"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Login
               </Link>
-              <Link 
-                href="/signup" 
+              <Link
+                href="/signup"
                 className="py-4 text-center text-sm font-black uppercase tracking-widest text-black border-4 border-black bg-[#A3FF12] shadow-[4px_4px_0_0_black]"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -185,14 +184,14 @@ export default function Navbar() {
           {!loading && user && (
             <div className="flex flex-col gap-4 mt-2">
               <div className="flex items-center gap-4 border-4 border-black p-4 bg-white shadow-[6px_6px_0_0_#000]">
-                 {user.photoURL ? (
-                    <img src={user.photoURL} alt="User" className="h-10 w-10 border-2 border-black" />
-                 ) : (
-                    <div className="h-10 w-10 flex items-center justify-center bg-[#A3FF12] border-2 border-black font-black uppercase">{user.displayName?.[0] || user.email?.[0]}</div>
-                 )}
-                 <div className="flex-1 truncate font-black uppercase text-xs">{user.displayName || user.email}</div>
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="User" className="h-10 w-10 border-2 border-black" />
+                ) : (
+                  <div className="h-10 w-10 flex items-center justify-center bg-[#A3FF12] border-2 border-black font-black uppercase">{user.displayName?.[0] || user.email?.[0]}</div>
+                )}
+                <div className="flex-1 truncate font-black uppercase text-xs">{user.displayName || user.email}</div>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   logout();
                   setIsMenuOpen(false);

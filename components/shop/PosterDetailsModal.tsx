@@ -117,15 +117,15 @@ export default function PosterDetailsModal({
                 )}
 
                 <div className="space-y-4">
-                   <div className="border-4 border-black p-4 bg-[#f9f9f9]">
-                      <h4 className="font-black uppercase text-sm mb-2 text-black underline decoration-4 decoration-[#A3FF12]">Product Details</h4>
-                      <ul className="text-xs md:text-sm font-bold text-black/80 space-y-1">
-                        <li>• High-quality archival ink on 300GSM paper</li>
-                        <li>• Matte finish for zero glare</li>
-                        <li>• Precise A4 dimensions (210 × 297 mm)</li>
-                        <li>• Securely shipped in protective packaging</li>
-                      </ul>
-                   </div>
+                  <div className="border-4 border-black p-4 bg-[#f9f9f9]">
+                    <h4 className="font-black uppercase text-sm mb-2 text-black underline decoration-4 decoration-[#A3FF12]">Product Details</h4>
+                    <ul className="text-xs md:text-sm font-bold text-black/80 space-y-1">
+                      <li>• High-quality archival ink on 300GSM paper</li>
+                      <li>• Matte finish for zero glare</li>
+                      <li>• Precise A4 dimensions (210 × 297 mm)</li>
+                      <li>• Securely shipped in protective packaging</li>
+                    </ul>
+                  </div>
 
                   {/* Quantity and Cart Actions */}
                   {quantity === 0 ? (

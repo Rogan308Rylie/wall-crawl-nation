@@ -58,7 +58,7 @@ export default function ThankYouPage() {
       </AnimatePresence>
 
       <motion.div
-        animate={isDestructing ? { 
+        animate={isDestructing ? {
           x: [0, -30, 30, -30, 30, -40, 40, 0],
           y: [0, 30, -30, 30, -30, 40, -40, 0],
           scale: [1, 1.05, 1.1, 1.15, 1.2, 4, 0],
@@ -78,7 +78,7 @@ export default function ThankYouPage() {
       >
         <div className="border-8 border-black p-8 sm:p-12 bg-white shadow-[16px_16px_0_0_#A3FF12] max-w-3xl w-full">
           <h1 className="text-4xl sm:text-5xl font-black mb-8 uppercase text-black tracking-tighter">Payment Successful 🎉</h1>
-          
+
           <p className="text-xl font-bold text-black uppercase mb-8">
             Here is what you ordered....
           </p>
