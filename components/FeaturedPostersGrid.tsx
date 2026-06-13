@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import PosterCard from "./PosterCard";
+import { useInView } from "@/hooks/useInView";
 
 type Poster = {
   id: string;
@@ -23,6 +24,7 @@ type Poster = {
 export default function FeaturedPostersGrid() {
   const [posters, setPosters] = useState<Poster[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gridRef, gridInView] = useInView();
 
   useEffect(() => {
     async function fetchFeaturedPosters() {
@@ -74,7 +76,12 @@ export default function FeaturedPostersGrid() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7">
+    <div
+      ref={gridRef as any}
+      className={`grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7 stagger-children scroll-animate ${
+        gridInView ? "scroll-animate-active" : ""
+      }`}
+    >
       {posters.map((poster) => (
         <PosterCard
           key={poster.id}

@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import { CartProvider } from "../context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import RandomTheme from "@/components/RandomTheme";
+import CustomCursor from "@/components/CustomCursor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <RandomTheme />
+        <CustomCursor />
         <AuthProvider>
           <CartProvider>
             <Navbar />

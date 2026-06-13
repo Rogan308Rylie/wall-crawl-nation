@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
 import { buttons } from "@/lib/ui/buttons";
@@ -23,34 +23,95 @@ export default function PosterCard({
 }: PosterCardProps) {
   const { cart, addToCart, increaseQuantity, decreaseQuantity } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(true);
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const cartItem = cart.find((item) => item.id === id);
   const quantity = cartItem?.quantity || 0;
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia("(hover: none)").matches);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile || !cardRef.current) return;
+
+    const target = e.target as HTMLElement;
+    const isOverCTA = target.closest('.card-cta-container') || target.tagName === 'BUTTON';
+
+    if (isOverCTA) {
+      // Reset tilt and specular when hovering CTA controls
+      setTiltStyle({
+        transform: "perspective(600px) rotateX(0deg) rotateY(0deg)",
+        transition: "transform 200ms ease-out",
+        ["--mx" as any]: "50%",
+        ["--my" as any]: "50%",
+      });
+      return;
+    }
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const normalizedX = (mouseX / width) - 0.5;
+    const normalizedY = (mouseY / height) - 0.5;
+
+    // Max tilt = 8deg on each axis
+    const rotateX = -normalizedY * 16;
+    const rotateY = normalizedX * 16;
+
+    // specular highlight shifts opposite to the tilt direction
+    const mx = `${width - mouseX}px`;
+    const my = `${height - mouseY}px`;
+
+    setTiltStyle({
+      transform: `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+      transition: "none",
+      ["--mx" as any]: mx,
+      ["--my" as any]: my,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (isMobile) return;
+    setTiltStyle({
+      transform: "perspective(600px) rotateX(0deg) rotateY(0deg)",
+      transition: "transform 400ms ease-out",
+    });
+  };
 
   return (
     <>
       <div
-        className="
-      group
-      relative
-      flex
-      flex-col
-      gap-3
-      border-4
-      border-black
-      bg-white
-      p-3
-      shadow-[6px_6px_0_0_#A3FF12]
-      transition-all
-      duration-200
-      hover:-translate-y-1
-      hover:translate-x-1
-      hover:shadow-[10px_10px_0_0_#A3FF12]
-    "
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={isMobile ? undefined : tiltStyle}
+        className={`
+          group
+          relative
+          flex
+          flex-col
+          gap-3
+          border-4
+          border-black
+          bg-white
+          p-3
+          shadow-[6px_6px_0_0_#A3FF12]
+          ${isMobile 
+            ? "poster-card-mobile-tap transition-all duration-200 active:scale-[1.02]" 
+            : "transition-transform duration-200"
+          }
+        `}
       >
         {/* Poster frame */}
         <div
           onClick={() => setIsModalOpen(true)}
+          data-cursor="poster"
           className="
       relative
       w-full
@@ -79,6 +140,16 @@ export default function PosterCard({
       drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]
     "
           />
+
+          {/* Specular light highlight overlay */}
+          {!isMobile && (
+            <div
+              className="absolute inset-0 pointer-events-none z-10 overflow-hidden"
+              style={{
+                background: "radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.08), transparent 60%)",
+              }}
+            />
+          )}
           
           {/* Overlay to hint interaction */}
           <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -88,7 +159,7 @@ export default function PosterCard({
           </div>
         </div>
 
-        <div onClick={() => setIsModalOpen(true)} className="cursor-pointer group/info">
+        <div onClick={() => setIsModalOpen(true)} data-cursor="poster" className="cursor-pointer group/info">
           <div className="flex items-start justify-between gap-1">
             <h3 className="flex-1 text-sm sm:text-base font-black uppercase leading-tight tracking-wider text-black group-hover/info:text-black line-clamp-2">
               {title}
@@ -103,12 +174,12 @@ export default function PosterCard({
         {quantity === 0 ? (
           <button
             onClick={() => addToCart({ type: "poster", id, title, price, imagePath })}
-            className={`${buttons.primary} mt-auto w-full text-xs sm:text-sm py-2 sm:py-2.5 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all`}
+            className={`${buttons.primary} card-cta-container mt-auto w-full text-xs sm:text-sm py-2 sm:py-2.5 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all`}
           >
             Add to Cart
           </button>
         ) : (
-          <div className="mt-auto flex items-center justify-between gap-2 border-4 border-black bg-white p-1.5 shadow-[4px_4px_0_0_#000]">
+          <div className="card-cta-container mt-auto flex items-center justify-between gap-2 border-4 border-black bg-white p-1.5 shadow-[4px_4px_0_0_#000]">
             <button
               onClick={() => decreaseQuantity(id)}
               className="h-8 sm:h-9 w-8 sm:w-9 flex items-center justify-center border-2 border-black bg-[#A3FF12] text-black font-black text-lg hover:bg-black hover:text-[#A3FF12] transition-colors"

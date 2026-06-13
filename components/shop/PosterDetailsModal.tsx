@@ -1,18 +1,20 @@
-"use client"
+"use client";
 
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import Image from "next/image"
 import { useCart } from "@/context/CartContext"
 import { buttons } from "@/lib/ui/buttons"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface PosterDetailsModalProps {
-  id: string
-  title: string
-  price: number
-  imagePath: string
-  tags?: string[]
-  isOpen: boolean
-  onClose: () => void
+  id: string;
+  title: string;
+  price: number;
+  imagePath: string;
+  tags?: string[];
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function PosterDetailsModal({
@@ -27,8 +29,25 @@ export default function PosterDetailsModal({
   const { cart, addToCart, increaseQuantity, decreaseQuantity } = useCart()
   const cartItem = cart.find((item) => item.id === id)
   const quantity = cartItem?.quantity || 0
+  const [mounted, setMounted] = useState(false)
 
-  return (
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -146,6 +165,7 @@ export default function PosterDetailsModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }

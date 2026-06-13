@@ -16,6 +16,7 @@ import CollectionsCarousel from "./shop/CollectionsCarousel";
 import { buttons } from "@/lib/ui/buttons";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ChevronDown, Check, Tag, SlidersHorizontal } from "lucide-react";
+import { useInView } from "@/hooks/useInView";
 
 const PAGE_SIZE = 12;
 
@@ -35,6 +36,9 @@ export default function ShopClient() {
   const [mounted, setMounted] = useState(false);
   const [sortBy, setSortBy] = useState("title_asc"); // default sorting
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  const [gridRef, gridInView] = useInView();
+  const [carouselRef, carouselInView] = useInView();
 
   // Filter states
   const [allTags, setAllTags] = useState<string[]>([]);
@@ -413,7 +417,12 @@ export default function ShopClient() {
       </AnimatePresence>
 
       {/* Collections Carousel */}
-      <CollectionsCarousel />
+      <div 
+        ref={carouselRef as any}
+        className={`scroll-animate ${carouselInView ? "scroll-animate-active" : ""}`}
+      >
+        <CollectionsCarousel />
+      </div>
 
       {/* spacer to separate carousel from grid if filters are empty */}
       {selectedTags.length === 0 && <div className="h-4" />}
@@ -447,17 +456,10 @@ export default function ShopClient() {
 
       {/* posters grid */}
       <div
-        className="
-      grid
-    grid-cols-2
-    gap-4
-    sm:grid-cols-3
-    sm:gap-5
-    md:grid-cols-4
-    md:gap-6
-    lg:grid-cols-6
-    lg:gap-7
-  "
+        ref={gridRef as any}
+        className={`grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7 stagger-children scroll-animate ${
+          gridInView ? "scroll-animate-active" : ""
+        }`}
       >
         {posters.map((poster) => (
           <PosterCard

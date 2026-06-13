@@ -135,7 +135,8 @@ export default function CollectionCard({ collection }: { collection: Collection 
         {posters.length > 1 && (
           <button
             onClick={(e) => { e.stopPropagation(); handleNavigation("prev") }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            data-cursor="hover"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200"
             aria-label="Previous poster"
           >
             ‹
@@ -146,7 +147,8 @@ export default function CollectionCard({ collection }: { collection: Collection 
         {posters.length > 1 && (
           <button
             onClick={(e) => { e.stopPropagation(); handleNavigation("next") }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            data-cursor="hover"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200"
             aria-label="Next poster"
           >
             ›

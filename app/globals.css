@@ -99,6 +99,7 @@ label[for],
 }
 button.bg-\[\#A3FF12\]:hover, a.bg-\[\#A3FF12\]:hover { 
   background-color: var(--dynamic-accent, #9D00FF) !important; 
+  color: #ffffff !important; /* Force white text for legibility on dark accent */
 }
 
 .border-\[\#A3FF12\] { 
@@ -119,6 +120,18 @@ button.text-\[\#A3FF12\]:hover, a.text-\[\#A3FF12\]:hover {
   color: var(--dynamic-primary, #A3FF12) !important; 
 }
 
+/* Fix for elements/buttons that explicitly invert to black background and neon green text on hover */
+button.bg-\[\#A3FF12\].hover\:bg-black:hover,
+a.bg-\[\#A3FF12\].hover\:bg-black:hover {
+  background-color: #000000 !important;
+}
+
+.hover\:bg-black:hover.hover\:text-\[\#A3FF12\]:hover,
+button.bg-\[\#A3FF12\].hover\:bg-black:hover,
+a.bg-\[\#A3FF12\].hover\:bg-black:hover {
+  color: var(--dynamic-primary, #A3FF12) !important;
+}
+
 /* Shadows mapped to Accent */
 .shadow-\[2px_2px_0_0_\#A3FF12\] { box-shadow: 2px 2px 0 0 var(--dynamic-accent, #9D00FF) !important; }
 .shadow-\[4px_4px_0_0_\#A3FF12\] { box-shadow: 4px 4px 0 0 var(--dynamic-accent, #9D00FF) !important; }
@@ -135,3 +148,88 @@ button.text-\[\#A3FF12\]:hover, a.text-\[\#A3FF12\]:hover {
 .hover\:shadow-\[10px_10px_0_0_\#A3FF12\]:hover { box-shadow: 10px 10px 0 0 var(--dynamic-accent, #9D00FF) !important; }
 .hover\:shadow-\[12px_12px_0_0_\#A3FF12\]:hover { box-shadow: 12px 12px 0 0 var(--dynamic-accent, #9D00FF) !important; }
 .hover\:shadow-\[16px_16px_0_0_\#A3FF12\]:hover { box-shadow: 16px 16px 0 0 var(--dynamic-accent, #9D00FF) !important; }
+
+/* -------------------------------------------------------------------------- */
+/* INTERACTIVE ANIMATIONS & EFFECTS */
+
+/* Phase 2: Hero Text Slam */
+@keyframes heroSlam {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.hero-word {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-word {
+    opacity: 0;
+    transform: translateY(-50px);
+    animation: heroSlam 500ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  }
+}
+
+/* Phase 3: Scroll Animations */
+.scroll-animate {
+  opacity: 1; /* Fallback for prefers-reduced-motion or JavaScript loading */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-animate {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+    transition: opacity 500ms cubic-bezier(0.25, 1, 0.5, 1),
+                transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .scroll-animate.scroll-animate-active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Stagger Delays for grid children */
+  .stagger-children > * {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+    transition: opacity 500ms cubic-bezier(0.25, 1, 0.5, 1),
+                transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .stagger-children.scroll-animate-active > * {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .stagger-children.scroll-animate-active > *:nth-child(1) { transition-delay: 0ms; }
+  .stagger-children.scroll-animate-active > *:nth-child(2) { transition-delay: 80ms; }
+  .stagger-children.scroll-animate-active > *:nth-child(3) { transition-delay: 160ms; }
+  .stagger-children.scroll-animate-active > *:nth-child(4) { transition-delay: 240ms; }
+  .stagger-children.scroll-animate-active > *:nth-child(5) { transition-delay: 320ms; }
+  .stagger-children.scroll-animate-active > *:nth-child(n+6) { transition-delay: 400ms; }
+}
+
+/* Phase 4: Mobile Card Tap Scaling */
+@media (hover: none) {
+  .poster-card-mobile-tap {
+    transition: transform 150ms ease-out !important;
+  }
+  .poster-card-mobile-tap:active {
+    transform: scale(1.02) !important;
+  }
+}
+
+/* Phase 5: Hide system cursor on hover-capable devices */
+@media (hover: hover) {
+  html,
+  body,
+  body * {
+    cursor: none !important;
+  }
+}
