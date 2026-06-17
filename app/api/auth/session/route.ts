@@ -6,16 +6,12 @@ import { getAdminAuth } from "@/lib/firebaseAdmin";
  * 🔐 CREATE SESSION (called after Firebase client login)
  */
 export async function POST(req: Request) {
-  console.log("🔥 SESSION POST HIT");
-
   try {
     const body = await req.json();
-    console.log("📦 SESSION BODY:", body); // ✅ STEP 2
 
     const { idToken } = body;
 
     if (!idToken) {
-      console.log("❌ idToken MISSING");
       return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
     }
 
@@ -29,8 +25,6 @@ export async function POST(req: Request) {
       sameSite: "lax",
       path: "/",
     });
-
-    console.log("🍪 SESSION COOKIE SET"); // ✅ STEP 3
 
     return NextResponse.json({ success: true });
   } catch (err) {

@@ -1,9 +1,15 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function GET() {
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
+
   try {
-    const adminDb = await getAdminDb();
+    const adminDb = getAdminDb();
     const snapshot = await adminDb
       .collection("orders")
       .orderBy("createdAt", "desc")

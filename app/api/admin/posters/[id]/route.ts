@@ -1,41 +1,23 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
+
   try {
-    console.log("PATCH route hit");
-
     const { id } = await params;
-
-    // 🔐 Verify session
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("__session")?.value;
-
-    if (!sessionCookie) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const decoded = await getAdminAuth().verifySessionCookie(
-      sessionCookie,
-      true
-    );
-
-    const userSnap = await getAdminDb()
-      .collection("users")
-      .doc(decoded.uid)
-      .get();
-
-    if (!userSnap.exists || userSnap.data()?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     const body = await req.json();
+
+    if (typeof body.price !== "number" || body.price <= 0 || !Number.isFinite(body.price)) {
+      return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+    }
 
     await getAdminDb()
       .collection("posters")

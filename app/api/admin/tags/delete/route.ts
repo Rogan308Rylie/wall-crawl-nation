@@ -2,8 +2,12 @@ export const runtime = "nodejs"
 
 import { NextRequest, NextResponse } from "next/server"
 import { getAdminDb } from "@/lib/firebaseAdmin"
+import { requireAdmin } from "@/lib/adminAuth"
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth.response
+
   try {
     const { name } = await req.json()
 

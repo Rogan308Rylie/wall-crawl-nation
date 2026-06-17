@@ -1,26 +1,16 @@
 export const runtime = "nodejs"
 
 import { NextRequest, NextResponse } from "next/server"
-import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin"
+import { getAdminDb } from "@/lib/firebaseAdmin"
 import { Timestamp } from "firebase-admin/firestore"
+import { requireAdmin } from "@/lib/adminAuth"
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth.response
+
   try {
-    const session = req.cookies.get("__session")?.value
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const auth = getAdminAuth()
-    const decoded = await auth.verifySessionCookie(session)
-
     const db = getAdminDb()
-    const userDoc = await db.collection("users").doc(decoded.uid).get()
-
-    if (!userDoc.exists || userDoc.data()?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
 
     const body = await req.json()
 

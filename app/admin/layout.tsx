@@ -21,15 +21,10 @@ export default async function AdminLayout({
     true
   );
 
-  console.log("🔐 decoded.uid:", decoded.uid);
-
   const userSnap = await getAdminDb()
     .collection("users")
     .doc(decoded.uid)
     .get();
-
-  console.log("📄 userSnap.exists:", userSnap.exists);
-  console.log("📄 userSnap.data():", userSnap.data());
 
   if (!userSnap.exists || userSnap.data()?.role !== "admin") {
     redirect("/");

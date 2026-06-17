@@ -2,8 +2,12 @@ export const runtime = "nodejs"
 
 import { NextRequest, NextResponse } from "next/server"
 import { getAdminDb } from "@/lib/firebaseAdmin"
+import { requireAdmin } from "@/lib/adminAuth"
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth.response
+
   try {
     const { posterId, tags } = await req.json()
 
@@ -14,9 +18,21 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (!Array.isArray(tags)) {
+      return NextResponse.json(
+        { error: "Tags must be an array" },
+        { status: 400 }
+      )
+    }
+
+    // Sanitize each tag
+    const sanitizedTags: string[] = tags
+      .map((t: unknown) => String(t).trim().toLowerCase())
+      .filter((t) => /^[a-z0-9 _-]+$/.test(t))
+
     const db = getAdminDb()
 
-    await db.collection("posters").doc(posterId).update({ tags })
+    await db.collection("posters").doc(posterId).update({ tags: sanitizedTags })
 
     return NextResponse.json({ success: true })
   } catch (error) {

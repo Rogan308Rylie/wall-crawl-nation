@@ -317,21 +317,11 @@ export default function AdminPostersPage() {
 	}
 
 	async function handleSubmitUploads() {
-		console.log("===== UPLOAD CLICKED =====");
-		console.log("Uploads length:", uploads.length);
-		console.log("Uploads array:", uploads);
-
-		if (uploads.length === 0) {
-			console.log("No uploads found, returning early");
-			return;
-		}
+		if (uploads.length === 0) return;
 
 		setUploading(true);
-		console.log("Set uploading to true");
 
 		for (const item of uploads) {
-			console.log("Uploading item:", item.title);
-
 			const fd = new FormData();
 			fd.append("image", item.file);
 			fd.append("title", item.title);
@@ -340,18 +330,17 @@ export default function AdminPostersPage() {
 				fd.append("tags", item.tags);
 			}
 
-			console.log("Making fetch request to /api/admin/posters");
-
 			const res = await fetch("/api/admin/posters", {
 				method: "POST",
 				body: fd,
 			});
 
-			console.log("Response status:", res.status);
+			if (!res.ok) {
+				console.error("Upload failed for:", item.title, res.status);
+			}
 		}
 
 		setUploading(false);
-		console.log("Set uploading to false, reloading page");
 		location.reload();
 	}
 

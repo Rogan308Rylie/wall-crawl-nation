@@ -140,7 +140,6 @@ const initialAddressState: AddressFormState = {
   return res.json();
 }
 
-console.log("NEW RAZORPAY PLACE ORDER CALLED");
 
 async function placeOrder() {
   if (!user) return;

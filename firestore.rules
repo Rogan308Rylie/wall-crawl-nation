@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // USERS
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    // ORDERS
+    match /orders/{orderId} {
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.paymentStatus == "created"
+        && request.resource.data.status == "pending";
+
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+
+      allow update, delete: if false;
+    }
+
+    // POSTERS, TAGS, COLLECTIONS (PUBLIC READ, NO CLIENT WRITE)
+    match /posters/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /tags/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /collections/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

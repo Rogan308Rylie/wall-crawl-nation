@@ -3,9 +3,7 @@ import { cookies } from "next/headers";
 import { getAdminDb, getAdminAuth } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { put } from "@vercel/blob";
-
-const adminDb = getAdminDb();
-const adminAuth = getAdminAuth();
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
@@ -20,10 +18,11 @@ export async function POST(req: Request) {
     }
 
     // 2️⃣ Verify session
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     const uid = decoded.uid;
 
     // 3️⃣ Check admin role from Firestore
+    const adminDb = getAdminDb();
     const userSnap = await adminDb.collection("users").doc(uid).get();
     if (!userSnap.exists || userSnap.data()?.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -40,6 +39,13 @@ export async function POST(req: Request) {
     if (!title || !price || !image) {
       return NextResponse.json(
         { error: "Missing fields" },
+        { status: 400 }
+      );
+    }
+
+    if (isNaN(Number(price)) || Number(price) <= 0) {
+      return NextResponse.json(
+        { error: "Invalid price" },
         { status: 400 }
       );
     }
@@ -99,12 +105,21 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-	const snapshot = await getAdminDb().collection("posters").orderBy("createdAt", "desc").get();
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
 
-	const posters = snapshot.docs.map((doc) => ({
-		id: doc.id,
-		...doc.data(),
-	}));
+  try {
+    const snapshot = await getAdminDb().collection("posters").orderBy("createdAt", "desc").get();
 
-	return NextResponse.json({ posters });
+    const posters = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return NextResponse.json({ posters });
+  } catch (err) {
+    console.error("Fetch posters error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
+

@@ -20,6 +20,13 @@ export async function POST(req: Request) {
       );
     }
 
+    if (typeof amount !== "number" || amount <= 0 || !Number.isFinite(amount)) {
+      return NextResponse.json(
+        { error: "Invalid amount" },
+        { status: 400 }
+      );
+    }
+
     const razorpayOrder = await razorpay.orders.create({
       amount: amount * 100,
       currency: "INR",
@@ -40,5 +47,3 @@ export async function POST(req: Request) {
   }
 }
 
-console.log("KEY ID:", !!process.env.RAZORPAY_KEY_ID);
-console.log("KEY SECRET:", !!process.env.RAZORPAY_KEY_SECRET);

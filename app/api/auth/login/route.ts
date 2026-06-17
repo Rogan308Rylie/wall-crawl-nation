@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     (await cookies()).set("__session", sessionCookie, {
       httpOnly: true,
-      secure: false, // ✅ REQUIRED FOR localhost
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: expiresIn / 1000,
