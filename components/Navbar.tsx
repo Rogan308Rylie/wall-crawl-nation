@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { buttons } from "@/lib/ui/buttons";
+import { db } from "@/lib/firebase";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -27,27 +28,35 @@ export default function Navbar() {
       }`;
   }
 
-  // Keyboard shortcuts (Development Only)
+  // Keyboard shortcuts
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") return;
-
     function handleKey(e: KeyboardEvent) {
       // Ctrl + Shift + L → Logout
       if (e.ctrlKey && e.shiftKey && e.key === "L") {
         logout();
-        console.log("Logged out (dev shortcut)");
+        console.log("Logged out (shortcut)");
       }
       // Ctrl + Shift + D → Admin page
       if (e.ctrlKey && e.shiftKey && e.key === "D") {
         e.preventDefault();
-        router.push("/admin");
-        console.log("Navigated to admin (dev shortcut)");
+        if (!user) return;
+        // Verify admin role before routing
+        import("firebase/firestore").then(({ doc, getDoc }) => {
+          getDoc(doc(db, "users", user.uid)).then((snap) => {
+            if (snap.exists() && snap.data().role === "admin") {
+              router.push("/admin");
+              console.log("Navigated to admin (shortcut)");
+            } else {
+              console.log("Access denied: Admin only");
+            }
+          });
+        });
       }
     }
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [logout, router]);
+  }, [logout, router, user]);
 
 
   return (
