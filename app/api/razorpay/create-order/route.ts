@@ -2,6 +2,8 @@ export const runtime = "nodejs";
 
 import Razorpay from "razorpay";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -10,27 +12,67 @@ const razorpay = new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { amount, orderId } = body;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("__session")?.value;
 
-    if (!amount || !orderId) {
+    if (!sessionCookie) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let uid: string;
+    try {
+      const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+      uid = decoded.uid;
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { orderId } = body;
+
+    if (!orderId) {
       return NextResponse.json(
-        { error: "amount and orderId are required" },
+        { error: "orderId is required" },
         { status: 400 }
       );
     }
 
-    if (typeof amount !== "number" || amount <= 0 || !Number.isFinite(amount)) {
+    const db = getAdminDb();
+    const orderRef = db.collection("orders").doc(orderId);
+    const orderSnap = await orderRef.get();
+
+    if (!orderSnap.exists) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    const orderData = orderSnap.data()!;
+
+    if (orderData.userId !== uid) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (orderData.paymentStatus !== "created") {
+      return NextResponse.json({ error: "Order cannot be paid" }, { status: 400 });
+    }
+
+    const serverAmount = orderData.totalAmount;
+
+    if (typeof serverAmount !== "number" || serverAmount <= 0 || !Number.isFinite(serverAmount)) {
       return NextResponse.json(
-        { error: "Invalid amount" },
-        { status: 400 }
+        { error: "Invalid order amount" },
+        { status: 500 }
       );
     }
 
     const razorpayOrder = await razorpay.orders.create({
-      amount: amount * 100,
+      amount: serverAmount * 100,
       currency: "INR",
       receipt: orderId,
+    });
+
+    // Store the Razorpay order ID back on the Firestore order doc
+    await orderRef.update({
+      "razorpay.razorpay_order_id": razorpayOrder.id
     });
 
     return NextResponse.json({
@@ -46,4 +88,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

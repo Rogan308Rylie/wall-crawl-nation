@@ -23,7 +23,7 @@ export function calculateDeliveryFee(
   if (cartTotal < 350) {
     return 80;
   }
-  return 40;
+  return 50;
 }
 
 
@@ -203,8 +203,6 @@ async function placeOrder() {
 
   setPlacing(true);
 
-  const orderId = crypto.randomUUID();
-
   try {
     const finalAddress = address.isNitkkr
       ? {
@@ -231,23 +229,26 @@ async function placeOrder() {
           additionalNotes: address.additionalNotes,
         };
 
-    // 1️⃣ Create internal order (UNPAID)
-    await setDoc(doc(db, "orders", orderId), {
-      orderId,
-      userId: user.uid,
-      items: cart,
-      cartTotal,
-      deliveryFee,
-      totalAmount,
-      deliveryAddress: finalAddress,
-      status: "pending",
-      paymentStatus: "created",
-      createdAt: serverTimestamp(),
+    // 1️⃣ Create internal order (SERVER-SIDE)
+    const createRes = await fetch("/api/orders/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: cart,
+        deliveryAddress: finalAddress,
+      }),
     });
+
+    if (!createRes.ok) {
+      const errData = await createRes.json();
+      throw new Error(errData.error || "Failed to create order");
+    }
+
+    const { orderId, totalAmount: serverTotalAmount } = await createRes.json();
 
     // 2️⃣ Create Razorpay order (SERVER)
     const razorpayOrder = await createRazorpayOrder(
-      totalAmount,
+      serverTotalAmount,
       orderId
     );
 

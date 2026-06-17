@@ -4,10 +4,16 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import admin from "firebase-admin";
 import { getAdminDb } from "@/lib/firebaseAdmin";
+import Razorpay from "razorpay";
 import {
   sendCustomerOrderPlacedEmail,
   sendAdminNewOrderEmail,
 } from "@/lib/email/orderEmails";
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 
 export async function POST(req: Request) {
   try {
@@ -66,6 +72,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    // Confirm the payment amount returned by Razorpay matches the order exactly
+    const payment = await razorpay.payments.fetch(razorpay_payment_id);
+    if (payment.amount !== order.totalAmount * 100) {
+      console.error(`CRITICAL ANOMALY: Payment amount mismatch for order ${orderId}. Expected ${order.totalAmount * 100}, got ${payment.amount}`);
+      return NextResponse.json({ error: "Payment amount mismatch" }, { status: 400 });
+    }
+
+    // Optional cross-check: Ensure the razorpay order ID matches what we saved in create-order
+    if (order.razorpay?.razorpay_order_id && order.razorpay.razorpay_order_id !== razorpay_order_id) {
+      console.error(`CRITICAL ANOMALY: Order ID mismatch for order ${orderId}. Expected ${order.razorpay.razorpay_order_id}, got ${razorpay_order_id}`);
+      return NextResponse.json({ error: "Razorpay order ID mismatch" }, { status: 400 });
+    }
+
     // ✅ Mark order paid
     await orderRef.update({
       paymentStatus: "paid",
@@ -80,12 +99,12 @@ export async function POST(req: Request) {
 
     // 📧 PREPARE EMAIL DATA
     const orderData = {
-  id: orderId,
-  email: order.deliveryAddress.email,
-  name: order.deliveryAddress.fullName,
-  totalAmount: order.totalAmount,
-  items: order.items, 
-};
+      id: orderId,
+      email: order.deliveryAddress.email,
+      name: order.deliveryAddress.fullName,
+      totalAmount: order.totalAmount,
+      items: order.items, 
+    };
 
 
     // 📧 SEND EMAILS (NON-BLOCKING)
