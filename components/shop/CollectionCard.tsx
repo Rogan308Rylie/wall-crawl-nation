@@ -119,9 +119,12 @@ export default function CollectionCard({ collection }: { collection: Collection 
           key={currentIndex}
           src={currentPoster.imagePath || "/placeholder.jpg"}
           alt={currentPoster.title}
+          onContextMenu={(e) => e.preventDefault()}
+          onDragStart={(e) => e.preventDefault()}
           className={`
             absolute inset-0 w-full h-full object-contain z-30
             transition-transform duration-300 ease-out
+            select-none pointer-events-none
             ${sliding
               ? slideDirection === "left"
                 ? "-translate-x-full"
@@ -129,6 +132,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
               : "translate-x-0"
             }
           `}
+          style={{ WebkitUserDrag: "none" } as React.CSSProperties}
         />
 
         {/* Left Navigation Button */}

@@ -138,13 +138,23 @@ export default function PosterCard({
       duration-500
       group-hover:scale-105
       drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]
+      pointer-events-none
+      select-none
     "
+            style={{ WebkitUserDrag: "none" } as React.CSSProperties}
+          />
+
+          {/* Transparent protection overlay — blocks right-click, drag, and long-press save */}
+          <div
+            className="absolute inset-0 z-20"
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
           />
 
           {/* Specular light highlight overlay */}
           {!isMobile && (
             <div
-              className="absolute inset-0 pointer-events-none z-10 overflow-hidden"
+              className="absolute inset-0 pointer-events-none z-30 overflow-hidden"
               style={{
                 background: "radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.08), transparent 60%)",
               }}
@@ -152,7 +162,7 @@ export default function PosterCard({
           )}
           
           {/* Overlay to hint interaction */}
-          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 z-10 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
             <span className="bg-white border-2 border-black px-3 py-1 text-[10px] font-black uppercase text-black transform rotate-2">
               Detail view
             </span>

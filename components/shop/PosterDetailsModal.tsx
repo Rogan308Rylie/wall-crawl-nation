@@ -81,7 +81,14 @@ export default function PosterDetailsModal({
                   alt={title}
                   fill
                   unoptimized
-                  className="object-contain p-2 drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500 group-hover:scale-105"
+                  className="object-contain p-2 drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none"
+                  style={{ WebkitUserDrag: "none" } as React.CSSProperties}
+                />
+                {/* Transparent protection overlay — blocks right-click, drag, and long-press save */}
+                <div
+                  className="absolute inset-0 z-10"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
                 />
               </div>
 

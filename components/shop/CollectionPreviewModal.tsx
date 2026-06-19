@@ -84,7 +84,10 @@ export default function CollectionPreviewModal({
                     <img
                       src={poster.imagePath}
                       alt={poster.title}
-                      className="w-full h-full object-contain transition transform group-hover:scale-105"
+                      onContextMenu={(e) => e.preventDefault()}
+                      onDragStart={(e) => e.preventDefault()}
+                      className="w-full h-full object-contain transition transform group-hover:scale-105 select-none pointer-events-none"
+                      style={{ WebkitUserDrag: "none" } as React.CSSProperties}
                     />
                   </div>
                   <div className="mt-2 text-xs font-black uppercase text-black line-clamp-1 text-center group-hover:text-black">
