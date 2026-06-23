@@ -129,7 +129,7 @@ export default function CustomOrderPage() {
           Your wall. Your design.
         </h1>
         <p className="mt-6 text-lg font-bold text-black max-w-2xl mx-auto">
-          Got something in mind that isn't in the shop? We'll print it for you. ₹40 per poster, A4 size, no minimums.
+          Got something in mind that isn't in the shop? We'll print it for you. <br className="hidden sm:block" /> ₹40 per poster, A4 size, no minimums.
         </p>
       </section>
 
@@ -202,7 +202,7 @@ export default function CustomOrderPage() {
             Upload your designs yourself
           </h2>
           <p className="text-black font-bold mb-8">
-            Upload JPEGs, PNGs, or a ZIP and we'll count your images, calculate the price, and add it to your cart. Done in under a minute.
+            Upload JPEGs, PNGs, or a ZIP and we'll count your images, <br className="hidden sm:block" /> calculate the price, and add it to your cart. Done in under a minute.
           </p>
 
           <div className="flex-1 flex flex-col justify-end">
@@ -229,7 +229,16 @@ export default function CustomOrderPage() {
                         <span className="bg-black text-[#A3FF12] px-4 py-2 font-black uppercase tracking-widest text-sm border-2 border-black">
                           {files.length} file(s) selected
                         </span>
-                        <span className="text-sm font-bold text-gray-600">Click dashed area to add more</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            fileInputRef.current?.click();
+                          }}
+                          className="bg-white text-black border-2 border-black px-4 py-2 font-black uppercase tracking-widest text-sm hover:-translate-y-[2px] hover:shadow-[4px_4px_0_0_#000] transition-all"
+                        >
+                          Add more
+                        </button>
                       </div>
                       
                       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto p-2" onClick={(e) => e.stopPropagation()}>

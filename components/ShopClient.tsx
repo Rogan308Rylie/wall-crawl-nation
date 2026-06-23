@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import {
   collection,
   query,
@@ -499,17 +500,15 @@ export default function ShopClient() {
         </h2>
 
         <p className="mt-6 text-xl font-bold uppercase text-black border-4 border-black inline-block bg-white px-6 py-2 shadow-[4px_4px_0_0_#000]">
-          It's okay. Get your custom designs made here.
+          It's okay. <br className="hidden sm:block" /> Get your custom designs made here.
         </p>
         <br />
-        <a
-          href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/custom-order"
           className={`${buttons.primary} mt-10`}
         >
-          Chat on WhatsApp
-        </a>
+          Tell us what you want here
+        </Link>
       </div>
     </div>
   );

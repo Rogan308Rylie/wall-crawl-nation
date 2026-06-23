@@ -38,7 +38,7 @@ export default function Home() {
           className={`scroll-animate ${heroContentInView ? "scroll-animate-active" : ""} flex flex-col items-center`}
         >
           <p className="mt-12 max-w-2xl bg-black px-6 py-4 text-white font-bold tracking-[0.2em] uppercase border-4 border-black shadow-[8px_8px_0_0_#A3FF12] text-sm sm:text-base">
-            Premium wall art inspired by Culture, Individuality and Expression.
+            Premium wall art inspired by <br className="hidden sm:block" /> Culture, Individuality and Expression.
           </p>
 
           <div className="mt-16 flex gap-6 flex-wrap justify-center">
