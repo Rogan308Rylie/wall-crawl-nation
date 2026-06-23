@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useCart } from "@/context/CartContext"
 import { buttons } from "@/lib/ui/buttons"
 import PosterDetailsModal from "./PosterDetailsModal"
+import { X } from "lucide-react"
 
 interface Poster {
   id: string
@@ -66,7 +67,7 @@ export default function CollectionPreviewModal({
           className="absolute right-4 top-4 md:right-8 md:top-8 text-3xl md:text-4xl text-black hover:text-[#A3FF12] transition font-black hover:rotate-90 z-10"
           aria-label="Close preview"
         >
-          ✕
+          <X className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mt-8 md:mt-0">

@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext"
 import { useToast } from "@/context/ToastContext"
 import { buttons } from "@/lib/ui/buttons"
 import { motion, AnimatePresence } from "framer-motion"
+import { X, Gift, Link as LinkIcon, Smartphone, Twitter } from "lucide-react"
 
 interface PosterDetailsModalProps {
   id: string;
@@ -35,7 +36,7 @@ export default function PosterDetailsModal({
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    showToast("Link copied to clipboard! 🔗", "success");
+    showToast("Link copied to clipboard!", "success");
   };
 
   const shareText = `Check out this awesome poster: ${title}`;
@@ -107,7 +108,7 @@ export default function PosterDetailsModal({
               className="absolute right-4 top-4 md:right-8 md:top-8 text-3xl md:text-4xl text-black hover:text-[#A3FF12] transition font-black hover:rotate-90"
               aria-label="Close details"
             >
-              ✕
+              <X className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mt-8 md:mt-0">
@@ -207,25 +208,27 @@ export default function PosterDetailsModal({
 
                   {/* Share Section */}
                   <div className="mt-6 border-t-4 border-black pt-6">
-                    <h4 className="font-black uppercase text-sm mb-3 text-black underline decoration-4 decoration-[#A3FF12]">Ask someone to gift this to you 🎁</h4>
+                    <h4 className="font-black uppercase text-sm mb-3 text-black underline decoration-4 decoration-[#A3FF12] flex items-center gap-2">
+                      Ask someone to gift this to you <Gift className="w-4 h-4" />
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={handleCopyLink}
-                        className="flex-1 min-w-[100px] border-2 border-black bg-white hover:bg-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                        className="flex-1 min-w-[100px] flex items-center justify-center gap-2 border-2 border-black bg-white hover:bg-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
                       >
-                        🔗 Copy Link
+                        <LinkIcon className="w-4 h-4" /> Copy Link
                       </button>
                       <button
                         onClick={handleWhatsAppShare}
-                        className="flex-1 min-w-[100px] border-2 border-black bg-[#A3FF12] hover:bg-black hover:text-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                        className="flex-1 min-w-[100px] flex items-center justify-center gap-2 border-2 border-black bg-[#A3FF12] hover:bg-black hover:text-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
                       >
-                        📱 WhatsApp
+                        <Smartphone className="w-4 h-4" /> WhatsApp
                       </button>
                       <button
                         onClick={handleTwitterShare}
-                        className="flex-1 min-w-[100px] border-2 border-black bg-black text-white hover:text-[#A3FF12] font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                        className="flex-1 min-w-[100px] flex items-center justify-center gap-2 border-2 border-black bg-black text-white hover:text-[#A3FF12] font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
                       >
-                        🐦 X / Twitter
+                        <Twitter className="w-4 h-4 fill-current" /> X / Twitter
                       </button>
                     </div>
                   </div>

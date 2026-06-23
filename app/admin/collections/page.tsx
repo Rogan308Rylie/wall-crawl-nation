@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { X } from "lucide-react"
 
 interface Poster {
   id: string
@@ -577,7 +578,7 @@ export default function AdminCollectionsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-[#A3FF12]/90 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setEditingCollection(null)}
           />
 
@@ -588,7 +589,7 @@ export default function AdminCollectionsPage() {
               onClick={() => setEditingCollection(null)}
               className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors"
             >
-              ✕
+              <X className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
             </button>
 
             <h2 className="text-4xl font-black uppercase text-black mb-10 border-b-8 border-black pb-4 inline-block">Edit Collection</h2>

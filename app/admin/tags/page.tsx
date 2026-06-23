@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 
 export default function AdminTagsPage() {
 	const [tags, setTags] = useState<string[]>([]);
@@ -105,10 +106,10 @@ export default function AdminTagsPage() {
 										});
 										await fetchTags();
 									}}
-									className="text-white hover:text-red-500 transition-colors text-2xl leading-none font-black ml-2"
+									className="text-white hover:text-red-500 transition-colors leading-none ml-2 flex items-center"
 									type="button"
 								>
-									✕
+									<X className="w-5 h-5" strokeWidth={3} />
 								</button>
 							</div>
 						))}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { X } from "lucide-react";
 
 type Poster = {
 	id: string;
@@ -391,9 +392,9 @@ export default function AdminPostersPage() {
 										<p className="text-xl font-bold font-mono text-black">{item.file.name}</p>
 										<button 
 											onClick={() => setUploads(uploads.filter((_, idx) => idx !== i))}
-											className="text-black hover:text-red-600 font-black uppercase shrink-0 transition-colors"
+											className="text-black hover:text-red-600 font-black uppercase shrink-0 transition-colors flex items-center"
 										>
-											✕ Remove
+											<X className="w-5 h-5 mr-1" strokeWidth={3} /> Remove
 										</button>
 									</div>
 
@@ -615,7 +616,7 @@ export default function AdminPostersPage() {
 			{/* Edit modal */}
 			{editingPoster && (
 				<div 
-					className="fixed inset-0 bg-[#A3FF12]/90 flex items-center justify-center z-50 p-4"
+					className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 					onClick={() => setEditingPoster(null)}
 				>
 					<div 
@@ -627,7 +628,7 @@ export default function AdminPostersPage() {
 							className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors leading-none"
 							type="button"
 						>
-							✕
+							<X className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
 						</button>
 
 						<h2 className="text-3xl font-black uppercase text-black mb-8 border-b-8 border-black pb-4 inline-block">Edit Poster</h2>
@@ -671,10 +672,10 @@ export default function AdminPostersPage() {
 											{tag}
 											<button
 												onClick={() => handleRemoveTag(tag)}
-												className="ml-2 text-white hover:text-red-500 transition-colors text-xl leading-none"
+												className="ml-2 text-white hover:text-red-500 transition-colors leading-none flex items-center"
 												type="button"
 											>
-												✕
+												<X className="w-4 h-4" strokeWidth={3} />
 											</button>
 										</div>
 									))}
@@ -727,7 +728,7 @@ export default function AdminPostersPage() {
 			{/* Tag selector modal */}
 			{tagModalPoster && (
 				<div 
-					className="fixed inset-0 bg-[#A3FF12]/90 flex items-center justify-center z-50 p-4"
+					className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 					onClick={() => setTagModalPoster(null)}
 				>
 					<div 
@@ -739,7 +740,7 @@ export default function AdminPostersPage() {
 							className="absolute top-6 right-6 text-black hover:text-[#A3FF12] text-4xl font-black transition-colors leading-none"
 							type="button"
 						>
-							✕
+							<X className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
 						</button>
 
 						<h2 className="text-3xl font-black uppercase text-black mb-2 border-b-8 border-black pb-4 inline-block">Add Tags</h2>

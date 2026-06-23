@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
+import { PartyPopper } from "lucide-react";
 
 export default function ThankYouPage() {
   const router = useRouter();
@@ -77,7 +79,23 @@ export default function ThankYouPage() {
         className="min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 relative z-10 overflow-hidden"
       >
         <div className="border-8 border-black p-8 sm:p-12 bg-white shadow-[16px_16px_0_0_#A3FF12] max-w-3xl w-full">
-          <h1 className="text-4xl sm:text-5xl font-black mb-8 uppercase text-black tracking-tighter">Payment Successful 🎉</h1>
+          <div className="flex items-center gap-4 mb-8">
+            <h1 className="text-4xl sm:text-5xl font-black uppercase text-black tracking-tighter">Payment Successful</h1>
+            <button
+              onClick={() => {
+                confetti({
+                  particleCount: 150,
+                  spread: 100,
+                  origin: { y: 0.6 },
+                  colors: ['#A3FF12', '#000000', '#FFFFFF']
+                });
+              }}
+              className="p-2 border-4 border-black bg-[#A3FF12] hover:bg-black hover:text-[#A3FF12] transition-colors shadow-[4px_4px_0_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none"
+              title="Celebrate!"
+            >
+              <PartyPopper className="w-8 h-8 md:w-10 md:h-10" strokeWidth={3} />
+            </button>
+          </div>
 
           <p className="text-xl font-bold text-black uppercase mb-8">
             Here is what you ordered....
