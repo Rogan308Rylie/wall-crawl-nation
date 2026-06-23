@@ -53,7 +53,7 @@ export async function sendCustomerOrderPlacedEmail(order: Order) {
       <br /><br />
       <p>We’ll notify you as your order is packed, shipped, and delivered.</p>
 
-      <p>— Wall Crawl Nation</p>
+      <p>- Wall Crawl Nation</p>
     `,
   });
 }

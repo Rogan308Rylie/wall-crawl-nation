@@ -51,7 +51,7 @@ export default function CartPage() {
             <div className="flex items-center gap-6">
               <div className="relative h-32 w-24 overflow-hidden border-4 border-black bg-[#f0f0f0]">
                 <Image
-                  src={(item.type === "poster" ? item.imagePath : item.coverImage) || "/placeholder.jpg"}
+                  src={(item.type === "collection" ? item.coverImage : item.imagePath) || "/placeholder.jpg"}
                   alt={item.title}
                   fill
                   className="object-contain"
@@ -65,6 +65,11 @@ export default function CartPage() {
                   {item.type === "collection" && (
                     <span className="text-xs font-black bg-black text-[#A3FF12] px-2 py-1 uppercase shadow-[2px_2px_0_0_#A3FF12]">
                       Bundle
+                    </span>
+                  )}
+                  {item.type === "custom" && (
+                    <span className="text-xs font-black bg-black text-white px-2 py-1 uppercase shadow-[2px_2px_0_0_#A3FF12]">
+                      Custom
                     </span>
                   )}
                 </div>

@@ -20,12 +20,22 @@ export type CartItem =
     posterIds: string[]
     coverImage: string
   }
+  | {
+    type: "custom"
+    id: string
+    title: string
+    price: number
+    quantity: number
+    imagesCount: number
+    imagePath: string
+  }
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item:
     | Omit<Extract<CartItem, { type: "poster" }>, "quantity">
     | Omit<Extract<CartItem, { type: "collection" }>, "quantity">
+    | Omit<Extract<CartItem, { type: "custom" }>, "quantity">
   ) => void;
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
@@ -46,6 +56,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           Boolean(item.id && item.title && typeof item.price === "number" && typeof item.quantity === "number" && item.type)
         )
         .map((item) => {
+          if (item.type === "custom") {
+            return {
+              type: "custom" as const,
+              id: item.id,
+              title: item.title,
+              price: item.price,
+              quantity: item.quantity,
+              imagesCount: item.imagesCount || 1,
+              imagePath: item.imagePath || "/posters/default-cover.jpg",
+            };
+          }
           if (item.type === "collection") {
             return {
               type: "collection" as const,
@@ -77,6 +98,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   function addToCart(item:
     | Omit<Extract<CartItem, { type: "poster" }>, "quantity">
     | Omit<Extract<CartItem, { type: "collection" }>, "quantity">
+    | Omit<Extract<CartItem, { type: "custom" }>, "quantity">
   ) {
     setCart((prev) => {
       const existing = prev.find((p) => p.id === item.id);

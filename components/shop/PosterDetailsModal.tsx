@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import Image from "next/image"
 import { useCart } from "@/context/CartContext"
+import { useToast } from "@/context/ToastContext"
 import { buttons } from "@/lib/ui/buttons"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -30,6 +31,22 @@ export default function PosterDetailsModal({
   const cartItem = cart.find((item) => item.id === id)
   const quantity = cartItem?.quantity || 0
   const [mounted, setMounted] = useState(false)
+  const { showToast } = useToast()
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast("Link copied to clipboard! 🔗", "success");
+  };
+
+  const shareText = `Check out this awesome poster: ${title}`;
+
+  const handleWhatsAppShare = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + window.location.href)}`, "_blank");
+  };
+
+  const handleTwitterShare = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`, "_blank");
+  };
 
   useEffect(() => {
     setMounted(true)
@@ -38,12 +55,32 @@ export default function PosterDetailsModal({
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
+      
+      // Calculate scrollbar width to prevent layout shift when scroll is locked
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
       document.body.style.overflow = "hidden";
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
       return () => {
         document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
       };
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!mounted) return null
 
@@ -80,11 +117,12 @@ export default function PosterDetailsModal({
                   src={imagePath || "/placeholder.jpg"}
                   alt={title}
                   fill
-                  unoptimized
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-contain p-2 drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none"
                   style={{ WebkitUserDrag: "none" } as React.CSSProperties}
                 />
-                {/* Transparent protection overlay — blocks right-click, drag, and long-press save */}
+                {/* Transparent protection overlay - blocks right-click, drag, and long-press save */}
                 <div
                   className="absolute inset-0 z-10"
                   onContextMenu={(e) => e.preventDefault()}
@@ -94,7 +132,7 @@ export default function PosterDetailsModal({
 
               {/* Poster Info */}
               <div className="flex flex-col justify-center">
-                <h2 className="text-3xl md:text-5xl font-black uppercase text-black leading-none tracking-tight mb-4">
+                <h2 className="text-3xl md:text-5xl font-black uppercase text-black leading-none tracking-tight mb-4 pr-12 md:pr-16">
                   {title}
                 </h2>
 
@@ -166,6 +204,31 @@ export default function PosterDetailsModal({
                       </button>
                     </div>
                   )}
+
+                  {/* Share Section */}
+                  <div className="mt-6 border-t-4 border-black pt-6">
+                    <h4 className="font-black uppercase text-sm mb-3 text-black underline decoration-4 decoration-[#A3FF12]">Ask someone to gift this to you 🎁</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={handleCopyLink}
+                        className="flex-1 min-w-[100px] border-2 border-black bg-white hover:bg-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                      >
+                        🔗 Copy Link
+                      </button>
+                      <button
+                        onClick={handleWhatsAppShare}
+                        className="flex-1 min-w-[100px] border-2 border-black bg-[#A3FF12] hover:bg-black hover:text-[#A3FF12] text-black font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                      >
+                        📱 WhatsApp
+                      </button>
+                      <button
+                        onClick={handleTwitterShare}
+                        className="flex-1 min-w-[100px] border-2 border-black bg-black text-white hover:text-[#A3FF12] font-black uppercase text-xs py-2 shadow-[2px_2px_0_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all"
+                      >
+                        🐦 X / Twitter
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { doc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { buttons } from "@/lib/ui/buttons";
+import { useToast } from "@/context/ToastContext";
 
 export function calculateDeliveryFee(
   cartTotal: number,
@@ -53,6 +54,7 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const [isFirstTimeCustomer, setIsFirstTimeCustomer] = useState<boolean | null>(null);
   const [checkingCustomer, setCheckingCustomer] = useState(true);
+  const { showToast } = useToast();
   
 const initialAddressState: AddressFormState = {
   isNitkkr: true,
@@ -145,17 +147,17 @@ async function placeOrder() {
   if (!user) return;
 
   if (checkingCustomer) {
-    alert("Verifying customer status, please wait a moment.");
+    showToast("Verifying customer status, please wait a moment.", "info");
     return;
   }
 
   if (isReturningBelowMin) {
-    alert("Minimum order amount for returning customers is ₹150.");
+    showToast("Minimum order amount for returning customers is ₹150.", "error");
     return;
   }
 
   if (cart.length === 0) {
-    alert("Your cart is empty.");
+    showToast("Your cart is empty.", "error");
     return;
   }
 
@@ -165,18 +167,18 @@ async function placeOrder() {
     !address.gender ||
     !address.email
   ) {
-    alert("Please fill all required delivery details.");
+    showToast("Please fill all required delivery details.", "error");
     return;
   }
 
   if (address.isNitkkr) {
     if (!address.hostelNumber || !address.roomNumber || !address.block) {
-      alert("Please fill all required hostel delivery details.");
+      showToast("Please fill all required hostel delivery details.", "error");
       return;
     }
   } else {
     if (!address.addressLine || !address.city || !address.state || !address.pincode) {
-      alert("Please fill all required address details.");
+      showToast("Please fill all required address details.", "error");
       return;
     }
   }
@@ -184,18 +186,18 @@ async function placeOrder() {
   // ✅ Validate cart items
   for (const item of cart) {
     if (!item.id || !item.title || !item.price || !item.type) {
-      alert("Invalid item in cart");
+      showToast("Invalid item in cart", "error");
       return;
     }
 
-    if (item.type !== "poster" && item.type !== "collection") {
-      alert("Invalid item type");
+    if (item.type !== "poster" && item.type !== "collection" && item.type !== "custom") {
+      showToast("Invalid item type", "error");
       return;
     }
 
     if (item.type === "collection") {
       if (!("posterIds" in item) || !item.posterIds || item.posterIds.length === 0) {
-        alert("Invalid collection item - missing posters");
+        showToast("Invalid collection item - missing posters", "error");
         return;
       }
     }
@@ -283,7 +285,7 @@ async function placeOrder() {
     router.replace("/thank-you");
   } catch (err) {
     console.error(err);
-    alert("Payment succeeded but verification failed. Please contact support.");
+    showToast("Payment succeeded but verification failed. Please contact support.", "error");
   }
 },
 
@@ -301,7 +303,7 @@ async function placeOrder() {
     rzp.open();
   } catch (err) {
     console.error(err);
-    alert("Payment initialization failed");
+    showToast("Payment initialization failed", "error");
   } finally {
     setPlacing(false);
   }

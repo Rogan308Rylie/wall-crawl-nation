@@ -85,6 +85,21 @@ export async function POST(req: Request) {
           price: realPrice,
           title: docSnap.data()!.title,
         });
+      } else if (item.type === "custom") {
+        const docSnap = await db.collection("customOrders").doc(item.id).get();
+        if (!docSnap.exists) {
+          return NextResponse.json({ error: `Custom order ${item.id} not found` }, { status: 404 });
+        }
+        const customData = docSnap.data()!;
+        const realPrice = customData.totalPrice; // Total price of all images in that custom order
+        cartTotal += realPrice * item.quantity;
+        validatedItems.push({
+          ...item,
+          price: realPrice,
+          title: `Custom posters (${customData.totalImages} images)`,
+          images: customData.images || [],
+          notes: customData.notes || "",
+        });
       } else {
         return NextResponse.json({ error: "Unknown item type" }, { status: 400 });
       }

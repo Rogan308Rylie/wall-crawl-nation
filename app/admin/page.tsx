@@ -22,7 +22,7 @@ export default function AdminPage() {
               <h3 className="text-sm font-black text-black uppercase tracking-widest mb-3 border-b-2 border-black pb-1 inline-block">
                 Total Orders
               </h3>
-              <p className="text-5xl font-black text-black">—</p>
+              <p className="text-5xl font-black text-black">-</p>
             </div>
             <div className="text-4xl opacity-50 drop-shadow-[2px_2px_0_#A3FF12]">📦</div>
           </div>
@@ -36,7 +36,7 @@ export default function AdminPage() {
               <h3 className="text-sm font-black text-black uppercase tracking-widest mb-3 border-b-2 border-black pb-1 inline-block">
                 Total Revenue
               </h3>
-              <p className="text-5xl font-black text-black">—</p>
+              <p className="text-5xl font-black text-black">-</p>
             </div>
             <div className="text-4xl opacity-50 drop-shadow-[2px_2px_0_#A3FF12]">💰</div>
           </div>
@@ -50,7 +50,7 @@ export default function AdminPage() {
               <h3 className="text-sm font-black text-black uppercase tracking-widest mb-3 border-b-2 border-black pb-1 inline-block">
                 Pending Orders
               </h3>
-              <p className="text-5xl font-black text-black">—</p>
+              <p className="text-5xl font-black text-black">-</p>
             </div>
             <div className="text-4xl opacity-50 drop-shadow-[2px_2px_0_#A3FF12]">⏳</div>
           </div>

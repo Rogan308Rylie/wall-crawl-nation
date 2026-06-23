@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { buttons } from "@/lib/ui/buttons";
 import PosterDetailsModal from "./shop/PosterDetailsModal";
@@ -27,8 +28,31 @@ export default function PosterCard({
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const cartItem = cart.find((item) => item.id === id);
   const quantity = cartItem?.quantity || 0;
+
+  useEffect(() => {
+    if (searchParams.get("poster") === id) {
+      setIsModalOpen(true);
+    } else {
+      setIsModalOpen(false);
+    }
+  }, [searchParams, id]);
+
+  const openModal = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("poster", id);
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const closeModal = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("poster");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   useEffect(() => {
     setIsMobile(window.matchMedia("(hover: none)").matches);
@@ -102,15 +126,15 @@ export default function PosterCard({
           bg-white
           p-3
           shadow-[6px_6px_0_0_#A3FF12]
-          ${isMobile 
-            ? "poster-card-mobile-tap transition-all duration-200 active:scale-[1.02]" 
+          ${isMobile
+            ? "poster-card-mobile-tap transition-all duration-200 active:scale-[1.02]"
             : "transition-transform duration-200"
           }
         `}
       >
         {/* Poster frame */}
         <div
-          onClick={() => setIsModalOpen(true)}
+          onClick={openModal}
           data-cursor="poster"
           className="
       relative
@@ -130,7 +154,6 @@ export default function PosterCard({
             src={imagePath || "/placeholder.jpg"}
             alt={title || "Poster image"}
             fill
-            unoptimized
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
             className="
       object-contain
@@ -144,7 +167,7 @@ export default function PosterCard({
             style={{ WebkitUserDrag: "none" } as React.CSSProperties}
           />
 
-          {/* Transparent protection overlay — blocks right-click, drag, and long-press save */}
+          {/* Transparent protection overlay - blocks right-click, drag, and long-press save */}
           <div
             className="absolute inset-0 z-20"
             onContextMenu={(e) => e.preventDefault()}
@@ -160,7 +183,7 @@ export default function PosterCard({
               }}
             />
           )}
-          
+
           {/* Overlay to hint interaction */}
           <div className="absolute inset-0 z-10 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
             <span className="bg-white border-2 border-black px-3 py-1 text-[10px] font-black uppercase text-black transform rotate-2">
@@ -169,13 +192,12 @@ export default function PosterCard({
           </div>
         </div>
 
-        <div onClick={() => setIsModalOpen(true)} data-cursor="poster" className="cursor-pointer group/info">
+        <div onClick={openModal} data-cursor="poster" className="cursor-pointer group/info">
           <div className="flex items-start justify-between gap-1">
-            <h3 className={`flex-1 ${
-              title.length > 25 ? "text-[10px] sm:text-xs" :
-              title.length > 15 ? "text-xs sm:text-sm" :
-              "text-sm sm:text-base"
-            } font-black uppercase leading-tight tracking-wider text-black group-hover/info:text-black break-words`}>
+            <h3 className={`flex-1 ${title.length > 25 ? "text-[10px] sm:text-xs" :
+                title.length > 15 ? "text-xs sm:text-sm" :
+                  "text-sm sm:text-base"
+              } font-black uppercase leading-tight tracking-wider text-black group-hover/info:text-black break-words`}>
               {title}
             </h3>
             <span className="shrink-0 text-xs sm:text-sm font-black text-black bg-[#A3FF12] border-2 border-black px-1.5 shadow-[2px_2px_0_0_#000]">
@@ -225,7 +247,7 @@ export default function PosterCard({
         imagePath={imagePath}
         tags={tags}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
       />
     </>
   );

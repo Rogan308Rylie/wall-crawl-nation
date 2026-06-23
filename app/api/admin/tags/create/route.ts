@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Tag required" }, { status: 400 })
     }
 
-    // Sanitize tag name — used as Firestore doc ID, must be safe chars only
+    // Sanitize tag name - used as Firestore doc ID, must be safe chars only
     const sanitizedName = String(name).trim().toLowerCase()
     if (!sanitizedName || !/^[a-z0-9 _-]+$/.test(sanitizedName)) {
       return NextResponse.json({ error: "Invalid tag name. Use only letters, numbers, spaces, hyphens, underscores." }, { status: 400 })

@@ -126,15 +126,13 @@ export default function Home() {
             <p className="mt-4 text-black font-bold text-lg">
               We create custom posters tailored just for you. <br />  Any design, any vibe.
             </p>
-            <a
-              href="https://wa.me/919306553798?text=Hi%20I%20want%20a%20custom%20poster"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/custom-order"
               className={`${buttons.primary} mt-8`}
               data-cursor="hover"
             >
               Get Posters
-            </a>
+            </Link>
           </div>
 
           {/* Polaroids */}

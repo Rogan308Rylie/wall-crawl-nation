@@ -36,6 +36,14 @@ export type OrderItem =
     quantity: number
     posterIds: string[]
   }
+  | {
+    type: "custom"
+    id: string
+    title: string
+    price: number
+    quantity: number
+    images: string[]
+  }
 
 export type Order = {
   orderId: string;

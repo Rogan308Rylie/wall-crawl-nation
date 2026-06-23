@@ -74,7 +74,7 @@ export async function sendOrderStatusEmail(
       </a>
 
       <br /><br />
-      <p>— Wall Crawl Nation</p>
+      <p>- Wall Crawl Nation</p>
     `,
   });
 }

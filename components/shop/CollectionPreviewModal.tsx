@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import Image from "next/image"
 import { useCart } from "@/context/CartContext"
 import { buttons } from "@/lib/ui/buttons"
 import PosterDetailsModal from "./PosterDetailsModal"
@@ -81,13 +82,18 @@ export default function CollectionPreviewModal({
                   className="group border-4 border-black p-2 bg-[#f0f0f0] shadow-[4px_4px_0_0_#A3FF12] hover:shadow-[8px_8px_0_0_#A3FF12] transition-all cursor-pointer hover:-translate-y-1 hover:translate-x-1"
                 >
                   <div className="relative aspect-[210/297] border-2 border-black overflow-hidden bg-white">
-                    <img
+                    <Image
                       src={poster.imagePath}
                       alt={poster.title}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                      className="object-contain transition transform group-hover:scale-105 select-none pointer-events-none"
+                      style={{ WebkitUserDrag: "none" } as React.CSSProperties}
+                    />
+                    <div
+                      className="absolute inset-0 z-10"
                       onContextMenu={(e) => e.preventDefault()}
                       onDragStart={(e) => e.preventDefault()}
-                      className="w-full h-full object-contain transition transform group-hover:scale-105 select-none pointer-events-none"
-                      style={{ WebkitUserDrag: "none" } as React.CSSProperties}
                     />
                   </div>
                   <div className="mt-2 text-xs font-black uppercase text-black line-clamp-1 text-center group-hover:text-black">
@@ -100,7 +106,7 @@ export default function CollectionPreviewModal({
 
           {/* Right Column: Bundle Info */}
           <div className="flex flex-col justify-center">
-            <h2 className="text-3xl md:text-5xl font-black uppercase text-black leading-none tracking-tight mb-4">
+            <h2 className="text-3xl md:text-5xl font-black uppercase text-black leading-none tracking-tight mb-4 pr-12 md:pr-16">
               {collection.title}
             </h2>
 

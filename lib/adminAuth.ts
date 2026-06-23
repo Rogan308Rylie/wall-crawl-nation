@@ -1,5 +1,5 @@
 // lib/adminAuth.ts
-// Shared admin authentication helper — used by all /api/admin/* routes.
+// Shared admin authentication helper - used by all /api/admin/* routes.
 // Verifies the __session cookie and checks role === "admin" in Firestore.
 // Returns the decoded token on success, or throws with a NextResponse on failure.
 

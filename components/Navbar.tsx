@@ -86,6 +86,10 @@ export default function Navbar() {
             Shop
           </Link>
 
+          <Link href="/custom-order" className={navLink("/custom-order")}>
+            Custom
+          </Link>
+
           <Link href="/cart" className={navLink("/cart")}>
             Cart
             {mounted && cartCount > 0 && (
@@ -165,6 +169,13 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(false)}
           >
             Shop
+          </Link>
+          <Link
+            href="/custom-order"
+            className={navLink("/custom-order")}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Custom
           </Link>
           <Link
             href="/cart"

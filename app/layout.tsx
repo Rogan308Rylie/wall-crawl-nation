@@ -5,8 +5,8 @@ import Link from "next/link";
 import Navbar from "../components/Navbar";
 import { CartProvider } from "../context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 import RandomTheme from "@/components/RandomTheme";
-import CustomCursor from "@/components/CustomCursor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,14 +36,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <RandomTheme />
-        <CustomCursor />
-        <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <main className="p-6">{children}</main>
-          </CartProvider>
-          <script src="https://checkout.razorpay.com/v1/checkout.js" async />
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Navbar />
+              <main className="p-6">{children}</main>
+            </CartProvider>
+            <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );
