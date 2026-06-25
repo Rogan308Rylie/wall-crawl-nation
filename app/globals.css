@@ -142,6 +142,12 @@ a.bg-\[\#A3FF12\].hover\:bg-black:hover {
   color: var(--dynamic-primary, #A3FF12) !important;
 }
 
+/* Fix for buttons that start black with neon text and hover to neon background */
+button.bg-black.text-\[\#A3FF12\].hover\:bg-\[\#A3FF12\]:hover,
+a.bg-black.text-\[\#A3FF12\].hover\:bg-\[\#A3FF12\]:hover {
+  color: #000000 !important;
+}
+
 /* Shadows mapped to Accent */
 .shadow-\[2px_2px_0_0_\#A3FF12\] { box-shadow: 2px 2px 0 0 var(--dynamic-accent, #9D00FF) !important; }
 .shadow-\[4px_4px_0_0_\#A3FF12\] { box-shadow: 4px 4px 0 0 var(--dynamic-accent, #9D00FF) !important; }
