@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const now = Date.now();
 
     let rateData = rateLimitMap.get(ip);
-    
+
     // Cleanup expired entries
     if (rateData && now > rateData.resetTime) {
       rateLimitMap.delete(ip);

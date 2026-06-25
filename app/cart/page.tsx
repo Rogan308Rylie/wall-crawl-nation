@@ -10,31 +10,11 @@ export default function CartPage() {
   const { cart, increaseQuantity, decreaseQuantity } = useCart();
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [mounted, setMounted] = useState(false);
-  const [roast, setRoast] = useState<string>("");
-  const [isRoasting, setIsRoasting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const getCartVerdict = async () => {
-    setIsRoasting(true);
-    try {
-      const res = await fetch("/api/roast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart }),
-      });
-      const data = await res.json();
-      if (data.roast) setRoast(data.roast);
-      else if (data.error) setRoast(data.error);
-    } catch (error) {
-      setRoast("Wow, your cart is so tragic it broke my AI brain.");
-    } finally {
-      setIsRoasting(false);
-    }
-  };
 
   if (!mounted) {
     return null;
@@ -57,32 +37,6 @@ export default function CartPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
       <h1 className="mb-6 text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black border-b-8 border-black inline-block pr-8 pb-2">Your Cart</h1>
-      
-      {!roast && !isRoasting && (
-        <button
-          onClick={getCartVerdict}
-          className={`${buttons.primary} mb-10 w-full sm:w-auto block`}
-        >
-          Get Cart Verdict 🤖
-        </button>
-      )}
-
-      {isRoasting && (
-        <div className="mb-10 p-4 border-4 border-black bg-white shadow-[6px_6px_0_0_#000]">
-          <p className="font-black uppercase text-sm sm:text-base text-black tracking-widest animate-pulse">
-            🤖 Analyzing your terrible taste...
-          </p>
-        </div>
-      )}
-
-      {roast && !isRoasting && (
-        <div className="mb-10 p-4 border-4 border-black bg-[#A3FF12] shadow-[6px_6px_0_0_#000] animate-fade-in-out">
-          <p className="font-black uppercase text-sm sm:text-base text-black tracking-widest animate-pulse">
-            🤖 CART VERDICT:
-          </p>
-          <p className="mt-2 font-bold text-lg text-black">{roast}</p>
-        </div>
-      )}
 
       <div className="space-y-6">
         {cart.map((item) => (
