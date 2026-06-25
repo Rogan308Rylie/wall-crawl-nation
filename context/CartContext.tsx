@@ -10,6 +10,7 @@ export type CartItem =
     price: number
     quantity: number
     imagePath: string
+    tags?: string[]
   }
   | {
     type: "collection"

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCart } from "../../context/CartContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { buttons } from "@/lib/ui/buttons";
 
@@ -10,11 +10,31 @@ export default function CartPage() {
   const { cart, increaseQuantity, decreaseQuantity } = useCart();
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [mounted, setMounted] = useState(false);
+  const [roast, setRoast] = useState<string>("");
+  const [isRoasting, setIsRoasting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const getCartVerdict = async () => {
+    setIsRoasting(true);
+    try {
+      const res = await fetch("/api/roast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart }),
+      });
+      const data = await res.json();
+      if (data.roast) setRoast(data.roast);
+      else if (data.error) setRoast(data.error);
+    } catch (error) {
+      setRoast("Wow, your cart is so tragic it broke my AI brain.");
+    } finally {
+      setIsRoasting(false);
+    }
+  };
 
   if (!mounted) {
     return null;
@@ -23,8 +43,8 @@ export default function CartPage() {
   if (cart.length === 0) {
     return (
       <div className="text-center text-black border-4 border-black p-12 bg-white shadow-[12px_12px_0_0_#A3FF12] max-w-2xl mx-auto mt-20">
-        <p className="text-2xl font-black uppercase">Your cart is empty.</p>
-        <p className="mt-4 mb-8 font-bold border-2 border-black inline-block px-4 py-2 bg-[#A3FF12]">Add some posters to make your wall look sick.</p>
+        <p className="text-2xl font-black uppercase">Your wall is naked. Please dress it.</p>
+        <p className="mt-4 mb-8 font-bold border-2 border-black inline-block px-4 py-2 bg-[#A3FF12]">Your cart is currently empty. Go pick some art before the walls start crying.</p>
         <div>
           <button onClick={() => router.push("/shop")} className={buttons.primary}>
             Go to Shop
@@ -36,7 +56,33 @@ export default function CartPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
-      <h1 className="mb-10 text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black border-b-8 border-black inline-block pr-8 pb-2">Your Cart</h1>
+      <h1 className="mb-6 text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black border-b-8 border-black inline-block pr-8 pb-2">Your Cart</h1>
+      
+      {!roast && !isRoasting && (
+        <button
+          onClick={getCartVerdict}
+          className={`${buttons.primary} mb-10 w-full sm:w-auto block`}
+        >
+          Get Cart Verdict 🤖
+        </button>
+      )}
+
+      {isRoasting && (
+        <div className="mb-10 p-4 border-4 border-black bg-white shadow-[6px_6px_0_0_#000]">
+          <p className="font-black uppercase text-sm sm:text-base text-black tracking-widest animate-pulse">
+            🤖 Analyzing your terrible taste...
+          </p>
+        </div>
+      )}
+
+      {roast && !isRoasting && (
+        <div className="mb-10 p-4 border-4 border-black bg-[#A3FF12] shadow-[6px_6px_0_0_#000] animate-fade-in-out">
+          <p className="font-black uppercase text-sm sm:text-base text-black tracking-widest animate-pulse">
+            🤖 CART VERDICT:
+          </p>
+          <p className="mt-2 font-bold text-lg text-black">{roast}</p>
+        </div>
+      )}
 
       <div className="space-y-6">
         {cart.map((item) => (

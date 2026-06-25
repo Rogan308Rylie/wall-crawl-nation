@@ -7,6 +7,9 @@ import { CartProvider } from "../context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import RandomTheme from "@/components/RandomTheme";
+import SecretCodes from "@/components/SecretCodes";
+import Footer from "@/components/Footer";
+import SelfDestructButton from "@/components/SelfDestructButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +29,6 @@ export const metadata = {
   description: "Posters & wall art for pop culture lovers",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -39,8 +41,11 @@ export default function RootLayout({
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
+              <SecretCodes />
               <Navbar />
               <main className="p-6">{children}</main>
+              <Footer />
+              <SelfDestructButton />
             </CartProvider>
             <script src="https://checkout.razorpay.com/v1/checkout.js" async />
           </AuthProvider>

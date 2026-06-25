@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { buttons } from "@/lib/ui/buttons";
-import PosterDetailsModal from "./shop/PosterDetailsModal";
 
 type PosterCardProps = {
   id: string;
@@ -13,6 +12,8 @@ type PosterCardProps = {
   price: number;
   imagePath: string;
   tags?: string[];
+  prevPosterId?: string;
+  nextPosterId?: string;
 };
 
 export default function PosterCard({
@@ -21,9 +22,10 @@ export default function PosterCard({
   price,
   imagePath,
   tags,
+  prevPosterId,
+  nextPosterId,
 }: PosterCardProps) {
   const { cart, addToCart, increaseQuantity, decreaseQuantity } = useCart();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
   const cardRef = useRef<HTMLDivElement>(null);
@@ -34,23 +36,9 @@ export default function PosterCard({
   const cartItem = cart.find((item) => item.id === id);
   const quantity = cartItem?.quantity || 0;
 
-  useEffect(() => {
-    if (searchParams.get("poster") === id) {
-      setIsModalOpen(true);
-    } else {
-      setIsModalOpen(false);
-    }
-  }, [searchParams, id]);
-
   const openModal = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("poster", id);
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  const closeModal = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("poster");
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -116,6 +104,7 @@ export default function PosterCard({
         onMouseLeave={handleMouseLeave}
         style={isMobile ? undefined : tiltStyle}
         className={`
+          poster-card
           group
           relative
           flex
@@ -209,7 +198,8 @@ export default function PosterCard({
         {/* CTA - Morphs between Add to Cart and Quantity Controls */}
         {quantity === 0 ? (
           <button
-            onClick={() => addToCart({ type: "poster", id, title, price, imagePath })}
+            title="Do it. Emperor Palpatine commands it."
+            onClick={() => addToCart({ type: "poster", id, title, price, imagePath, tags })}
             className={`${buttons.primary} card-cta-container mt-auto w-full text-[10px] sm:text-xs py-1.5 sm:py-2 whitespace-nowrap shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-y-1 active:translate-x-1 transition-all`}
           >
             Add to Cart
@@ -239,16 +229,6 @@ export default function PosterCard({
           </div>
         )}
       </div>
-
-      <PosterDetailsModal
-        id={id}
-        title={title}
-        price={price}
-        imagePath={imagePath}
-        tags={tags}
-        isOpen={isModalOpen}
-        onClose={closeModal}
-      />
     </>
   );
 }

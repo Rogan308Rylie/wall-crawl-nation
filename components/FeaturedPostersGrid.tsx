@@ -82,16 +82,23 @@ export default function FeaturedPostersGrid() {
         gridInView ? "scroll-animate-active" : ""
       }`}
     >
-      {posters.map((poster) => (
-        <PosterCard
-          key={poster.id}
-          id={poster.id}
-          title={poster.title}
-          price={poster.price}
-          imagePath={poster.imagePath}
-          tags={poster.tags}
-        />
-      ))}
+      {posters.map((poster, index) => {
+        const prevPosterId = index > 0 ? posters[index - 1].id : undefined;
+        const nextPosterId = index < posters.length - 1 ? posters[index + 1].id : undefined;
+
+        return (
+          <PosterCard
+            key={poster.id}
+            id={poster.id}
+            title={poster.title}
+            price={poster.price}
+            imagePath={poster.imagePath}
+            tags={poster.tags}
+            prevPosterId={prevPosterId}
+            nextPosterId={nextPosterId}
+          />
+        );
+      })}
     </div>
   );
 }

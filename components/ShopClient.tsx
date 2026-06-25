@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   collection,
   query,
@@ -18,6 +19,7 @@ import { buttons } from "@/lib/ui/buttons";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ChevronDown, Check, Tag, SlidersHorizontal } from "lucide-react";
 import { useInView } from "@/hooks/useInView";
+import GlobalPosterModalWrapper from "./GlobalPosterModalWrapper";
 
 const PAGE_SIZE = 12;
 
@@ -37,6 +39,7 @@ export default function ShopClient() {
   const [mounted, setMounted] = useState(false);
   const [sortBy, setSortBy] = useState("title_asc"); // default sorting
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const router = useRouter();
 
   const [gridRef, gridInView] = useInView();
   const [carouselRef, carouselInView] = useInView();
@@ -237,12 +240,14 @@ export default function ShopClient() {
 
       {/* header container with sort and search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12 border-b-8 border-black pb-8">
-        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-black flex flex-wrap items-center gap-3 sm:gap-4">
-          Shop Posters
-          <span className="text-base sm:text-xl font-bold text-white bg-black px-2 sm:px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#A3FF12] sm:shadow-[4px_4px_0_0_#A3FF12]">
-            {posters.length} results
-          </span>
-        </h1>
+        <div className="flex flex-col gap-4">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-black flex flex-wrap items-center gap-3 sm:gap-4">
+            Shop Posters
+            <span className="text-base sm:text-xl font-bold text-white bg-black px-2 sm:px-3 py-1 border-2 border-black shadow-[3px_3px_0_0_#A3FF12] sm:shadow-[4px_4px_0_0_#A3FF12]">
+              {posters.length} results
+            </span>
+          </h1>
+        </div>
 
         {/* Toolbar: Search and Sort */}
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto relative z-30">
@@ -459,16 +464,23 @@ export default function ShopClient() {
         className={`grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 md:gap-6 lg:grid-cols-6 lg:gap-7 stagger-children scroll-animate ${gridInView ? "scroll-animate-active" : ""
           }`}
       >
-        {posters.map((poster) => (
-          <PosterCard
-            key={poster.id}
-            id={poster.id}
-            title={poster.title}
-            price={poster.price}
-            imagePath={poster.imagePath}
-            tags={poster.tags}
-          />
-        ))}
+        {posters.map((poster, index) => {
+          const prevPosterId = index > 0 ? posters[index - 1].id : undefined;
+          const nextPosterId = index < posters.length - 1 ? posters[index + 1].id : undefined;
+          
+          return (
+            <PosterCard
+              key={poster.id}
+              id={poster.id}
+              title={poster.title}
+              price={poster.price}
+              imagePath={poster.imagePath}
+              tags={poster.tags}
+              prevPosterId={prevPosterId}
+              nextPosterId={nextPosterId}
+            />
+          );
+        })}
       </div>
 
       {/* Infinite Scroll Sentinel */}
@@ -510,6 +522,9 @@ export default function ShopClient() {
           Tell us what you want here
         </Link>
       </div>
+
+      {/* Global modal wrapper */}
+      <GlobalPosterModalWrapper posters={posters} />
     </div>
   );
 }

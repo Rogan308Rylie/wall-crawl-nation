@@ -73,9 +73,15 @@ const initialAddressState: AddressFormState = {
 };
 
   const [address, setAddress] = useState<AddressFormState>(initialAddressState);
+  const [discountCode, setDiscountCode] = useState("");
+
+  const handleApplyDiscount = () => {
+    if (!discountCode.trim()) return;
+    showToast("Cheat codes disabled for this level. Play fair. Rizul already used them all anyway.", "error");
+    setDiscountCode("");
+  };
 
 
-    
     useEffect(() => {
       setMounted(true);
     }, []);
@@ -556,6 +562,24 @@ async function placeOrder() {
                 💡 ADD ₹{350 - cartTotal} MORE TO REDUCE YOUR DELIVERY FEE TO ₹40!
               </div>
             )}
+
+            {/* Cheat Code Box */}
+            <div className="mt-6 flex gap-2">
+              <input
+                type="text"
+                placeholder="Got a cheat code? Enter it here."
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+                className="w-full p-3 border-4 border-black bg-[#f0f0f0] text-black font-bold uppercase placeholder-black/50 focus:outline-none focus:bg-[#A3FF12] transition-colors"
+              />
+              <button
+                type="button"
+                onClick={handleApplyDiscount}
+                className="bg-black text-[#A3FF12] px-6 font-black uppercase border-4 border-black shadow-[4px_4px_0_0_#A3FF12] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all whitespace-nowrap"
+              >
+                Apply
+              </button>
+            </div>
 
             <div className="border-t-8 border-black pt-6 mt-8 flex justify-between font-black text-3xl uppercase text-black items-center">
               <span>Total</span>
