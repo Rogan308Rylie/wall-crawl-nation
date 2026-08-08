@@ -54,6 +54,9 @@ export const metadata: Metadata = {
     description: "Premium wall art inspired by culture, individuality, and expression.",
     images: ["/assets/og-image-placeholder.jpg"],
   },
+  verification: {
+    google: "BhypsWZECyNnF1BEGxT22D6hwhYGxJrVBIjdDlN-Yf4",
+  },
 };
 
 export default function RootLayout({
