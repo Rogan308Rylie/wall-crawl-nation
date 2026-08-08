@@ -16,10 +16,15 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const decoded = await getAdminAuth().verifySessionCookie(
-    sessionCookie,
-    true
-  );
+  let decoded;
+  try {
+    decoded = await getAdminAuth().verifySessionCookie(
+      sessionCookie,
+      true
+    );
+  } catch {
+    redirect("/login");
+  }
 
   const userSnap = await getAdminDb()
     .collection("users")
