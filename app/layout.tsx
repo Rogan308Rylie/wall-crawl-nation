@@ -21,12 +21,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://wall-crawl-nation.vercel.app"),
   title: {
-    default: "Wall Crawl Nation",
+    default: "Wall Crawl Nation | Premium Posters & Wall Art",
     template: "%s | Wall Crawl Nation",
   },
-  description: "Posters & wall art for pop culture lovers",
+  description: "Wall Crawl Nation offers premium, culture-driven posters and wall art for pop culture lovers. Elevate your space with our exclusive designs.",
+  keywords: ["wall art", "posters", "pop culture", "custom posters", "premium prints", "aesthetic decor"],
+  authors: [{ name: "Wall Crawl Nation" }],
+  creator: "Wall Crawl Nation",
+  publisher: "Wall Crawl Nation",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://wall-crawl-nation.vercel.app",
+    title: "Wall Crawl Nation | Premium Posters & Wall Art",
+    description: "Premium wall art inspired by culture, individuality, and expression. Redefining spaces with bold aesthetics.",
+    siteName: "Wall Crawl Nation",
+    images: [
+      {
+        url: "/assets/og-image-placeholder.jpg", // We will use a placeholder or they can add one later
+        width: 1200,
+        height: 630,
+        alt: "Wall Crawl Nation Posters",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Wall Crawl Nation | Premium Posters",
+    description: "Premium wall art inspired by culture, individuality, and expression.",
+    images: ["/assets/og-image-placeholder.jpg"],
+  },
 };
 
 export default function RootLayout({
