@@ -23,6 +23,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://wall-crawl-nation.vercel.app"),
+  applicationName: "Wall Crawl Nation",
   title: {
     default: "Wall Crawl Nation | Premium Posters & Wall Art",
     template: "%s | Wall Crawl Nation",
@@ -62,11 +63,22 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Wall Crawl Nation",
+    url: "https://wall-crawl-nation.vercel.app/",
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <RandomTheme />
         <ToastProvider>
           <AuthProvider>
