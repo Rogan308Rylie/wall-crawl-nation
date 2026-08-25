@@ -16,13 +16,13 @@ export function calculateDeliveryFee(
   isNITKKR: boolean
 ): number {
   if (isNITKKR) return 0;
-  if (isFirstTimeCustomer) return 80;
+  if (isFirstTimeCustomer) return 100;
   
   if (cartTotal < 150) {
-    return 80;
+    return 100;
   }
   if (cartTotal < 350) {
-    return 80;
+    return 100;
   }
   return 50;
 }
@@ -131,8 +131,6 @@ const initialAddressState: AddressFormState = {
     : calculateDeliveryFee(cartTotal, !!isFirstTimeCustomer, isNITKKR);
 
   const totalAmount = cartTotal + deliveryFee;
-
-  const isReturningBelowMin = !checkingCustomer && isFirstTimeCustomer === false && cartTotal < 150;
   
   async function createRazorpayOrder(amount: number, orderId: string) {
   const res = await fetch("/api/razorpay/create-order", {
@@ -154,11 +152,6 @@ async function placeOrder() {
 
   if (checkingCustomer) {
     showToast("Verifying customer status, please wait a moment.", "info");
-    return;
-  }
-
-  if (isReturningBelowMin) {
-    showToast("Minimum order amount for returning customers is ₹150.", "error");
     return;
   }
 
@@ -559,7 +552,7 @@ async function placeOrder() {
             {/* Reduced Delivery Nudge */}
             {!checkingCustomer && isFirstTimeCustomer === false && !isNITKKR && cartTotal >= 150 && cartTotal < 350 && (
               <div className="p-4 bg-[#A3FF12] text-black font-black uppercase border-4 border-black shadow-[4px_4px_0_0_#000] text-xs leading-snug tracking-wider">
-                💡 ADD ₹{350 - cartTotal} MORE TO REDUCE YOUR DELIVERY FEE TO ₹40!
+                💡 ADD ₹{350 - cartTotal} MORE TO REDUCE YOUR DELIVERY FEE TO ₹50!
               </div>
             )}
 

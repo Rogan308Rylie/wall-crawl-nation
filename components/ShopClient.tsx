@@ -158,11 +158,9 @@ export default function ShopClient() {
 
     async function fetchTags() {
       try {
-        const res = await fetch("/api/admin/tags/list");
-        const data = await res.json();
-        if (data.tags) {
-          setAllTags(data.tags.sort());
-        }
+        const snapshot = await getDocs(collection(db, "tags"));
+        const tagsList = snapshot.docs.map(doc => doc.data().name);
+        setAllTags(tagsList.sort());
       } catch (err) {
         console.error("Error fetching tags:", err);
       }

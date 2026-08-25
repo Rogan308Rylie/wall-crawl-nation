@@ -59,19 +59,25 @@ export default function PosterDetailsModal({
     }
   };
 
+  const getShareUrl = () => {
+    return typeof window !== 'undefined' 
+      ? `${window.location.origin}/shop/${id}` 
+      : `https://wall-crawl-nation.vercel.app/shop/${id}`;
+  };
+
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(getShareUrl());
     showToast("Link copied to clipboard!", "success");
   };
 
   const shareText = `Check out this awesome poster: ${title}`;
 
   const handleWhatsAppShare = () => {
-    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + window.location.href)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + getShareUrl())}`, "_blank");
   };
 
   const handleTwitterShare = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`, "_blank");
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(getShareUrl())}`, "_blank");
   };
 
   useEffect(() => {
