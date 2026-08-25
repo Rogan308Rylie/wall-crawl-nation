@@ -243,7 +243,7 @@ export default function PosterDetailsModal({
                   <h2 className="text-2xl md:text-4xl font-black uppercase text-black leading-none tracking-tight">
                     {title}
                   </h2>
-                  <Link href={`/shop/${id}`} className="mt-3 text-xs md:text-sm font-black uppercase text-black underline decoration-4 decoration-[#A3FF12] hover:text-[#A3FF12] hover:bg-black hover:no-underline px-2 py-1 transition-all">
+                  <Link href={`/shop/${id}`} target="_blank" rel="noopener noreferrer" className="mt-3 text-xs md:text-sm font-black uppercase text-black underline decoration-4 decoration-[#A3FF12] hover:text-[#A3FF12] hover:bg-black hover:no-underline px-2 py-1 transition-all">
                     Go to detail view &rarr;
                   </Link>
                 </div>
