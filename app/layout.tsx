@@ -29,7 +29,17 @@ export const metadata: Metadata = {
     template: "%s | Wall Crawl Nation",
   },
   description: "Wall Crawl Nation offers premium, culture-driven posters and wall art for pop culture lovers. Elevate your space with our exclusive designs.",
-  keywords: ["wall art", "posters", "pop culture", "custom posters", "premium prints", "aesthetic decor"],
+  keywords: [
+    "wall art", "posters", "pop culture", "custom posters", "premium prints", "aesthetic decor",
+    "premium wall art", "buy posters online India", "aesthetic room decor", "aesthetic wall posters",
+    "high quality art prints", "cool posters for room", "dorm room posters", "hypebeast room decor",
+    "typography posters", "graphic design prints", "wall decor online", "vintage posters",
+    "retro wall art", "dark academia posters", "neo-brutalist art", "minimalist posters",
+    "abstract wall art", "indian pop culture posters", "desi aesthetic posters", "streetwear posters",
+    "Y2K aesthetic decor", "grunge wall art", "cinematic posters", "anime", "marvel", "dc", "bollywood",
+    "kpop", "hip hop", "gaming", "cars", "jdm", "supercar", "music", "band", "sports", "basketball",
+    "cricket", "retro garage", "synthwave", "lofi", "cottagecore", "cyberpunk"
+  ],
   authors: [{ name: "Wall Crawl Nation" }],
   creator: "Wall Crawl Nation",
   publisher: "Wall Crawl Nation",
@@ -42,7 +52,7 @@ export const metadata: Metadata = {
     siteName: "Wall Crawl Nation",
     images: [
       {
-        url: "/assets/og-image-placeholder.jpg", // We will use a placeholder or they can add one later
+        url: "/assets/og-image-placeholder.jpg",
         width: 1200,
         height: 630,
         alt: "Wall Crawl Nation Posters",
@@ -65,9 +75,18 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
+    "@type": "Organization",
     name: "Wall Crawl Nation",
     url: "https://wall-crawl-nation.vercel.app/",
+    logo: "https://wall-crawl-nation.vercel.app/favicon.ico",
+    founder: {
+      "@type": "Person",
+      name: "Rizul"
+    },
+    description: "Premium wall art inspired by Culture, Individuality and Expression. No Rules // Just Art.",
+    sameAs: [
+      "https://wall-crawl-nation.vercel.app"
+    ]
   };
 
   return (

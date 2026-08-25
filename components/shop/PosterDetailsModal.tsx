@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import Image from "next/image"
+import Link from "next/link"
 import { useCart } from "@/context/CartContext"
 import { useToast } from "@/context/ToastContext"
 import { buttons } from "@/lib/ui/buttons"
@@ -181,6 +182,7 @@ export default function PosterDetailsModal({
                     alt={title}
                     fill
                     priority
+                    unoptimized={true}
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-contain p-2 drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none"
                     style={{ WebkitUserDrag: "none" } as React.CSSProperties}
@@ -234,9 +236,17 @@ export default function PosterDetailsModal({
 
               {/* Poster Info */}
               <div className="flex flex-col justify-start pt-2 pr-2 pb-2">
-                <h2 className="text-2xl md:text-4xl font-black uppercase text-black leading-none tracking-tight mb-2 md:mb-4 pr-12 md:pr-16">
-                  {title}
-                </h2>
+                <div className="flex flex-col items-start mb-2 md:mb-4 pr-12 md:pr-16">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-[#A3FF12] bg-black px-2 py-1 mb-2 inline-block">
+                    Quick View
+                  </span>
+                  <h2 className="text-2xl md:text-4xl font-black uppercase text-black leading-none tracking-tight">
+                    {title}
+                  </h2>
+                  <Link href={`/shop/${id}`} className="mt-3 text-xs md:text-sm font-black uppercase text-black underline decoration-4 decoration-[#A3FF12] hover:text-[#A3FF12] hover:bg-black hover:no-underline px-2 py-1 transition-all">
+                    Go to detail view &rarr;
+                  </Link>
+                </div>
 
                 <div className="flex items-center gap-3 mb-4 md:mb-6">
                   <span className="text-xl md:text-3xl font-black text-black bg-[#A3FF12] px-3 py-1.5 md:py-2 border-4 border-black shadow-[4px_4px_0_0_#000]">

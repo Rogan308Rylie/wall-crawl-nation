@@ -176,7 +176,7 @@ export default function PosterCard({
           {/* Overlay to hint interaction */}
           <div className="absolute inset-0 z-10 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
             <span className="bg-white border-2 border-black px-3 py-1 text-[10px] font-black uppercase text-black transform rotate-2">
-              Detail view
+              Quick view
             </span>
           </div>
         </div>
