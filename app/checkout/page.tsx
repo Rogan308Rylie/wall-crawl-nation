@@ -542,12 +542,7 @@ async function placeOrder() {
               </span>
             </div>
 
-            {/* Minimum Order Warning */}
-            {isReturningBelowMin && (
-              <div className="p-4 bg-red-500 text-white font-black uppercase border-4 border-black shadow-[4px_4px_0_0_#000] text-xs leading-snug tracking-wider">
-                ⚠️ MINIMUM ORDER FOR RETURNING CUSTOMERS IS ₹150. PLEASE ADD ₹{150 - cartTotal} MORE TO CART.
-              </div>
-            )}
+
 
             {/* Reduced Delivery Nudge */}
             {!checkingCustomer && isFirstTimeCustomer === false && !isNITKKR && cartTotal >= 150 && cartTotal < 350 && (
@@ -582,9 +577,9 @@ async function placeOrder() {
             <button
               type="button"
               onClick={placeOrder}
-              disabled={placing || isReturningBelowMin || checkingCustomer}
+              disabled={placing || checkingCustomer}
               className={`${buttons.primary} w-full mt-8 text-2xl py-6 ${
-                placing || isReturningBelowMin || checkingCustomer ? "opacity-50 cursor-not-allowed" : ""
+                placing || checkingCustomer ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {checkingCustomer ? "Verifying..." : placing ? "Processing..." : "Pay Now"}
