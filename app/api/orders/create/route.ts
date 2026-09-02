@@ -12,13 +12,13 @@ export function calculateDeliveryFee(
   isNITKKR: boolean
 ): number {
   if (isNITKKR) return 0;
-  if (isFirstTimeCustomer) return 80;
+  if (isFirstTimeCustomer) return 100;
 
   if (cartTotal < 150) {
-    return 80;
+    return 100;
   }
   if (cartTotal < 350) {
-    return 80;
+    return 100;
   }
   return 50;
 }
@@ -99,6 +99,9 @@ export async function POST(req: Request) {
           title: `Custom posters (${customData.totalImages} images)`,
           images: customData.images || [],
           notes: customData.notes || "",
+          couponCode: customData.couponCode || undefined,
+          originalPrice: customData.originalPrice || undefined,
+          discountApplied: customData.discountApplied || undefined,
         });
       } else {
         return NextResponse.json({ error: "Unknown item type" }, { status: 400 });
@@ -116,17 +119,15 @@ export async function POST(req: Request) {
     const isFirstTimeCustomer = pastOrdersSnap.empty;
     const isNITKKR = !!deliveryAddress.isNitkkr;
 
-    // Check returning customer minimum limit (handled on client, but good to enforce on server)
-    if (!isFirstTimeCustomer && cartTotal < 150) {
-      return NextResponse.json({ error: "Returning customers must place an order of at least ₹150" }, { status: 400 });
-    }
-
     const deliveryFee = calculateDeliveryFee(cartTotal, isFirstTimeCustomer, isNITKKR);
     const totalAmount = cartTotal + deliveryFee;
 
     const orderId = crypto.randomUUID();
 
-    await db.collection("orders").doc(orderId).set({
+    const batch = db.batch();
+
+    const orderRef = db.collection("orders").doc(orderId);
+    batch.set(orderRef, {
       orderId,
       userId: uid,
       items: validatedItems,
@@ -134,10 +135,25 @@ export async function POST(req: Request) {
       deliveryFee,
       totalAmount,
       deliveryAddress,
-      status: "pending",
-      paymentStatus: "created",
+      status: totalAmount === 0 ? "confirmed" : "pending",
+      paymentStatus: totalAmount === 0 ? "free_order" : "created",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    // Increment coupon usedCount if any custom order used a coupon
+    for (const item of validatedItems) {
+      if (item.type === "custom" && item.couponCode) {
+        const couponRef = db.collection("coupons").where("code", "==", item.couponCode).limit(1);
+        const couponSnap = await couponRef.get();
+        if (!couponSnap.empty) {
+          batch.update(couponSnap.docs[0].ref, {
+            usedCount: admin.firestore.FieldValue.increment(item.quantity)
+          });
+        }
+      }
+    }
+
+    await batch.commit();
 
     return NextResponse.json({ success: true, orderId, totalAmount });
   } catch (error) {

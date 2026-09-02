@@ -98,6 +98,13 @@ export default async function AdminLayout({
           >
             Tags
           </Link>
+
+          <Link
+            href="/admin/coupons"
+            className="block px-4 py-3 border-4 border-transparent hover:border-black font-black uppercase text-black hover:bg-[#A3FF12] transition-colors"
+          >
+            Coupons
+          </Link>
         </nav>
 
         {/* Footer */}

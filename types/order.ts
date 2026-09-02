@@ -43,6 +43,9 @@ export type OrderItem =
     price: number
     quantity: number
     images: string[]
+    couponCode?: string
+    discountApplied?: number
+    originalPrice?: number
   }
 
 export type Order = {
@@ -56,5 +59,6 @@ export type Order = {
 
   status: "pending" | "paid" | "cancelled";
   createdAt: number;
+  couponCode?: string; // Kept for general use if needed, but mainly tracking per item
 };
 

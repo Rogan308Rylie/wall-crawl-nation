@@ -71,15 +71,22 @@ export async function POST(req: Request) {
     }
 
     const totalImages = uploadedUrls.length;
-    const totalPrice = totalImages * PRICE_PER_IMAGE;
+    const originalPrice = totalImages * PRICE_PER_IMAGE;
+    let totalPrice = originalPrice;
+    let discountApplied = 0;
 
     const db = getAdminDb();
+
+
     
     await db.collection("customOrders").doc(customOrderId).set({
       id: customOrderId,
       totalImages,
       pricePerImage: PRICE_PER_IMAGE,
       totalPrice,
+      originalPrice,
+      discountApplied,
+      couponCode: null,
       images: uploadedUrls,
       notes,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -91,6 +98,9 @@ export async function POST(req: Request) {
       images: uploadedUrls,
       totalImages,
       totalPrice,
+      originalPrice,
+      discountApplied,
+      couponCode: null
     });
   } catch (error) {
     console.error("Failed to upload custom order:", error);

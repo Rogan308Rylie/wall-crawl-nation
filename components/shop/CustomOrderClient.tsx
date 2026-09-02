@@ -1,24 +1,60 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { buttons } from "@/lib/ui/buttons";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+
+const LOADING_PHRASES = [
+  "Assembling the Avengers...",
+  "Warming up the DeLorean...",
+  "Hacking into the Matrix...",
+  "Waiting for Goku to finish charging his attack...",
+  "Waiting for Rizul to fix the servers...",
+  "Downloading more RAM...",
+  "Asking AI to make this faster...",
+  "Pixelating the pixels...",
+  "Reversing the polarity of the neutron flow...",
+  "Aligning the cosmic rays with your posters...",
+  "Bribing the upload gremlins with snacks...",
+  "Running out of loading screen ideas...",
+  "Are we there yet? No. But soon...",
+];
 
 export default function CustomOrderClient() {
   const [files, setFiles] = useState<File[]>([]);
   const [notes, setNotes] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatusText, setUploadStatusText] = useState("");
+  const [loadingPhrase, setLoadingPhrase] = useState(LOADING_PHRASES[0]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isUploading) {
+      interval = setInterval(() => {
+        setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)]);
+      }, 4000);
+    }
+    return () => clearInterval(interval);
+  }, [isUploading]);
+
   const [uploadResult, setUploadResult] = useState<{
     customOrderId: string;
     images: string[];
     totalImages: number;
     totalPrice: number;
+    originalPrice?: number;
+    discountApplied?: number;
+    couponCode?: string;
   } | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [dragError, setDragError] = useState("");
   const [shakeError, setShakeError] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: string; value: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   const { addToCart } = useCart();
   const router = useRouter();
@@ -35,6 +71,42 @@ export default function CustomOrderClient() {
       setDragError("");
     }
     return valid;
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim() || !uploadResult) return;
+    setIsValidatingCoupon(true);
+    setCouponError("");
+
+    try {
+      const res = await fetch("/api/custom-orders/apply-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          customOrderId: uploadResult.customOrderId, 
+          couponCode 
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setCouponError(data.error || "Invalid coupon");
+      } else {
+        setUploadResult({
+          ...uploadResult,
+          totalPrice: data.totalPrice,
+          originalPrice: data.originalPrice,
+          discountApplied: data.discountApplied,
+          couponCode: data.couponCode
+        });
+        setCouponError("");
+      }
+    } catch (err) {
+      console.error(err);
+      setCouponError("Failed to apply coupon");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,10 +371,19 @@ export default function CustomOrderClient() {
                   />
                 </div>
 
+
                 {isUploading && (
-                  <div className="mb-4 w-full bg-gray-200 border-2 border-black h-6 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 h-full bg-[#A3FF12] w-full animate-pulse"></div>
-                    <span className="absolute inset-0 flex items-center justify-center text-xs font-black uppercase text-black z-10">{uploadStatusText}</span>
+                  <div className="mb-6 border-4 border-black bg-white p-6 shadow-[8px_8px_0_0_#A3FF12] text-center w-full">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-10 h-10 border-8 border-[#f0f0f0] border-t-[#A3FF12] border-r-black rounded-full animate-spin"></div>
+                    </div>
+                    <h2 className="text-lg font-black uppercase text-black animate-pulse mb-2">
+                      {loadingPhrase}
+                    </h2>
+                    <div className="w-full bg-gray-200 border-2 border-black h-4 relative overflow-hidden mt-4">
+                      <div className="absolute top-0 left-0 h-full bg-[#A3FF12] w-full"></div>
+                    </div>
+                    <p className="mt-2 text-xs font-bold uppercase text-black/60">{uploadStatusText}</p>
                   </div>
                 )}
 
@@ -317,8 +398,51 @@ export default function CustomOrderClient() {
             ) : (
               <div className="flex flex-col h-full">
                 <div className="bg-black text-white p-4 font-black uppercase text-xl mb-6 border-4 border-black shadow-[4px_4px_0_0_#A3FF12]">
-                  {uploadResult.totalImages} images × ₹40 = <span className="text-[#A3FF12]">₹{uploadResult.totalPrice}</span>
+                  <div className="flex justify-between items-center">
+                    <span>
+                      {uploadResult.totalImages} images × ₹40
+                    </span>
+                    <span className={uploadResult.discountApplied ? "line-through opacity-50 text-sm" : "text-[#A3FF12]"}>
+                      ₹{uploadResult.originalPrice || (uploadResult.totalImages * 40)}
+                    </span>
+                  </div>
+                  
+                  {uploadResult.discountApplied && uploadResult.discountApplied > 0 && (
+                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/20">
+                      <span className="text-[#A3FF12] text-sm flex items-center gap-2">
+                        <span className="bg-[#A3FF12] text-black px-1">CODE: {uploadResult.couponCode}</span>
+                        Discount Applied!
+                      </span>
+                      <span className="text-[#A3FF12] font-black">
+                        ₹{uploadResult.totalPrice}
+                      </span>
+                    </div>
+                  )}
                 </div>
+
+                {!uploadResult.discountApplied && (
+                  <div className="mb-6 p-4 border-4 border-black bg-[#A3FF12]/20">
+                    <label className="block text-black font-black uppercase tracking-widest text-sm mb-2">Get a discount by proving how well you know rizul</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Enter secret code"
+                        className="w-full p-3 border-4 border-black bg-white text-black font-bold uppercase focus:outline-none focus:bg-[#A3FF12]/50"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        disabled={isValidatingCoupon}
+                      />
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={isValidatingCoupon || !couponCode}
+                        className="bg-black text-[#A3FF12] px-4 font-black uppercase border-4 border-black shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] transition-transform"
+                      >
+                        {isValidatingCoupon ? "..." : "Apply"}
+                      </button>
+                    </div>
+                    {couponError && <p className="text-red-600 font-bold mt-2 text-sm uppercase">{couponError}</p>}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 overflow-y-auto max-h-[250px] mb-6 p-3 border-4 border-black bg-gray-50">
                   {uploadResult.images.map((src, idx) => (
