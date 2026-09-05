@@ -30,6 +30,23 @@ body {
   animation: marquee 50s linear infinite;
 }
 
+@keyframes stripe-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 36px 0; }
+}
+
+.animate-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+  background-size: 36px 36px;
+  animation: stripe-move 1.2s linear infinite;
+}
+
 a,
 button,
 [role="button"],

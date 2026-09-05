@@ -28,6 +28,17 @@ export default function CustomOrderClient() {
   const [notes, setNotes] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatusText, setUploadStatusText] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<{
+    current: number;
+    total: number;
+    percent: number;
+    currentFileName: string;
+  }>({
+    current: 0,
+    total: 0,
+    percent: 0,
+    currentFileName: "",
+  });
   const [loadingPhrase, setLoadingPhrase] = useState(LOADING_PHRASES[0]);
 
   useEffect(() => {
@@ -310,7 +321,13 @@ export default function CustomOrderClient() {
     }
 
     setIsUploading(true);
-    setUploadStatusText("Starting upload...");
+    setUploadProgress({
+      current: 0,
+      total: files.length,
+      percent: 0,
+      currentFileName: files[0]?.name || "",
+    });
+    setUploadStatusText(`Preparing ${files.length} poster${files.length > 1 ? "s" : ""}...`);
 
     try {
       const customOrderId = crypto.randomUUID();
@@ -318,7 +335,15 @@ export default function CustomOrderClient() {
 
       for (let i = 0; i < files.length; i++) {
         const rawFile = files[i];
-        setUploadStatusText(`Uploading image ${i + 1} of ${files.length}...`);
+        // Calculate progress starting for this image
+        const startPercent = Math.round((i / files.length) * 90);
+        setUploadProgress({
+          current: i + 1,
+          total: files.length,
+          percent: Math.max(startPercent, 4),
+          currentFileName: rawFile.name,
+        });
+        setUploadStatusText(`Uploading ${rawFile.name}...`);
 
         const fileToUpload = await prepareImageForUpload(rawFile);
         const formData = new FormData();
@@ -348,13 +373,27 @@ export default function CustomOrderClient() {
         if (data.url) {
           uploadedUrls.push(data.url);
         }
+
+        const finishPercent = Math.round(((i + 1) / files.length) * 90);
+        setUploadProgress({
+          current: i + 1,
+          total: files.length,
+          percent: finishPercent,
+          currentFileName: rawFile.name,
+        });
       }
 
       if (uploadedUrls.length === 0) {
         throw new Error("No images were successfully uploaded.");
       }
 
-      setUploadStatusText("Finalizing order...");
+      setUploadProgress({
+        current: files.length,
+        total: files.length,
+        percent: 95,
+        currentFileName: "All images uploaded",
+      });
+      setUploadStatusText("Finalizing order & calculating summary...");
 
       const finalizeRes = await fetch("/api/custom-orders/upload", {
         method: "POST",
@@ -373,6 +412,12 @@ export default function CustomOrderClient() {
       }
 
       const finalData = await finalizeRes.json();
+      setUploadProgress({
+        current: files.length,
+        total: files.length,
+        percent: 100,
+        currentFileName: "Complete!",
+      });
       setUploadResult(finalData);
       showToast(`Uploaded ${finalData.totalImages} images successfully!`, "success");
     } catch (err: any) {
@@ -586,17 +631,64 @@ export default function CustomOrderClient() {
 
 
                 {isUploading && (
-                  <div className="mb-6 border-4 border-black bg-white p-6 shadow-[8px_8px_0_0_#A3FF12] text-center w-full">
-                    <div className="flex justify-center mb-4">
-                      <div className="w-10 h-10 border-8 border-[#f0f0f0] border-t-[#A3FF12] border-r-black rounded-full animate-spin"></div>
+                  <div className="mb-6 border-4 border-black bg-white p-5 sm:p-6 shadow-[8px_8px_0_0_#000] text-left w-full relative">
+                    {/* Header with spinner, loading phrase and neo-brutalist badges */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b-2 border-black">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 border-4 border-[#e0e0e0] border-t-[#A3FF12] border-r-black rounded-full animate-spin"></div>
+                        <span className="font-black uppercase tracking-wider text-xs sm:text-sm text-black block leading-none">
+                          {loadingPhrase}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="bg-[#f0f0f0] border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider shadow-[2px_2px_0_0_#000]">
+                          {uploadProgress.current} OF {uploadProgress.total}
+                        </span>
+                        <span className="bg-black text-[#A3FF12] font-mono font-black text-sm px-2.5 py-1 border-2 border-black shadow-[2px_2px_0_0_#A3FF12]">
+                          {uploadProgress.percent}%
+                        </span>
+                      </div>
                     </div>
-                    <h2 className="text-lg font-black uppercase text-black animate-pulse mb-2">
-                      {loadingPhrase}
-                    </h2>
-                    <div className="w-full bg-gray-200 border-2 border-black h-4 relative overflow-hidden mt-4">
-                      <div className="absolute top-0 left-0 h-full bg-[#A3FF12] w-full"></div>
+
+                    {/* Stylized Neo-Brutalist Progress Bar Track */}
+                    <div className="relative w-full bg-[#EEEEEE] border-4 border-black h-8 shadow-[4px_4px_0_0_#000] overflow-hidden">
+                      {/* Bar Fill with Animated Hazard Stripes */}
+                      <div
+                        className="h-full bg-[#A3FF12] border-r-4 border-black transition-all duration-300 ease-out animate-stripes relative"
+                        style={{ width: `${Math.min(100, Math.max(uploadProgress.percent, 3))}%` }}
+                      >
+                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-white/25 pointer-events-none"></div>
+                      </div>
+
+                      {/* Poster segment tick dividers */}
+                      {uploadProgress.total > 1 && uploadProgress.total <= 25 && (
+                        <div className="absolute inset-0 flex pointer-events-none">
+                          {Array.from({ length: uploadProgress.total - 1 }).map((_, idx) => (
+                            <div
+                              key={idx}
+                              className="h-full border-r-2 border-black/20"
+                              style={{ width: `${100 / uploadProgress.total}%` }}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <p className="mt-2 text-xs font-bold uppercase text-black/60">{uploadStatusText}</p>
+
+                    {/* Progress details footer */}
+                    <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-bold text-black">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-black font-black">⚡</span>
+                        <span className="uppercase font-black tracking-wide truncate">
+                          {uploadStatusText}
+                        </span>
+                      </div>
+                      {uploadProgress.currentFileName && (
+                        <span className="text-gray-500 font-mono text-[11px] truncate max-w-[220px] sm:text-right">
+                          {uploadProgress.currentFileName}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
 
