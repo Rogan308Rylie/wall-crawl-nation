@@ -46,7 +46,91 @@ function sanitizeFilename(fileName: string): string {
 
 export async function POST(req: Request) {
   try {
+    const contentType = req.headers.get("content-type") || "";
+
+    // 1. Finalize action via JSON
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      if (body.action === "finalize") {
+        const { customOrderId, uploadedUrls, notes } = body;
+        if (!customOrderId || !uploadedUrls || uploadedUrls.length === 0) {
+          return NextResponse.json(
+            { error: "Invalid finalize payload: missing customOrderId or uploadedUrls" },
+            { status: 400 }
+          );
+        }
+
+        const totalImages = uploadedUrls.length;
+        const originalPrice = totalImages * PRICE_PER_IMAGE;
+        const totalPrice = originalPrice;
+        const discountApplied = 0;
+
+        const db = getAdminDb();
+        await db.collection("customOrders").doc(customOrderId).set({
+          id: customOrderId,
+          totalImages,
+          pricePerImage: PRICE_PER_IMAGE,
+          totalPrice,
+          originalPrice,
+          discountApplied,
+          couponCode: null,
+          images: uploadedUrls,
+          notes: notes || "",
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        return NextResponse.json({
+          success: true,
+          customOrderId,
+          images: uploadedUrls,
+          totalImages,
+          totalPrice,
+          originalPrice,
+          discountApplied,
+          couponCode: null,
+        });
+      }
+    }
+
+    // 2. FormData upload: Single File chunk or Batch
     const formData = await req.formData();
+    const singleFile = formData.get("file") as File | null;
+    const customOrderId =
+      (formData.get("customOrderId") as string) || crypto.randomUUID();
+    const index = formData.get("index") || "0";
+
+    // Mode A: Single file upload (Chunked mode from client)
+    if (singleFile) {
+      const fileName = extractFilename(singleFile.name);
+      const safeName = sanitizeFilename(fileName);
+      const ext = getFileExtension(safeName);
+
+      if (!isImageExtension(ext)) {
+        return NextResponse.json(
+          { error: `File type "${ext}" is not supported. Only JPG, PNG, and WEBP are allowed.` },
+          { status: 400 }
+        );
+      }
+
+      const arrayBuf = await singleFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+      const blobPath = `custom-orders/${customOrderId}/${Date.now()}-${index}-${safeName}`;
+      const fileContentType = getContentType(safeName);
+
+      const blob = await put(blobPath, buffer, {
+        access: "public",
+        contentType: fileContentType,
+      });
+
+      return NextResponse.json({
+        success: true,
+        customOrderId,
+        url: blob.url,
+        name: safeName,
+      });
+    }
+
+    // Mode B: Batch upload fallback
     const files = formData.getAll("files") as File[];
     const notes = (formData.get("notes") as string) || "";
 
@@ -109,23 +193,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const customOrderId = crypto.randomUUID();
     const uploadedUrls: string[] = [];
 
-    // Upload concurrently in batches of 5 to avoid timeouts & rate limits
     const CHUNK_SIZE = 5;
     for (let i = 0; i < imageBuffers.length; i += CHUNK_SIZE) {
       const chunk = imageBuffers.slice(i, i + CHUNK_SIZE);
       const chunkUrls = await Promise.all(
         chunk.map(async (img, idx) => {
-          const index = i + idx;
+          const chunkIndex = i + idx;
           const safeName = sanitizeFilename(img.name);
-          const blobPath = `custom-orders/${customOrderId}/${Date.now()}-${index}-${safeName}`;
-          const contentType = getContentType(safeName);
+          const blobPath = `custom-orders/${customOrderId}/${Date.now()}-${chunkIndex}-${safeName}`;
+          const fileContentType = getContentType(safeName);
 
           const blob = await put(blobPath, img.buffer, {
             access: "public",
-            contentType,
+            contentType: fileContentType,
           });
           return blob.url;
         })

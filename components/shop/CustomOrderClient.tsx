@@ -248,6 +248,59 @@ export default function CustomOrderClient() {
     setDragOver(false);
   };
 
+  const prepareImageForUpload = async (file: File): Promise<File> => {
+    // If not an image or already under 3.5MB, upload original directly
+    if (file.size <= 3.5 * 1024 * 1024 || !file.type.startsWith("image/")) {
+      return file;
+    }
+
+    // If over 3.5MB, downscale slightly in canvas to ensure it fits safely under Vercel's 4.5MB limit
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+
+        // Keep high print quality (up to 3000px max dimension)
+        const MAX_DIM = 3000;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(file);
+
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            const compressed = new File([blob], file.name, {
+              type: file.type || "image/jpeg",
+            });
+            resolve(compressed);
+          },
+          file.type === "image/png" ? "image/png" : "image/jpeg",
+          0.92
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+  };
+
   const handleUpload = async () => {
     if (files.length === 0) {
       setDragError("You should add something here first");
@@ -257,34 +310,74 @@ export default function CustomOrderClient() {
     }
 
     setIsUploading(true);
-    setUploadStatusText("Uploading files...");
-
-    // Check if zip is included to show specific status
-    const hasZip = files.some(f => f.name.toLowerCase().endsWith('.zip'));
-    if (hasZip) {
-      setTimeout(() => setUploadStatusText("Processing ZIP - counting images..."), 1000);
-    }
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    formData.append("notes", notes);
+    setUploadStatusText("Starting upload...");
 
     try {
-      const res = await fetch("/api/custom-orders/upload", {
+      const customOrderId = crypto.randomUUID();
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const rawFile = files[i];
+        setUploadStatusText(`Uploading image ${i + 1} of ${files.length}...`);
+
+        const fileToUpload = await prepareImageForUpload(rawFile);
+        const formData = new FormData();
+        formData.append("file", fileToUpload);
+        formData.append("customOrderId", customOrderId);
+        formData.append("index", String(i));
+
+        const res = await fetch("/api/custom-orders/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          let errMsg = `Failed to upload image ${i + 1} (${rawFile.name})`;
+          try {
+            const errData = await res.json();
+            errMsg = errData.error || errMsg;
+          } catch {
+            if (res.status === 413) {
+              errMsg = `Image ${rawFile.name} exceeds server size limit`;
+            }
+          }
+          throw new Error(errMsg);
+        }
+
+        const data = await res.json();
+        if (data.url) {
+          uploadedUrls.push(data.url);
+        }
+      }
+
+      if (uploadedUrls.length === 0) {
+        throw new Error("No images were successfully uploaded.");
+      }
+
+      setUploadStatusText("Finalizing order...");
+
+      const finalizeRes = await fetch("/api/custom-orders/upload", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "finalize",
+          customOrderId,
+          uploadedUrls,
+          notes,
+        }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        showToast(data.error || "Upload failed", "error");
-      } else {
-        setUploadResult(data);
-        showToast(`Uploaded ${data.totalImages} images successfully!`, "success");
+      if (!finalizeRes.ok) {
+        const errData = await finalizeRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to finalize custom order");
       }
-    } catch (err) {
-      console.error(err);
-      showToast("An error occurred during upload.", "error");
+
+      const finalData = await finalizeRes.json();
+      setUploadResult(finalData);
+      showToast(`Uploaded ${finalData.totalImages} images successfully!`, "success");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      showToast(err.message || "An error occurred during upload.", "error");
     } finally {
       setIsUploading(false);
       setUploadStatusText("");
