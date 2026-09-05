@@ -13,7 +13,7 @@ export default async function AdminLayout({
   const sessionCookie = cookieStore.get("__session")?.value;
 
   if (!sessionCookie) {
-    redirect("/login");
+    redirect("/login?redirect=/admin");
   }
 
   let decoded;
@@ -23,7 +23,7 @@ export default async function AdminLayout({
       true
     );
   } catch {
-    redirect("/login");
+    redirect("/login?expired=true&redirect=/admin");
   }
 
   const userSnap = await getAdminDb()

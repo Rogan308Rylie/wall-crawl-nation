@@ -111,21 +111,33 @@ export default function Navbar() {
           )}
 
           {!loading && user && (
-            <div className="flex cursor-pointer items-center gap-3 border-4 border-black px-4 py-2 bg-white shadow-[6px_6px_0_0_#000] transition-transform hover:-translate-y-1 hover:translate-x-1 hover:shadow-[10px_10px_0_0_#000] active:translate-y-0 active:translate-x-0 active:shadow-[0_0_0_0_#000]">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  className="h-8 w-8 rounded-none object-cover border-2 border-black"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center bg-[#A3FF12] text-black border-2 border-black text-sm font-black uppercase">
-                  {(user.displayName || user.email || "U")[0].toUpperCase()}
-                </div>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 border-4 border-black px-4 py-2 bg-white shadow-[6px_6px_0_0_#000]">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    className="h-8 w-8 rounded-none object-cover border-2 border-black"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center bg-[#A3FF12] text-black border-2 border-black text-sm font-black uppercase">
+                    {(user.displayName || user.email || "U")[0].toUpperCase()}
+                  </div>
+                )}
 
-              <span className="max-w-[1400px] truncate text-xs font-black uppercase tracking-widest text-black">{user.displayName || user.email}</span>
+                <span className="max-w-[160px] truncate text-xs font-black uppercase tracking-widest text-black">
+                  {user.displayName || user.email}
+                </span>
+              </div>
+
+              <button
+                onClick={() => logout()}
+                className="px-3 py-2 border-4 border-black bg-black text-white hover:bg-[#A3FF12] hover:text-black font-black uppercase text-xs tracking-widest shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all"
+                title="Log out of your account"
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>

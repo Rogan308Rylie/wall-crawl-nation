@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import JSZip from "jszip";
 import { buttons } from "@/lib/ui/buttons";
 import { useCart } from "@/context/CartContext";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 
 const LOADING_PHRASES = [
@@ -55,22 +57,91 @@ export default function CustomOrderClient() {
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: string; value: number } | null>(null);
   const [couponError, setCouponError] = useState("");
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [isEditingCoupon, setIsEditingCoupon] = useState(false);
 
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessingZip, setIsProcessingZip] = useState(false);
 
-  const validateFiles = (fileList: File[]) => {
-    const valid = fileList.filter((f) => {
-      const ext = f.name.toLowerCase().split('.').pop();
-      return ext === "zip" || ext === "jpg" || ext === "jpeg" || ext === "png";
-    });
-    if (valid.length !== fileList.length) {
-      setDragError("Some files were ignored. Only JPG, PNG, or ZIP allowed.");
+  const processIncomingFiles = async (fileList: File[]) => {
+    const hasZip = fileList.some((f) => f.name.toLowerCase().endsWith(".zip"));
+    if (hasZip) {
+      setIsProcessingZip(true);
+      setUploadStatusText("Unpacking ZIP archive...");
+    }
+
+    const newFiles: File[] = [];
+    let ignoredCount = 0;
+    let extractedCount = 0;
+
+    for (const file of fileList) {
+      const ext = file.name.toLowerCase().split(".").pop() || "";
+      if (ext === "zip") {
+        try {
+          const zip = await JSZip.loadAsync(file);
+          let foundImages = 0;
+
+          for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+            if (zipEntry.dir) continue;
+
+            const fileName = relativePath.split(/[/\\]/).pop() || "image.png";
+            const lowerPath = relativePath.toLowerCase();
+
+            if (
+              lowerPath.includes("__macosx/") ||
+              lowerPath.includes("__macosx\\") ||
+              fileName.startsWith(".") ||
+              fileName.startsWith("._")
+            ) {
+              continue;
+            }
+
+            const innerExt = fileName.toLowerCase().split(".").pop() || "";
+            if (["jpg", "jpeg", "png", "webp"].includes(innerExt)) {
+              const blob = await zipEntry.async("blob");
+              const mimeType =
+                innerExt === "png"
+                  ? "image/png"
+                  : innerExt === "webp"
+                  ? "image/webp"
+                  : "image/jpeg";
+              const extractedFile = new File([blob], fileName, { type: mimeType });
+              newFiles.push(extractedFile);
+              foundImages++;
+              extractedCount++;
+            }
+          }
+
+          if (foundImages === 0) {
+            showToast(`No JPG, PNG, or WEBP images found in "${file.name}"`, "error");
+          } else {
+            showToast(`Extracted ${foundImages} images from "${file.name}"!`, "success");
+          }
+        } catch (err) {
+          console.error("Client ZIP parse error, passing to server:", err);
+          newFiles.push(file);
+          showToast(`Added ${file.name} for server processing`, "info");
+        }
+      } else if (["jpg", "jpeg", "png", "webp"].includes(ext)) {
+        newFiles.push(file);
+      } else {
+        ignoredCount++;
+      }
+    }
+
+    setIsProcessingZip(false);
+
+    if (ignoredCount > 0) {
+      setDragError("Some files were ignored. Only JPG, PNG, WEBP, or ZIP allowed.");
     } else {
       setDragError("");
     }
-    return valid;
+
+    if (newFiles.length > 0) {
+      setFiles((prev) => [...prev, ...newFiles]);
+    }
   };
 
   const handleApplyCoupon = async () => {
@@ -84,7 +155,7 @@ export default function CustomOrderClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           customOrderId: uploadResult.customOrderId, 
-          couponCode 
+          couponCode: couponCode.trim(),
         }),
       });
 
@@ -100,6 +171,8 @@ export default function CustomOrderClient() {
           couponCode: data.couponCode
         });
         setCouponError("");
+        setIsEditingCoupon(false);
+        showToast(`Coupon "${data.couponCode}" applied successfully!`, "success");
       }
     } catch (err) {
       console.error(err);
@@ -109,20 +182,59 @@ export default function CustomOrderClient() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRemoveCoupon = async () => {
+    if (!uploadResult) return;
+    setIsValidatingCoupon(true);
+    setCouponError("");
+
+    try {
+      const res = await fetch("/api/custom-orders/apply-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customOrderId: uploadResult.customOrderId,
+          couponCode: "",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setCouponError(data.error || "Failed to remove coupon");
+        showToast(data.error || "Failed to remove coupon", "error");
+      } else {
+        setUploadResult({
+          ...uploadResult,
+          totalPrice: data.totalPrice,
+          originalPrice: data.originalPrice,
+          discountApplied: 0,
+          couponCode: undefined,
+        });
+        setCouponCode("");
+        setCouponError("");
+        setIsEditingCoupon(false);
+        showToast("Coupon removed", "info");
+      }
+    } catch (err) {
+      console.error(err);
+      setCouponError("Failed to remove coupon");
+      showToast("Failed to remove coupon", "error");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = validateFiles(Array.from(e.target.files));
-      setFiles(prev => [...prev, ...newFiles]);
+      await processIncomingFiles(Array.from(e.target.files));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newFiles = validateFiles(Array.from(e.dataTransfer.files));
-      setFiles(prev => [...prev, ...newFiles]);
+      await processIncomingFiles(Array.from(e.dataTransfer.files));
     }
   };
 
@@ -165,13 +277,14 @@ export default function CustomOrderClient() {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Upload failed");
+        showToast(data.error || "Upload failed", "error");
       } else {
         setUploadResult(data);
+        showToast(`Uploaded ${data.totalImages} images successfully!`, "success");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred during upload.");
+      showToast("An error occurred during upload.", "error");
     } finally {
       setIsUploading(false);
       setUploadStatusText("");
@@ -293,7 +406,7 @@ export default function CustomOrderClient() {
                   {files.length === 0 ? (
                     <>
                       <span className="font-black text-xl mb-2 uppercase">Drag & Drop files here</span>
-                      <span className="text-sm font-bold text-gray-600 mb-4">or click to browse (.jpg, .png, .zip)</span>
+                      <span className="text-sm font-bold text-gray-600 mb-4">or click to browse (.jpg, .png, .webp, .zip)</span>
                     </>
                   ) : (
                     <div className="w-full">
@@ -350,11 +463,18 @@ export default function CustomOrderClient() {
                     ref={fileInputRef}
                     type="file"
                     multiple
-                    accept=".jpg,.jpeg,.png,.zip"
+                    accept=".jpg,.jpeg,.png,.webp,.zip,application/zip,application/x-zip-compressed"
                     className="hidden"
                     onChange={handleFileChange}
                   />
                 </div>
+
+                {isProcessingZip && (
+                  <div className="mb-4 p-4 border-2 border-black bg-[#A3FF12]/20 flex items-center gap-3">
+                    <div className="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+                    <span className="font-black text-sm uppercase text-black">Unpacking ZIP files and extracting images...</span>
+                  </div>
+                )}
 
                 {dragError && (
                   <p className="text-red-600 font-bold mb-4 text-sm px-4 py-2 bg-red-100 border-2 border-red-600 inline-block">{dragError}</p>
@@ -389,10 +509,10 @@ export default function CustomOrderClient() {
 
                 <button
                   onClick={handleUpload}
-                  disabled={isUploading}
-                  className={`${buttons.primary} w-full ${files.length === 0 || isUploading ? "opacity-50" : ""}`}
+                  disabled={isUploading || isProcessingZip || files.length === 0}
+                  className={`${buttons.primary} w-full ${files.length === 0 || isUploading || isProcessingZip ? "opacity-50" : ""}`}
                 >
-                  Upload & add to cart
+                  {isProcessingZip ? "Unpacking ZIP..." : isUploading ? "Uploading..." : "Upload & add to cart"}
                 </button>
               </div>
             ) : (
@@ -409,10 +529,22 @@ export default function CustomOrderClient() {
                   
                   {uploadResult.discountApplied && uploadResult.discountApplied > 0 && (
                     <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/20">
-                      <span className="text-[#A3FF12] text-sm flex items-center gap-2">
-                        <span className="bg-[#A3FF12] text-black px-1">CODE: {uploadResult.couponCode}</span>
-                        Discount Applied!
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[#A3FF12] text-sm flex items-center gap-2">
+                          <span className="bg-[#A3FF12] text-black px-1.5 py-0.5 text-xs font-black">
+                            CODE: {uploadResult.couponCode}
+                          </span>
+                          Discount Applied! (-₹{uploadResult.discountApplied})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveCoupon}
+                          disabled={isValidatingCoupon}
+                          className="text-xs text-red-400 hover:text-red-300 underline font-black uppercase cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
                       <span className="text-[#A3FF12] font-black">
                         ₹{uploadResult.totalPrice}
                       </span>
@@ -420,29 +552,86 @@ export default function CustomOrderClient() {
                   )}
                 </div>
 
-                {!uploadResult.discountApplied && (
-                  <div className="mb-6 p-4 border-4 border-black bg-[#A3FF12]/20">
-                    <label className="block text-black font-black uppercase tracking-widest text-sm mb-2">Get a discount by proving how well you know rizul</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Enter secret code"
-                        className="w-full p-3 border-4 border-black bg-white text-black font-bold uppercase focus:outline-none focus:bg-[#A3FF12]/50"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        disabled={isValidatingCoupon}
-                      />
-                      <button
-                        onClick={handleApplyCoupon}
-                        disabled={isValidatingCoupon || !couponCode}
-                        className="bg-black text-[#A3FF12] px-4 font-black uppercase border-4 border-black shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] transition-transform"
-                      >
-                        {isValidatingCoupon ? "..." : "Apply"}
-                      </button>
+                <div className="mb-6 p-4 border-4 border-black bg-[#A3FF12]/20">
+                  {uploadResult.discountApplied && uploadResult.discountApplied > 0 && !isEditingCoupon ? (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs font-black uppercase tracking-wider text-black block mb-1">
+                          Active Coupon:
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="bg-black text-[#A3FF12] px-2.5 py-1 font-black text-sm border-2 border-black shadow-[2px_2px_0_0_#000]">
+                            {uploadResult.couponCode}
+                          </span>
+                          <span className="text-black font-black text-sm">
+                            Saved ₹{uploadResult.discountApplied}!
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditingCoupon(true);
+                            setCouponCode("");
+                            setCouponError("");
+                          }}
+                          className="bg-black text-[#A3FF12] hover:bg-gray-900 border-2 border-black px-3 py-1.5 font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+                        >
+                          ✏️ Change Coupon
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRemoveCoupon}
+                          disabled={isValidatingCoupon}
+                          className="bg-white text-red-600 hover:bg-red-50 border-2 border-black px-3 py-1.5 font-black uppercase text-xs shadow-[2px_2px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+                        >
+                          ✕ Remove
+                        </button>
+                      </div>
                     </div>
-                    {couponError && <p className="text-red-600 font-bold mt-2 text-sm uppercase">{couponError}</p>}
-                  </div>
-                )}
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-black font-black uppercase tracking-widest text-sm">
+                          {uploadResult.discountApplied && uploadResult.discountApplied > 0
+                            ? "Enter New Coupon Code"
+                            : "Get a discount by proving how well you know rizul"}
+                        </label>
+                        {isEditingCoupon && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditingCoupon(false);
+                              setCouponError("");
+                            }}
+                            className="text-xs text-black underline font-black uppercase cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter secret code"
+                          className="w-full p-3 border-4 border-black bg-white text-black font-bold uppercase focus:outline-none focus:bg-[#A3FF12]/50"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          disabled={isValidatingCoupon}
+                        />
+                        <button
+                          onClick={handleApplyCoupon}
+                          disabled={isValidatingCoupon || !couponCode.trim()}
+                          className="bg-black text-[#A3FF12] px-4 font-black uppercase border-4 border-black shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] transition-transform cursor-pointer disabled:opacity-50"
+                        >
+                          {isValidatingCoupon ? "..." : "Apply"}
+                        </button>
+                      </div>
+                      {couponError && <p className="text-red-600 font-bold mt-2 text-sm uppercase">{couponError}</p>}
+                    </div>
+                  )}
+                </div>
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 overflow-y-auto max-h-[250px] mb-6 p-3 border-4 border-black bg-gray-50">
                   {uploadResult.images.map((src, idx) => (

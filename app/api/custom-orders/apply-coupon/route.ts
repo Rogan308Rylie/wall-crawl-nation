@@ -7,8 +7,8 @@ export async function POST(req: Request) {
   try {
     const { customOrderId, couponCode } = await req.json();
 
-    if (!customOrderId || !couponCode) {
-      return NextResponse.json({ error: "Missing customOrderId or couponCode" }, { status: 400 });
+    if (!customOrderId) {
+      return NextResponse.json({ error: "Missing customOrderId" }, { status: 400 });
     }
 
     const db = getAdminDb();
@@ -22,9 +22,26 @@ export async function POST(req: Request) {
     }
 
     const customOrderData = customOrderSnap.data()!;
-    const originalPrice = customOrderData.originalPrice || (customOrderData.totalImages * customOrderData.pricePerImage);
+    const originalPrice = customOrderData.originalPrice || (customOrderData.totalImages * (customOrderData.pricePerImage || 40));
     let totalPrice = originalPrice;
     let discountApplied = 0;
+
+    // Support removing coupon if code is empty
+    if (!couponCode || typeof couponCode !== "string" || couponCode.trim() === "") {
+      await customOrderRef.update({
+        totalPrice: originalPrice,
+        discountApplied: 0,
+        couponCode: null,
+      });
+
+      return NextResponse.json({
+        success: true,
+        totalPrice: originalPrice,
+        originalPrice,
+        discountApplied: 0,
+        couponCode: null,
+      });
+    }
 
     // 2. Fetch the coupon
     const couponSnap = await db.collection("coupons").where("code", "==", couponCode.toUpperCase()).get();

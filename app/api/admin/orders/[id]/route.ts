@@ -1,42 +1,34 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { getAdminAuth, getAdminDb } from "@/lib/firebaseAdmin";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 import { sendOrderStatusEmail } from "@/lib/email/statusEmails";
+import { requireAdmin } from "@/lib/adminAuth";
 
-// Allowed transitions (keep your business rules)
+// Allowed transitions for admin
 const allowedTransitions: Record<string, string[]> = {
-  confirmed: ["packed"],
-  packed: ["shipped"],
-  shipped: ["delivered"],
+  pending: ["confirmed", "packed", "shipped", "delivered", "completed", "cancelled"],
+  confirmed: ["pending", "packed", "shipped", "delivered", "completed", "cancelled"],
+  packed: ["confirmed", "shipped", "delivered", "completed", "cancelled"],
+  shipped: ["packed", "delivered", "completed", "cancelled"],
+  delivered: ["confirmed", "packed", "shipped", "completed", "cancelled"],
+  completed: ["confirmed", "packed", "shipped", "delivered", "cancelled"],
+  cancelled: ["confirmed", "pending", "packed", "shipped", "delivered", "completed"],
 };
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }, // Next.js 16
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // 🔐 TOKEN-BASED AUTH (no cookies anywhere)
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const token = authHeader.split("Bearer ")[1];
-    const decoded = await getAdminAuth().verifyIdToken(token);
-    const uid = decoded.uid;
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
 
     const db = getAdminDb();
-
-    // 🔒 Admin check via Firestore (your existing schema)
-    const userSnap = await db.collection("users").doc(uid).get();
-    if (!userSnap.exists || userSnap.data()?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     const { id } = await params;
     const body = await req.json();
     const nextStatus: string = body.status;
+    const silent: boolean = Boolean(body.silent);
 
     if (!nextStatus) {
       return NextResponse.json({ error: "Missing status" }, { status: 400 });
@@ -53,13 +45,8 @@ export async function PATCH(
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
-    if (!order.deliveryAddress) {
-      return NextResponse.json(
-        { error: "Order missing delivery address" },
-        { status: 400 },
-      );
-    }
-    const currentStatus = order?.status;
+
+    const currentStatus = order?.status || "confirmed";
 
     if (
       !allowedTransitions[currentStatus] ||
@@ -71,18 +58,26 @@ export async function PATCH(
       );
     }
 
+    // 📧 SEND STATUS EMAIL only if not silent and status is customer-facing
+    const isStatusEmail =
+      !silent &&
+      (nextStatus === "packed" ||
+        nextStatus === "shipped" ||
+        nextStatus === "delivered");
+
+    if (isStatusEmail && (!order.deliveryAddress || !order.deliveryAddress.email)) {
+      return NextResponse.json(
+        { error: "Order missing delivery address email for notification" },
+        { status: 400 },
+      );
+    }
+
     await orderRef.update({
       status: nextStatus,
       updatedAt: new Date(),
     });
 
-    // 📧 SEND STATUS EMAIL (only for customer-facing statuses)
-    const isStatusEmail =
-      nextStatus === "packed" ||
-      nextStatus === "shipped" ||
-      nextStatus === "delivered";
-
-    if (currentStatus !== nextStatus && isStatusEmail) {
+    if (currentStatus !== nextStatus && isStatusEmail && order.deliveryAddress?.email) {
       const SITE_URL =
         process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -111,10 +106,40 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("Update order error:", err);
     return NextResponse.json(
       { error: "Failed to update order" },
       { status: 500 },
     );
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
+
+    const db = getAdminDb();
+    const { id } = await params;
+    const orderRef = db.collection("orders").doc(id);
+    const orderSnap = await orderRef.get();
+
+    if (!orderSnap.exists) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    await orderRef.delete();
+
+    return NextResponse.json({ success: true, message: "Order deleted successfully" });
+  } catch (err) {
+    console.error("Delete order error:", err);
+    return NextResponse.json(
+      { error: "Failed to delete order" },
+      { status: 500 },
+    );
+  }
+}
+

@@ -65,6 +65,7 @@ export async function GET(req: Request) {
       // Determine extension from url if possible, otherwise default to .jpg
       let ext = "jpg";
       if (imgUrl.toLowerCase().includes(".png")) ext = "png";
+      if (imgUrl.toLowerCase().includes(".webp")) ext = "webp";
       
       zip.file(`custom_image_${i + 1}.${ext}`, buffer);
     }
